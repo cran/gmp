@@ -1,5 +1,5 @@
-\name{isprimeprob}
-\alias{isprimeprob}
+\name{isprime}
+\alias{isprime}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Determine if number is prime}
 \description{
@@ -8,7 +8,7 @@
   composite.
 }
 \usage{
-isprimeprob(n, reps = 10)
+isprime(n, reps = 40)  % we feel better with 40 :)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -29,7 +29,10 @@ isprimeprob(n, reps = 10)
 
 
 }
-\references{Gnu MP Library see http://swox.com/gmp}
+\references{
+   \item Gnu MP Library see \url{http://swox.com/gmp},
+   \item Home page: \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
+ }
 
 \author{Antoine Lucas}
 
@@ -37,11 +40,11 @@ isprimeprob(n, reps = 10)
 
 \seealso{\code{\link{nextprime}}}
 \examples{
-isprimeprob(210)
-isprimeprob(71)
+isprime(210)
+isprime(71)
 
 # All primes numbers from 1 to 100
-t <-sapply(1:100,isprimeprob)
+t <-isprime(1:100)
 (1:100)[t>0]
 
 
