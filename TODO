@@ -1,0 +1,5 @@
+
+  * add a function gmp.as.numeric that convert large number to double.
+  
+  * use a better format for data than strings.
+

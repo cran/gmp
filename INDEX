@@ -1,0 +1,8 @@
+gcdex                   Compute Bezoult coefficient
+gmp.add                 Basic arithmetic operators for large integers
+gcd                     Great common divisor, Least common multiple
+gmp.inv                 Compute inverse of a modulo b.
+gmp.rand                Generate a random number
+isprimeprob             Determine if number is prime
+nextprime               Next prime number
+powm                    Exponential function

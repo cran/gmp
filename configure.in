@@ -1,0 +1,19 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(src/gmpR.c)
+
+dnl Checks for libraries.
+
+dnl Check for lib gmp
+dnl AC_CHECK_LIB(gmp,__gmpz_init,PKG_LIBS=-lgmp , [AC_MSG_ERROR([GNU MP not found])])
+
+	PKG_CPPFLAGS="${PKG_CPPFLAGS} -I/usr/local/include/ "
+	PKG_LIBS="${PKG_LIBS} -L/usr/local/lib/ -lgmp"
+
+
+AC_SUBST(PKG_CPPFLAGS)
+AC_SUBST(PKG_LIBS)
+AC_OUTPUT(src/Makevars)
+
+
+
+
