@@ -17,9 +17,12 @@ add.bigz<- function(a,b)
 }
 
 "-.bigz" <- function(...) sub.bigz(...)
-sub.bigz<- function(a,b)
+sub.bigz<- function(a,b=NULL)
 {
-    .Call("biginteger_sub",a,b, PACKAGE= "gmp")
+    if(is.null(b))
+      .Call("biginteger_sub",0,a, PACKAGE= "gmp")
+    else
+      .Call("biginteger_sub",a,b, PACKAGE= "gmp")
 }
 
 "*.bigz" <- function(...) mul.bigz(...)
@@ -28,10 +31,26 @@ mul.bigz<- function(a,b)
     .Call("biginteger_mul",a,b, PACKAGE= "gmp")
 }
 
+"%/%.bigz" <- function(...) divq.bigz(...)
+divq.bigz<- function(a,b)
+{
+    .Call("biginteger_div",a,b, PACKAGE= "gmp")
+}
+
 "/.bigz" <- function(...) div.bigz(...)
 div.bigz<- function(a,b)
 {
+  ismod <- FALSE
+  if(class(a) == "bigz")
+    if(!is.null(modulus(a)) )
+      ismod =TRUE
+  if(class(b) == "bigz")
+    if(!is.null(modulus(b)) )
+      ismod =TRUE
+  if(ismod)
     .Call("biginteger_div",a,b, PACKAGE= "gmp")
+  else
+    .Call("bigrational_as",a,b, PACKAGE= "gmp")
 }
 
 "%%.bigz" <- function(...) mod.bigz(...)
@@ -71,7 +90,10 @@ print.bigz<- function(x,...)
 
 as.bigz<- function(a,mod = NA)
 {
-    .Call("biginteger_as", a, mod, PACKAGE="gmp")
+  if(class(a) == "bigq")
+    as.bigz.bigq(a,mod)
+  else
+  .Call("biginteger_as", a, mod, PACKAGE="gmp")
 }
 
 as.character.bigz<- function(a)
@@ -169,7 +191,18 @@ is.na.bigz <- function(a)
     .Call("biginteger_neq", a, b, PACKAGE="gmp")
 }
 
-# TODO: Compute log functions directly on bigintegers to increase accuracy
+abs.bigz <- function(a)
+  {
+    .Call("biginteger_abs",a,PACKAGE="gmp")
+  }
+
+sign.bigz <- function(a)
+  {
+    .Call("biginteger_sgn",a,PACKAGE="gmp")
+  }
+
+
+# TODO: Compute log functions directly on bigzs to increase accuracy
 
 log.bigz <- function(x,base=exp(1))
 {
@@ -282,4 +315,10 @@ lucnum2 <- function (n)
 
 }
   
- 
+factorize <- function(n) 
+{
+   .Call("factorR",as.bigz(n),
+         PACKAGE= "gmp"
+      ) 
+
+}

@@ -1,4 +1,4 @@
-\name{add.bigz}
+\name{bigz operators}
 \alias{add.bigz}
 \alias{+.bigz}
 \alias{sub.bigz}
@@ -9,6 +9,9 @@
 \alias{/.bigz}
 \alias{mod.bigz}
 \alias{\%\%.bigz}
+\alias{divq.bigz}
+\alias{\%/\%.bigz}
+\alias{abs.bigz}
 \alias{inv.bigz}
 \alias{inv}
 \alias{pow.bigz}
@@ -26,14 +29,17 @@
 \usage{
 add.bigz(a, b)
 a + b (if a or b is a bigz vector)
-sub.bigz(a, b)
+sub.bigz(a, b = NULL)
 a - b (if a or b is a bigz vector)
 mul.bigz(a, b)
 a * b (if a or b is a bigz vector)
 div.bigz(a, b)
 a / b (if a or b is a bigz vector)
+divq.bigz(a,b)
+a \%/\% b (if a or b is a bigz vector)
 mod.bigz(a, b)
 a \%\% b (if a or b is a bigz vector)
+abs.bigz(a)
 inv.bigz(a, b,...)
 inv(a, ...)
 pow.bigz(a, b,...)
@@ -57,17 +63,15 @@ log10(a) (if a is a bigz vector)
 \details{
   For details about the internal modulus state, see the manpage of
   "bigz".
+
+  div or "/" return a rational number; divq or "\%/\%" return the
+  quotient of division.
 }
 \value{
   A bigz class representing the result of the arithmetic operation.
 }
 
-
-\references{
-   \item Gnu MP Library see \url{http://swox.com/gmp},
-   \item Home page: \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
- }
-
+\references{Gnu MP Library see http://swox.com/gmp}
 
 %\references{ ~put references to the literature/web site here ~ }
 \author{Immanuel Scholz and Antoine Lucas}

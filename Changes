@@ -1,3 +1,17 @@
+
+Thu Jan 13 2005 
+  * bug fixed on rational numbers class & use of negatives values
+    allowed for both rational and integer class.
+
+Mon Jan 10 2005
+  * bug fixed on rational numbers class
+
+Wed Jan 5 2005
+  * First try for a class for rational numbers
+
+Fri Dec 10 2004
+  * Function Factorize
+
 Fri Dec 09 2004: 0.2-2
 
 Thu Dec 02 2004:

@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2004-11-27 18:40:56 antoine>
+ *  \date Last modified: Time-stamp: <2005-02-06 18:28:16 antoine>
  *
  *  \author Immanuel Scholz 
  *
@@ -25,8 +25,10 @@ biginteger::biginteger(void* raw)
 {
     mpz_init(value);
     int* r = (int*)raw;
-    if (r[0]) {
-        mpz_import(value, r[0], 1, sizeof(int), 0, 0, &r[1]);
+    if (r[0]>0) {
+        mpz_import(value, r[0], 1, sizeof(int), 0, 0, &r[2]);
+	if(r[1]==-1)
+	  mpz_neg(value,value);
 	na = false;
     } else
 	setValue();
@@ -44,14 +46,19 @@ string biginteger::str() const
     return s;
 }
 
+
+/** 
+ * \brief export mpz to R raw value
+ */ 
 int biginteger::as_raw(void* raw) const
 {
-    int totals = raw_size();
-    memset(raw, 0, totals);
+    int totals = raw_size() ;
+    memset(raw, 0, totals );
     int* r = (int*)raw;
-    r[0] = totals/sizeof(int) - 1;
+    r[0] = totals/sizeof(int) - 2;
+    r[1] = (int) mpz_sgn(value);
     if (!isNA())
-        mpz_export(&r[1], 0, 1, sizeof(int), 0, 0, value);
+        mpz_export(&r[2], 0, 1, sizeof(int), 0, 0, value);
     return totals;
 }
 
@@ -61,7 +68,8 @@ size_t biginteger::raw_size() const
 	return sizeof(int);
 
     int numb = 8*sizeof(int);
-    return sizeof(int) * (1 + (mpz_sizeinbase(value,2)+numb-1) / numb);
+
+    return sizeof(int) * (2 + (mpz_sizeinbase(value,2)+numb-1) / numb);
 }
 
 void biginteger::swap(biginteger& other)

@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2004-11-27 18:46:51 antoine>
+ *  \date Last modified: Time-stamp: <2005-01-15 12:39:10 antoine>
  *
  *  \author Immanuel Scholz 
  *
@@ -92,6 +92,7 @@ bigmod operator%(const bigmod& lhs, const bigmod& rhs)
     biginteger mod;
     if (!lhs.modulus.isNA() || !rhs.modulus.isNA())
 	mod = rhs.value;
+
     mpz_t val;
     mpz_init(val);
     mpz_t_sentry val_s(val);
@@ -133,9 +134,11 @@ bigmod inv(const bigmod& x, const bigmod& m)
 
 bigmod set_modulus(const bigmod& x, const bigmod& m)
 {
+
     if (!m.value.isNA() && m.value.as_long() == 0)
 	Rf_error("division by zero");
-    if (!m.value.isNA() && mpz_cmp(x.value.getValueTemp(),m.value.getValueTemp())>=0) {
+    //    if (!m.value.isNA() && mpz_cmp(x.value.getValueTemp(),m.value.getValueTemp())>=0) {
+    if (!m.value.isNA() ) {
 	bigmod t(x%m);
 	return bigmod(t.value, m.value);
     } else

@@ -1,12 +1,17 @@
+add.bigq                Basic arithmetic operators for large rationals
 add.bigz                Basic arithmetic operators for large integers
+bigq                    Large sized rationals
+==.bigq                 Relational Operators
+[.bigq                  Extract or Replace Parts of an Object
 bigz                    Large sized integer values
 ==.bigz                 Relational Operators
 [.bigz                  Extract or Replace Parts of an Object
+factorize               Factorize a number
 gcd.bigz                Great common divisor, Least common multiple
 gcdex                   Compute Bezoult coefficient
 isprime                 Determine if number is prime
 lucnum                  Compute Fibonacci and Lucas numbers
 modulus                 Modulus
 nextprime               Next prime number
-sizeinbase              Compute size of a biginteger in a base
+sizeinbase              Compute size of a bigz in a base
 urand.bigz              Generate a random number

@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2004-12-01 09:32:38 lucas>
+ *  \date Last modified: Time-stamp: <2005-01-15 15:57:09 antoine>
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
@@ -31,11 +31,13 @@
 
 #include "biginteger.h"
 
+
 #include <stdio.h>
 
 #include <vector>
 #include <algorithm>
 using namespace std;
+#include "bigintegerR.h"
 
 /* Globals variables */
 
@@ -140,6 +142,12 @@ extern "C"
      */
     SEXP biginteger_is_na(SEXP a);
 
+
+    /**
+     * \brief Return sign of a
+     */
+    SEXP biginteger_sgn(SEXP a) ;
+
     /**
      * \brief Return whether a < b
      */
@@ -190,6 +198,12 @@ extern "C"
      */
     SEXP biginteger_nextprime(SEXP a) ;
 
+
+    /**
+     * \brief Return absolute value of a
+     */
+    SEXP biginteger_abs(SEXP a) ;
+
     /**
      * \brief Return bezoult coefficients
      */
@@ -224,12 +238,12 @@ extern "C"
     /**
      * \brief Compute lucas number
      */
-    SEXP lucnum2(SEXP n) ;
+      SEXP lucnum2(SEXP n) ;
 
 }
 
 
-namespace
+namespace bigintegerR
 {
   /** \brief create a vector of bigmods, all without a modulus.
    */
@@ -288,14 +302,14 @@ namespace
 	SEXP modAttr = Rf_getAttrib(param, modName);
 	UNPROTECT(1);
     	if (TYPEOF(modAttr) != NILSXP) {
-	    vector<bigmod> v = create_vector(param);
-	    vector<bigmod> attrib = create_vector(modAttr);
+	    vector<bigmod> v = bigintegerR::create_vector(param);
+	    vector<bigmod> attrib = bigintegerR::create_vector(modAttr);
 	    if (!attrib.empty()) // sanity check
 		for (int i = 0; i < v.size(); ++i)
 		    v[i] = set_modulus(v[i], attrib[i%attrib.size()]);
 	    return v;
 	} else
-	    return create_vector(param);
+	    return bigintegerR::create_vector(param);
     }
 
     vector<int> create_int(SEXP param) {
@@ -374,8 +388,8 @@ namespace
      */
     SEXP biginteger_binary_operation(SEXP a, SEXP b, biginteger_binary_fn f)
     {
-	vector<bigmod> va = create_bignum(a);
-	vector<bigmod> vb = create_bignum(b);
+	vector<bigmod> va = bigintegerR::create_bignum(a);
+	vector<bigmod> vb = bigintegerR::create_bignum(b);
 	if (va.empty() || vb.empty())
 	    Rf_error("argument must not be an empty list.");
 	vector<bigmod> result;
@@ -383,14 +397,14 @@ namespace
 	result.reserve(size);
 	for (int i = 0; i < size; ++i)
 	    result.push_back(f(va[i%va.size()], vb[i%vb.size()]));
-	return create_SEXP(result);
+	return bigintegerR::create_SEXP(result);
     }
 
     typedef bool (*biginteger_logical_binary_fn)(const bigmod&, const bigmod&);
     SEXP biginteger_logical_binary_operation(SEXP a, SEXP b, biginteger_logical_binary_fn f)
     {
-	vector<bigmod> va = create_bignum(a);
-	vector<bigmod> vb = create_bignum(b);
+	vector<bigmod> va = bigintegerR::create_bignum(a);
+	vector<bigmod> vb = bigintegerR::create_bignum(b);
 	if (va.empty() || vb.empty())
 	    Rf_error("argument must not be an empty list.");
 	int size = max(va.size(), vb.size());
@@ -423,29 +437,31 @@ namespace
 
 }
 
-SEXP biginteger_add (SEXP a, SEXP b) {return biginteger_binary_operation(a,b,operator+);}
-SEXP biginteger_sub (SEXP a, SEXP b) {return biginteger_binary_operation(a,b,operator-);}
-SEXP biginteger_mul (SEXP a, SEXP b) {return biginteger_binary_operation(a,b,operator*);}
-SEXP biginteger_div (SEXP a, SEXP b) {return biginteger_binary_operation(a,b,operator/);}
-SEXP biginteger_mod (SEXP a, SEXP b) {return biginteger_binary_operation(a,b,operator%);}
-SEXP biginteger_pow (SEXP a, SEXP b) {return biginteger_binary_operation(a,b,pow);}
-SEXP biginteger_inv (SEXP a, SEXP b) {return biginteger_binary_operation(a,b,inv);}
-SEXP biginteger_gcd (SEXP a, SEXP b) {return biginteger_binary_operation(a,b,gcd);}
-SEXP biginteger_lcm (SEXP a, SEXP b) {return biginteger_binary_operation(a,b,lcm);}
-SEXP biginteger_as (SEXP a, SEXP mod) {return biginteger_binary_operation(a,mod,set_modulus);}
+/* End of namespace bigintegerR*/
 
-SEXP biginteger_lt (SEXP a, SEXP b) {return biginteger_logical_binary_operation(a,b,lt);}
-SEXP biginteger_gt (SEXP a, SEXP b) {return biginteger_logical_binary_operation(a,b,gt);}
-SEXP biginteger_lte (SEXP a, SEXP b) {return biginteger_logical_binary_operation(a,b,lte);}
-SEXP biginteger_gte (SEXP a, SEXP b) {return biginteger_logical_binary_operation(a,b,gte);}
-SEXP biginteger_eq (SEXP a, SEXP b) {return biginteger_logical_binary_operation(a,b,eq);}
-SEXP biginteger_neq (SEXP a, SEXP b) {return biginteger_logical_binary_operation(a,b,neq);}
+SEXP biginteger_add (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator+);}
+SEXP biginteger_sub (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator-);}
+SEXP biginteger_mul (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator*);}
+SEXP biginteger_div (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator/);}
+SEXP biginteger_mod (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator%);}
+SEXP biginteger_pow (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,pow);}
+SEXP biginteger_inv (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,inv);}
+SEXP biginteger_gcd (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,gcd);}
+SEXP biginteger_lcm (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,lcm);}
+SEXP biginteger_as (SEXP a, SEXP mod) {return bigintegerR::biginteger_binary_operation(a,mod,set_modulus);}
+
+SEXP biginteger_lt (SEXP a, SEXP b) {return bigintegerR::biginteger_logical_binary_operation(a,b,bigintegerR::lt);}
+SEXP biginteger_gt (SEXP a, SEXP b) {return bigintegerR::biginteger_logical_binary_operation(a,b,bigintegerR::gt);}
+SEXP biginteger_lte (SEXP a, SEXP b) {return bigintegerR::biginteger_logical_binary_operation(a,b,bigintegerR::lte);}
+SEXP biginteger_gte (SEXP a, SEXP b) {return bigintegerR::biginteger_logical_binary_operation(a,b,bigintegerR::gte);}
+SEXP biginteger_eq (SEXP a, SEXP b) {return bigintegerR::biginteger_logical_binary_operation(a,b,bigintegerR::eq);}
+SEXP biginteger_neq (SEXP a, SEXP b) {return bigintegerR::biginteger_logical_binary_operation(a,b,bigintegerR::neq);}
 
 
 
 SEXP biginteger_as_character(SEXP a)
 {
-    vector<bigmod> v = create_bignum(a);
+    vector<bigmod> v = bigintegerR::create_bignum(a);
     SEXP ans;
     PROTECT(ans = Rf_allocVector(STRSXP, v.size()));
     for (int i = 0; i < v.size(); ++i)
@@ -457,7 +473,7 @@ SEXP biginteger_as_character(SEXP a)
 
 SEXP biginteger_as_numeric(SEXP a)
 {
-    vector<bigmod> v = create_bignum(a);
+    vector<bigmod> v = bigintegerR::create_bignum(a);
     SEXP ans;
     PROTECT(ans = Rf_allocVector(REALSXP,v.size()));
     for (int i = 0; i < v.size(); ++i)
@@ -468,8 +484,8 @@ SEXP biginteger_as_numeric(SEXP a)
 
 SEXP biginteger_get_at(SEXP a, SEXP b)
 {
-    vector<bigmod> va = create_bignum(a);
-    vector<int> vb = create_int(b);
+    vector<bigmod> va = bigintegerR::create_bignum(a);
+    vector<int> vb = bigintegerR::create_int(b);
     vector<bigmod> result;
     if (TYPEOF(b) == LGLSXP) {
 	for (int i = 0; i < va.size(); ++i)
@@ -478,7 +494,7 @@ SEXP biginteger_get_at(SEXP a, SEXP b)
     } else {
 	vb.erase(remove(vb.begin(), vb.end(), 0), vb.end()); // remove all zeroes
 	if (vb.empty())
-	    return create_SEXP(vector<bigmod>());
+	    return bigintegerR::create_SEXP(vector<bigmod>());
 	if (vb[0] < 0) {
 	    for (vector<int>::iterator it = vb.begin(); it != vb.end(); ++it)
 		if (*it > 0)
@@ -503,14 +519,14 @@ SEXP biginteger_get_at(SEXP a, SEXP b)
 	    }
 	}
     }
-    return create_SEXP(result);
+    return bigintegerR::create_SEXP(result);
 }
 
 SEXP biginteger_set_at(SEXP src, SEXP idx, SEXP value)
 {
-    vector<bigmod> result = create_bignum(src);
-    vector<bigmod> vvalue = create_bignum(value);
-    vector<int> vidx = create_int(idx);
+    vector<bigmod> result = bigintegerR::create_bignum(src);
+    vector<bigmod> vvalue = bigintegerR::create_bignum(value);
+    vector<int> vidx = bigintegerR::create_int(idx);
     if (TYPEOF(idx) == LGLSXP) {
 	int pos = 0;
 	for (int i = 0; i < result.size(); ++i)
@@ -519,7 +535,7 @@ SEXP biginteger_set_at(SEXP src, SEXP idx, SEXP value)
     } else {
 	vidx.erase(remove(vidx.begin(), vidx.end(), 0), vidx.end()); // remove all zeroes
 	if (vidx.empty())
-	    return create_SEXP(result);
+	    return bigintegerR::create_SEXP(result);
 	if (vidx[0] < 0) {
 	    for (vector<int>::iterator it = vidx.begin(); it != vidx.end(); ++it)
 		if (*it > 0)
@@ -545,14 +561,14 @@ SEXP biginteger_set_at(SEXP src, SEXP idx, SEXP value)
 	    }
 	}
     }
-    return create_SEXP(result);
+    return bigintegerR::create_SEXP(result);
 }
 
 SEXP biginteger_length(SEXP a)
 {
     SEXP ans;
     PROTECT(ans = Rf_allocVector(INTSXP,1));
-    INTEGER(ans)[0] = create_bignum(a).size();
+    INTEGER(ans)[0] = bigintegerR::create_bignum(a).size();
     UNPROTECT(1);
     return ans;
 }
@@ -587,18 +603,30 @@ SEXP biginteger_setlength(SEXP vec, SEXP value)
 	default:
 	    Rf_error("invalid second argument");
     }
-    vector<bigmod> v = create_bignum(vec);
+    vector<bigmod> v =bigintegerR::create_bignum(vec);
     v.resize(len);
-    return create_SEXP(v);
+    return bigintegerR::create_SEXP(v);
 }
 
 SEXP biginteger_is_na(SEXP a) 
 {
-    vector<bigmod> v = create_bignum(a);
+    vector<bigmod> v = bigintegerR::create_bignum(a);
     SEXP ans;
     PROTECT(ans = Rf_allocVector(LGLSXP, v.size()));
     for (int i = 0; i < v.size(); ++i)
 	LOGICAL(ans)[i] = v[i].value.isNA();
+    UNPROTECT(1);
+    return ans;
+}
+
+
+SEXP biginteger_sgn(SEXP a) 
+{
+    vector<bigmod> v = bigintegerR::create_bignum(a);
+    SEXP ans;
+    PROTECT(ans = Rf_allocVector(INTSXP, v.size()));
+    for (int i = 0; i < v.size(); ++i)
+	INTEGER(ans)[i] = mpz_sgn(v[i].value.getValueTemp());
     UNPROTECT(1);
     return ans;
 }
@@ -617,19 +645,19 @@ SEXP biginteger_c(SEXP args)
 
     for(i =0; i<LENGTH(args);i++)
       {
-	v = create_bignum(VECTOR_ELT(args,i));
+	v = bigintegerR::create_bignum(VECTOR_ELT(args,i));
 	for(j=0; j< v.size() ; j++)
 	    result.push_back(v[j]);
 	v.clear();
       }
 
-    return create_SEXP(result);
+    return bigintegerR::create_SEXP(result);
 }
 
 
 SEXP biginteger_rep(SEXP x, SEXP times) 
 {
-  vector<bigmod> v = create_bignum(x);
+  vector<bigmod> v = bigintegerR::create_bignum(x);
   vector<bigmod> result;
   int i,j,size,rep;
   
@@ -642,15 +670,15 @@ SEXP biginteger_rep(SEXP x, SEXP times)
     for(j = 0 ; j < v.size() ; j++)
       result.push_back(v[j]);
   
-  return create_SEXP(result);
+  return bigintegerR::create_SEXP(result);
 }
 
 
 
 SEXP biginteger_is_prime(SEXP a, SEXP reps) 
 {
-    vector<bigmod> v = create_bignum(a);
-    vector<int> vb = create_int(reps);
+    vector<bigmod> v = bigintegerR::create_bignum(a);
+    vector<int> vb = bigintegerR::create_int(reps);
     SEXP ans;
     PROTECT(ans = Rf_allocVector(INTSXP, v.size()));
     if(v.size() == vb.size())
@@ -674,7 +702,7 @@ struct mpz_t_sentry {
 
 SEXP biginteger_nextprime(SEXP a) 
 {
-    vector<bigmod> v = create_bignum(a);
+    vector<bigmod> v =bigintegerR::create_bignum(a);
     vector<bigmod> result;
     
     result.reserve(v.size());
@@ -690,7 +718,29 @@ SEXP biginteger_nextprime(SEXP a)
 	result[i].value.setValue(val);
       }
     
-    return create_SEXP(result);
+    return bigintegerR::create_SEXP(result);
+    
+}
+
+SEXP biginteger_abs(SEXP a) 
+{
+    vector<bigmod> v =bigintegerR::create_bignum(a);
+    vector<bigmod> result;
+    
+    result.reserve(v.size());
+    
+    mpz_t val;
+    mpz_init(val);
+    mpz_t_sentry val_s(val);
+
+    for (int i = 0; i < v.size(); ++i)
+      {
+	mpz_abs(val,v[i].value.getValueTemp());
+	result.push_back(bigmod());
+	result[i].value.setValue(val);
+      }
+    
+    return bigintegerR::create_SEXP(result);
     
 }
 
@@ -701,13 +751,13 @@ SEXP biginteger_nextprime(SEXP a)
  */
 SEXP biginteger_gcdex(SEXP a, SEXP b) 
 {
-    vector<bigmod> va = create_bignum(a);
-    vector<bigmod> vb = create_bignum(b);
+    vector<bigmod> va = bigintegerR::create_bignum(a);
+    vector<bigmod> vb = bigintegerR::create_bignum(b);
     vector<bigmod> result;
     int i;
 
     if(va.size() != vb.size())
-      return create_SEXP(vector<bigmod>());
+      return bigintegerR::create_SEXP(vector<bigmod>());
     
 
     result.reserve(3*va.size());
@@ -733,7 +783,7 @@ SEXP biginteger_gcdex(SEXP a, SEXP b)
 	result[i*3+2].value.setValue(t);
 	
       }
-    return create_SEXP(result);
+    return bigintegerR::create_SEXP(result);
 
 }
 
@@ -759,7 +809,7 @@ SEXP biginteger_rand_u (SEXP nb ,SEXP length,SEXP newseed, SEXP ok)
 
 
   /* store input data into appropriate mode */
-  vector<bigmod> va = create_bignum(newseed);
+  vector<bigmod> va = bigintegerR::create_bignum(newseed);
   PROTECT (ok = AS_INTEGER(ok));
   PROTECT (length = AS_INTEGER(length));
   PROTECT (nb = AS_INTEGER(nb));
@@ -795,7 +845,7 @@ SEXP biginteger_rand_u (SEXP nb ,SEXP length,SEXP newseed, SEXP ok)
       result.push_back(bigmod());
       result[i].value.setValue(bz);
     }
-    return create_SEXP(result);
+    return bigintegerR::create_SEXP(result);
 }
 
 
@@ -805,7 +855,7 @@ SEXP biginteger_rand_u (SEXP nb ,SEXP length,SEXP newseed, SEXP ok)
  */
 SEXP biginteger_sizeinbase(SEXP x, SEXP base) 
 {
-    vector<bigmod> vx = create_bignum(x);
+    vector<bigmod> vx = bigintegerR::create_bignum(x);
 
     int i,basesize;
     double reslog;
@@ -855,7 +905,7 @@ SEXP fibnum(SEXP n)
   result[0].value.setValue(val);
 
 
-  return create_SEXP(result);
+  return bigintegerR::create_SEXP(result);
 
 }
 
@@ -887,7 +937,7 @@ SEXP fibnum2(SEXP n)
   result[1].value.setValue(val);
 
 
-  return create_SEXP(result);
+  return bigintegerR::create_SEXP(result);
 
 }
 
@@ -914,7 +964,7 @@ SEXP lucnum(SEXP n)
   result[0].value.setValue(val);
 
 
-  return create_SEXP(result);
+  return bigintegerR::create_SEXP(result);
 
 }
 
@@ -946,7 +996,7 @@ SEXP lucnum2(SEXP n)
   result[1].value.setValue(val);
 
 
-  return create_SEXP(result);
+  return bigintegerR::create_SEXP(result);
 
 }
 

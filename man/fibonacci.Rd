@@ -30,12 +30,7 @@ lucnum2(n)
 Fibonacci numbers and Lucas number.
 }
 
-\references{
-   \item Gnu MP Library see \url{http://swox.com/gmp},
-   \item Home page: \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
- }
-
-%\references{Gnu MP Library see http://swox.com/gmp}
+\references{Gnu MP Library see http://swox.com/gmp}
 \author{Antoine Lucas}
 
 

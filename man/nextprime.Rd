@@ -10,7 +10,7 @@ nextprime(n)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{n}{An integer, numeric, string or bigz}
+  \item{n}{Integer}
 }
 \details{
   This function uses probabilistic algorithm to identify
@@ -20,11 +20,7 @@ nextprime(n)
 \value{
   A (probably) prime  number
 }
-
-\references{
-   \item Gnu MP Library see \url{http://swox.com/gmp},
-   \item Home page: \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
- }
+\references{Gnu MP Library see http://swox.com/gmp}
 
 \author{Antoine Lucas}
 

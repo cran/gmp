@@ -75,11 +75,9 @@ print.bigz(x,...)
   where the second operands value is used.
 }
 
-\references{
-   \item Gnu MP Library see \url{http://swox.com/gmp},
-   \item Home page: \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
- }
+\references{Gnu MP Library see http://swox.com/gmp}
 
+%\references{ ~put references to the literature/web site here ~ }
 \author{Immanuel Scholz}
 %\note{ ~~further notes~~ }
 

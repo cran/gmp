@@ -12,8 +12,8 @@ gcdex(a, b)
 }
 
 \arguments{
-  \item{a}{An integer, numeric, string or bigz}
-  \item{b}{An integer, numeric, string or bigz}
+  \item{a}{Integer or string from an integer}
+  \item{b}{Integer or string from an integer}
 }
 
 \value{
@@ -23,11 +23,7 @@ gcdex(a, b)
 
 }
 
-\references{
-   \item Gnu MP Library see \url{http://swox.com/gmp},
-   \item Home page: \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
- }
-
+\references{Gnu MP Library see http://swox.com/gmp}
 \author{Antoine Lucas}
 
 

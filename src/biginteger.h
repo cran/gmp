@@ -6,10 +6,12 @@
 #include <string>
 
 /**
- * A big integer. Actually a wrapper for mpz_t to work with plus some special stuff.
+ * A big integer. Actually a wrapper for mpz_t to work with plus 
+ * some special stuff.
  *
- * The biginteger special state "NA" means, no value is assigned. This does not mean,
- * the internal state is not constructed, but the value explicit is "not available".
+ * The biginteger special state "NA" means, no value is assigned. 
+ * This does not mean, the internal state is not constructed, but 
+ * the value explicit is "not available".
  */
 
 
@@ -39,8 +41,9 @@ public:
     biginteger(void* raw);
 
     /**
-     * Create a biginteger from a value. Remember to free the parameter's mpz_t
-     * if you allocated them by yourself - biginteger will copy the value.
+     * Create a biginteger from a value. Remember to free the 
+     * parameter's mpz_t if you allocated them by yourself - 
+     * biginteger will copy the value.
      */
     biginteger(const mpz_t& value_) : na(false) {mpz_init_set(value, value_);}
     
@@ -52,7 +55,7 @@ public:
     /**
      * Construct a biginteger from a double value.
      */
-    biginteger(double value_) : na(false) {mpz_init_set_d(value, value_);}
+    biginteger(double value_) : na(false) {mpz_init_set_d(value, value_);  }
 
     /**
      * Construct a biginteger from a string value.
@@ -60,12 +63,12 @@ public:
     biginteger(const std::string& value_) : na(false) {mpz_init_set_str(value, value_.c_str(), 0);}
     
     /**
-     * Copy constructor (mpz_t aren't standard-copyable)
+     *  Copy constructor (mpz_t aren't standard-copyable)
      */
     biginteger(const biginteger& rhs) : na(rhs.na) {mpz_init_set(value, rhs.value);}
 
     /**
-     * Asignment operator.
+     *  Assignment operator.
      */
     biginteger& operator=(const biginteger& rhs) {mpz_set(value, rhs.value); na = rhs.na;}
 
@@ -84,6 +87,7 @@ public:
      * Set the biginteger to a specific value.
      */
     void setValue(mpz_t value_) {mpz_set(value, value_); na = false;}
+    void setValue(int value_) {mpz_set_ui(value, value_); na = false;}
 
     /**
      * For const-purposes, return the value. Remember, that the return value
@@ -98,7 +102,12 @@ public:
     bool isNA() const {return na;}
     
     /**
-     * Convert the biginteger into a standard string.
+     * Return true, if the value is 0.
+     */
+    int sgn() const {return mpz_sgn(value);}
+    
+    /**
+     *  Convert the biginteger into a standard string.
      */
     std::string str() const;
 
@@ -109,7 +118,8 @@ public:
     long as_long() const {return mpz_get_ui(value);}
 
     /**
-     * Convert the biginteger into a double value (you may loose precision)
+     * \brief Convert the biginteger into a double value 
+     * (you may loose precision)
      */
     double as_double() const {return mpz_get_d(value);}
 

@@ -1,7 +1,7 @@
 \name{sizeinbase}
 \alias{sizeinbase}
 
-\title{Compute size of a biginteger in a base}
+\title{Compute size of a bigz in a base}
 \description{
   Return size (number of digits) written in base b. 
 }
@@ -10,7 +10,7 @@ sizeinbase(a, b=10)
 }
 
 \arguments{
-  \item{a}{An integer, numeric, string or bigz}
+  \item{a}{Integer}
   \item{b}{base}
 }
 
@@ -18,13 +18,7 @@ sizeinbase(a, b=10)
 Integer: size (number of digits).
 }
 
-
-\references{
-   \item Gnu MP Library see \url{http://swox.com/gmp},
-   \item Home page: \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
- }
-
-
+\references{Gnu MP Library see http://swox.com/gmp}
 \author{Antoine Lucas}
 
 

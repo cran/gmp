@@ -1,9 +1,14 @@
 
   * provide more functions for bigintegers, such as sum, prod, min, max, ...
 
+  * Better integration to R with as.integer.big(q/z), as.data.frame ...
+
+  * matrix and linear algebra computation.
+
   * provide basic algorithmns and number theoretic symbols (CRA, Jacobi symbol)
 
   * provide binary-to-biginteger interface with bitwise operations (i.e., bit access to big integers)
 
   * test, test, test, ...
+
 

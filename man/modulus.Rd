@@ -18,12 +18,6 @@ modulus(a,value)
   \item{value}{Object of class bigz}
 }
 
-\references{
-   \item Gnu MP Library see \url{http://swox.com/gmp},
-   \item Home page: \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
- }
-
-
 \examples{
   x <- as.bigz(24)
   modulus(x)

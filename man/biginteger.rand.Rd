@@ -22,13 +22,7 @@ urand.bigz(nb=1,size=200, seed = 0)
 \value{
   A number.
 }
-
-\references{
-   \item mpz\_urandomb from Gnu MP Library see \url{http://swox.com/gmp},
-   \item Home page: \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
- }
-
-
+\references{mpz\_urandomb from Gnu MP Library see http://swox.com/gmp}
 
 \author{Antoine Lucas}
 

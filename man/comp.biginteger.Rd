@@ -1,4 +1,4 @@
-\name{==.bigz}
+\name{Relational Operator}
 
 \alias{==.bigz}
 \alias{!=.bigz}
@@ -6,6 +6,7 @@
 \alias{<=.bigz}
 \alias{>.bigz}
 \alias{>=.bigz}
+\alias{sign.bigz}
 \title{Relational Operators}
 \description{
 Binary operators which allow the comparison of values in atomic vectors.
@@ -17,17 +18,12 @@ a <= b
 a >= b
 a == b
 a != b
+sign.bigz(a)
 }
 
 \arguments{
   \item{a,b}{Object or vector of class bigz}
 }
-
-\references{
-   \item Gnu MP Library see \url{http://swox.com/gmp},
-   \item Home page: \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
- }
-
 
 \examples{
   x <- as.bigz(8000)

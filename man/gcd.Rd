@@ -19,12 +19,7 @@ lcm.bigz(a, b)
 \value{
   A string of the integer value.
 }
-\references{
-   \item Gnu MP Library see \url{http://swox.com/gmp},
-   \item Home page: \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
- }
-
-
+\references{Gnu MP Library see http://swox.com/gmp}
 \author{Antoine Lucas}
 
 \seealso{\code{\link{gcdex}}}
