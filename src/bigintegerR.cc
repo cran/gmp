@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2005-01-15 15:57:09 antoine>
+ *  \date Last modified: Time-stamp: <2005-02-27 09:49:01 antoine>
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
@@ -120,7 +120,7 @@ extern "C"
     /**
      * \brief Convert from a biginteger vector to a character string vector.
      */
-    SEXP biginteger_as_character(SEXP a);
+    SEXP biginteger_as_character(SEXP a,SEXP b);
 
     /**
      * \brief Convert from a biginteger vector to a real vector.
@@ -459,13 +459,15 @@ SEXP biginteger_neq (SEXP a, SEXP b) {return bigintegerR::biginteger_logical_bin
 
 
 
-SEXP biginteger_as_character(SEXP a)
+SEXP biginteger_as_character(SEXP a, SEXP b)
 {
     vector<bigmod> v = bigintegerR::create_bignum(a);
     SEXP ans;
+    int base;
+    base = *INTEGER(b);
     PROTECT(ans = Rf_allocVector(STRSXP, v.size()));
     for (int i = 0; i < v.size(); ++i)
-	SET_STRING_ELT(ans, i, Rf_mkChar(v[i].str().c_str()));
+	SET_STRING_ELT(ans, i, Rf_mkChar(v[i].str(base).c_str()));
     
     UNPROTECT(1);
     return ans;

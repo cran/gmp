@@ -16,7 +16,7 @@
 }
 \usage{
 as.bigq(n, d = 1)
-as.character.bigq(a)
+as.character.bigq(a,b=10)
 as.double.bigq(x,...)
 as.bigz.bigq(a,mod=NA)
 is.na.bigq(a)
@@ -33,6 +33,7 @@ numerator(x)
   Any format error results in \code{0})}
 \item{mod}{Optional modulus to convert into biginteger}
 \item{x}{Numeric value}
+\item{b}{Base: from 2 to 32}
 \item{...}{Additional parameters}
 
 }
@@ -67,6 +68,7 @@ x * y / 13
 
 # convert to string, double
 as.character(x)
+as.double(x)
 
 
 }

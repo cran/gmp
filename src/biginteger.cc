@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2005-02-06 18:28:16 antoine>
+ *  \date Last modified: Time-stamp: <2005-02-27 09:42:17 antoine>
  *
  *  \author Immanuel Scholz 
  *
@@ -34,13 +34,17 @@ biginteger::biginteger(void* raw)
 	setValue();
 }
 
-string biginteger::str() const
+/*
+ * Convert to string in base b; b from 2 to 36
+ */
+
+string biginteger::str(int b) const
 {
     if (isNA())
 	return "NA";
     
-    char* buf = new char[mpz_sizeinbase(value, 10)+2];
-    mpz_get_str(buf, 10, value);
+    char* buf = new char[mpz_sizeinbase(value, b)+2];
+    mpz_get_str(buf, b, value);
     string s = buf;
     delete [] buf;
     return s;
@@ -81,7 +85,7 @@ void biginteger::swap(biginteger& other)
 }
 
 
-string bigmod::str() const
+string bigmod::str(int b) const
 {
     if (value.isNA())
 	return "NA";
@@ -89,10 +93,10 @@ string bigmod::str() const
     string s; // sstream seems to collide with libgmp :-(
     if (!modulus.isNA())
 	s = "(";
-    s += value.str();
+    s += value.str(b);
     if (!modulus.isNA()) {
 	s += " %% ";
-	s += modulus.str();
+	s += modulus.str(b);
 	s += ")";
     }
     return s;

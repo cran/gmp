@@ -35,6 +35,7 @@ public:
 	 const biginteger& denominator_ = biginteger()) : numerator(numerator_),denominator(denominator_) {}
 
 
+
   //  const mpq_t& getQValueTemp() const ;
   /*
    * \brief Set a value from double
@@ -62,7 +63,7 @@ public:
   /**
    * Return as a human readible string
    */
-  std::string str() const;
+  std::string str(int b) const;
 };
 
 // Use this to clear mpz_t structs at end-of-function automatically

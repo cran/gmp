@@ -51,9 +51,9 @@ as.bigq<- function(n,d=1)
     .Call("bigrational_as", n, d, PACKAGE="gmp")
 }
 
-as.character.bigq<- function(a)
+as.character.bigq<- function(a,b=10)
 {
-    .Call("bigrational_as_character", a, PACKAGE="gmp")
+    .Call("bigrational_as_character", a,as.integer(b), PACKAGE="gmp")
 }
 
 as.double.bigq<- function(x,...)

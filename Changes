@@ -1,3 +1,6 @@
+Thu Mar 17 2005
+  * add a base 16 output function
+  * Makevars.win
 
 Thu Jan 13 2005 
   * bug fixed on rational numbers class & use of negatives values

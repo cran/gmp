@@ -96,9 +96,9 @@ as.bigz<- function(a,mod = NA)
   .Call("biginteger_as", a, mod, PACKAGE="gmp")
 }
 
-as.character.bigz<- function(a)
+as.character.bigz<- function(a,b=10)
 {
-    .Call("biginteger_as_character", a, PACKAGE="gmp")
+    .Call("biginteger_as_character", a,as.integer(b), PACKAGE="gmp")
 }
 
 as.double.bigz<- function(x,...)

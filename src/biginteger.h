@@ -109,7 +109,7 @@ public:
     /**
      *  Convert the biginteger into a standard string.
      */
-    std::string str() const;
+    std::string str(int b) const;
 
     /**
      * Convert the biginteger into a long value (cut off the msb's if it don't
@@ -174,7 +174,7 @@ public:
     /**
      * Return as a human readible string
      */
-    std::string str() const;
+    std::string str(int b) const;
 };
 
 

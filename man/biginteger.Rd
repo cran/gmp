@@ -11,7 +11,7 @@
 }
 \usage{
 as.bigz(a, mod = NA)
-as.character.bigz(a)
+as.character.bigz(a,b=10)
 as.double.bigz(x,...)
 %as.bigz(str, mod = NA)
 %as.bigz(big, mod = NA)
@@ -29,6 +29,7 @@ print.bigz(x,...)
   (String value: ither starting with \code{0x} for hexadecimal, \code{0b} for
   binary or without prefix for decimal values.
   Any format error results in \code{0})}
+\item{b}{Base: from 2 to 32}
 \item{x}{Numeric value}
 \item{...}{Additional parameters}
 \item{mod}{An integer, numeric, string or bigz of the internal modulus, see below.}
@@ -107,6 +108,9 @@ c <- x ^ as.bigz(e, n)
 
 # WRONG! (although very beautiful. Maybe ok for small examples)
 c <- x ^ e %% n
+
+# Return result in hexa
+as.character(c,b=16)
 }
 }
 

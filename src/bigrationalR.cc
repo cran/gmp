@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 12/12/04   
- *  \date Last modified: Time-stamp: <2005-02-06 21:20:28 antoine>
+ *  \date Last modified: Time-stamp: <2005-02-27 09:55:12 antoine>
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
@@ -94,7 +94,7 @@ extern "C"
     /**
      * \brief Convert from a bigrational vector to a character string vector.
      */
-    SEXP bigrational_as_character(SEXP a);
+    SEXP bigrational_as_character(SEXP a, SEXP b);
 
     /**
      * \brief Convert from a bigrational vector to a real vector.
@@ -416,13 +416,15 @@ SEXP bigrational_neq (SEXP a, SEXP b) {return bigrationalR::bigrational_logical_
 
 
 
-SEXP bigrational_as_character(SEXP a)
+SEXP bigrational_as_character(SEXP a,SEXP b)
 {
     vector<bigrational> v = bigrationalR::create_bignum(a);
     SEXP ans;
+    int base;
+    base = *INTEGER(b);
     PROTECT(ans = Rf_allocVector(STRSXP, v.size()));
     for (int i = 0; i < v.size(); ++i)
-	SET_STRING_ELT(ans, i, Rf_mkChar(v[i].str().c_str()));
+	SET_STRING_ELT(ans, i, Rf_mkChar(v[i].str(base).c_str()));
     UNPROTECT(1);
     return ans;
 }

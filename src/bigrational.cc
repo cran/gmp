@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 12/12/04   
- *  \date Last modified: Time-stamp: <2005-01-10 11:21:54 lucas>
+ *  \date Last modified: Time-stamp: <2005-02-27 09:48:06 antoine>
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
@@ -25,18 +25,19 @@ using std::string;
 /**
  * \brief Print value
  */
-string bigrational::str() const
+string bigrational::str(int b) const
 {
-    if (numerator.isNA())
+    if (numerator.isNA() )
 	return "NA";
 
-    string s; // sstream seems to collide with libgmp :-(
+
+   string s; // sstream seems to collide with libgmp :-(
     if (!denominator.isNA())
 	s = "(";
-    s += numerator.str();
+    s += numerator.str(b);
     if (!denominator.isNA()) {
 	s += " / ";
-	s += denominator.str();
+	s += denominator.str(b);
 	s += ")";
     }
     return s;
