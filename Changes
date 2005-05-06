@@ -1,3 +1,16 @@
+
+Fri May 06 2005
+  Minor bug fixed...
+  * error message corrected on function pow
+  * bug fixed (a test to check 0 values with mpz_sgn instead of
+    as_long)
+  * man page modified for as.bigz
+
+Wed Mar 23 2005
+  * catch illegal base argument at as.character.bigz (fix segfault)
+  * added RFC 2409 global unique Diffie-Hellman groups as data constants
+  * typos in DESCRIPTION
+
 Thu Mar 17 2005
   * add a base 16 output function
   * Makevars.win

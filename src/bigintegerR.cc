@@ -465,6 +465,8 @@ SEXP biginteger_as_character(SEXP a, SEXP b)
     SEXP ans;
     int base;
     base = *INTEGER(b);
+    if (base<2 || base>36)
+	    Rf_error("select a base between 2 and 36");
     PROTECT(ans = Rf_allocVector(STRSXP, v.size()));
     for (int i = 0; i < v.size(); ++i)
 	SET_STRING_ELT(ans, i, Rf_mkChar(v[i].str(base).c_str()));

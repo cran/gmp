@@ -27,8 +27,8 @@ print.bigz(x,...)
 %  \item{big}{A bigz value (class of type \code{"\link{bigz}"})}
 \item{a}{Either integer, numeric or string value
   (String value: ither starting with \code{0x} for hexadecimal, \code{0b} for
-  binary or without prefix for decimal values.
-  Any format error results in \code{0})}
+  binary, \code{0} for octal or without prefix for decimal values.
+  Any format error results return an Error message)}
 \item{b}{Base: from 2 to 32}
 \item{x}{Numeric value}
 \item{...}{Additional parameters}

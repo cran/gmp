@@ -28,29 +28,19 @@
 }
 \usage{
 add.bigz(a, b)
-a + b (if a or b is a bigz vector)
 sub.bigz(a, b = NULL)
-a - b (if a or b is a bigz vector)
 mul.bigz(a, b)
-a * b (if a or b is a bigz vector)
 div.bigz(a, b)
-a / b (if a or b is a bigz vector)
 divq.bigz(a,b)
-a \%/\% b (if a or b is a bigz vector)
 mod.bigz(a, b)
-a \%\% b (if a or b is a bigz vector)
 abs.bigz(a)
 inv.bigz(a, b,...)
 inv(a, ...)
 pow.bigz(a, b,...)
 pow(a, ...)
-a ^ b (if a or b is a bigz vector)
 log.bigz(x, base=exp(1))
-log(a, base=exp(1)) (if a is a bigz vector)
 log2.bigz(a)
-log2(a) (if a is a bigz vector)
 log10.bigz(a)
-log10(a) (if a is a bigz vector)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -66,6 +56,9 @@ log10(a) (if a is a bigz vector)
 
   div or "/" return a rational number; divq or "\%/\%" return the
   quotient of division.
+
+  Operators can be use directly when objects are of class bigz:
+  a + b, log(a), etc.
 }
 \value{
   A bigz class representing the result of the arithmetic operation.

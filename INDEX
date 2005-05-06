@@ -13,5 +13,7 @@ isprime                 Determine if number is prime
 lucnum                  Compute Fibonacci and Lucas numbers
 modulus                 Modulus
 nextprime               Next prime number
+Oakley                  RFC 2409 Oakley Groups - Standardized
+                        Parameters for Diffie-Hellman Key Exchange
 sizeinbase              Compute size of a bigz in a base
 urand.bigz              Generate a random number

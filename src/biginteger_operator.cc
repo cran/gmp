@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2005-01-15 12:39:10 antoine>
+ *  \date Last modified: Time-stamp: <2005-04-11 10:04:45 lucas>
  *
  *  \author Immanuel Scholz 
  *
@@ -49,7 +49,7 @@ namespace
 	    bool zeroRhsAllowed = true) {
 	if (lhs.value.isNA() || rhs.value.isNA())
 	    return bigmod();
-	if (!zeroRhsAllowed && rhs.value.as_long() == 0)
+	if (!zeroRhsAllowed && mpz_sgn(rhs.value.getValueTemp()) == 0)
 	    Rf_error("division by zero");
 	biginteger mod = get_modulus(lhs, rhs);
 	mpz_t val;
@@ -87,7 +87,7 @@ bigmod operator%(const bigmod& lhs, const bigmod& rhs)
 {
     if (lhs.value.isNA() || rhs.value.isNA())
 	return bigmod();
-    if (rhs.value.as_long() == 0)
+    if (mpz_sgn(rhs.value.getValueTemp()) == 0)
 	Rf_error("division by zero");
     biginteger mod;
     if (!lhs.modulus.isNA() || !rhs.modulus.isNA())
@@ -109,9 +109,11 @@ bigmod pow(const bigmod& base, const bigmod& exp)
     mpz_t_sentry val_s(val);
     biginteger mod = get_modulus(base, exp);
     if (mod.isNA()) {
-	if (!mpz_fits_ulong_p(exp.value.getValueTemp()))
-	    Rf_error("exponent too large for pow");
-	mpz_pow_ui(val, base.value.getValueTemp(), mpz_get_ui(exp.value.getValueTemp()));
+      if(mpz_sgn(exp.value.getValueTemp() ) <0)
+	Rf_error("Negative values not allowed");
+      if (!mpz_fits_ulong_p(exp.value.getValueTemp()))
+	Rf_error("exponent too large for pow");
+      mpz_pow_ui(val, base.value.getValueTemp(), mpz_get_ui(exp.value.getValueTemp()));
     } else
 	mpz_powm(val, base.value.getValueTemp(), exp.value.getValueTemp(), mod.getValueTemp());
     return bigmod(val, mod);
@@ -121,7 +123,7 @@ bigmod inv(const bigmod& x, const bigmod& m)
 {
     if (x.value.isNA() || m.value.isNA())
 	return bigmod();
-    if (m.value.as_long() == 0)
+    if (mpz_sgn(m.value.getValueTemp()) == 0)
 	Rf_error("division by zero");
     biginteger mod = get_modulus(x, m);
     mpz_t val;
@@ -135,7 +137,7 @@ bigmod inv(const bigmod& x, const bigmod& m)
 bigmod set_modulus(const bigmod& x, const bigmod& m)
 {
 
-    if (!m.value.isNA() && m.value.as_long() == 0)
+    if (!m.value.isNA() && mpz_sgn(m.value.getValueTemp()) == 0)
 	Rf_error("division by zero");
     //    if (!m.value.isNA() && mpz_cmp(x.value.getValueTemp(),m.value.getValueTemp())>=0) {
     if (!m.value.isNA() ) {

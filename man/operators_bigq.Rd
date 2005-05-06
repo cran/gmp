@@ -17,13 +17,9 @@
 }
 \usage{
 add.bigq(a, b)
-a + b (if a or b is a bigq vector)
 sub.bigq(a, b=NULL)
-a - b (if a or b is a bigq vector)
 mul.bigq(a, b)
-a * b (if a or b is a bigq vector)
 div.bigq(a, b)
-a / b (if a or b is a bigq vector)
 abs.bigq(a)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -32,6 +28,8 @@ abs.bigq(a)
   \item{...}{Additional parameters}
 }
 \details{
+  Operators can be use directly when objects are of class bigq:
+  a + b, a * b, etc.
 
 }
 \value{

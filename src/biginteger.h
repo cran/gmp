@@ -60,7 +60,11 @@ public:
     /**
      * Construct a biginteger from a string value.
      */
-    biginteger(const std::string& value_) : na(false) {mpz_init_set_str(value, value_.c_str(), 0);}
+    biginteger(const std::string& value_) : na(false) 
+      {
+	if(mpz_init_set_str(value, value_.c_str(), 0) == -1)
+	  Rf_error("Not a valid number");    
+      }
     
     /**
      *  Copy constructor (mpz_t aren't standard-copyable)
