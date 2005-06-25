@@ -76,6 +76,16 @@ print.bigz(x,...)
   where the second operands value is used.
 }
 
+\note{
+  x = as.bigz(1234567890123456789012345678901234567890)
+  will not work as integer will be first converted to a double
+  and then converted to a "bigz" element.
+
+  Correct syntaxe:
+  x = as.bigz("1234567890123456789012345678901234567890")
+}
+
+
 \references{Gnu MP Library see http://swox.com/gmp}
 
 %\references{ ~put references to the literature/web site here ~ }

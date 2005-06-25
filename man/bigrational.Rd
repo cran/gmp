@@ -27,21 +27,23 @@ numerator(x)
 
 \arguments{
 
-\item{a,n,d}{Either integer, numeric or string value
-  (String value: ither starting with \code{0x} for hexadecimal, \code{0b} for
-  binary or without prefix for decimal values.
-  Any format error results in \code{0})}
-\item{mod}{Optional modulus to convert into biginteger}
-\item{x}{Numeric value}
-\item{b}{Base: from 2 to 32}
-\item{...}{Additional parameters}
-
+  \item{n,d}{Either integer, numeric or string value
+    (String value: ither starting with \code{0x} for hexadecimal, \code{0b} for
+    binary or without prefix for decimal values.
+    Any format error results in \code{0}).
+    n stands for numerator, d for denominator}
+  \item{a}{An element of class bigq}
+  \item{mod}{Optional modulus to convert into biginteger}
+  \item{x}{Numeric value}
+  \item{b}{Base: from 2 to 32}
+  \item{...}{Additional parameters}
 }
 \value{
   A bigq class representing the parameter value.
 }
 \details{
-
+  as.bigz.bigq returns the smallest integers not less than the
+  corresponding rationals bigq.
 }
 
 \references{http://mulcyber.toulouse.inra.fr/projects/gmp/}
@@ -56,7 +58,7 @@ numerator(x)
 x <- as.bigq(21,6)
 x
 # 7 / 2
-# Wow ! result is simplify.
+# Wow ! result is simplified.
 
 y <- as.bigq(5,3)
 

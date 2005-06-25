@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 04/12/04   
- *  \date Last modified: Time-stamp: <2004-12-04 10:13:41 antoine>
+ *  \date Last modified: Time-stamp: <2006-05-21 21:58:46 antoine>
  *
  *  \author Antoine Lucas (help from Immanuel Scholz) (R adaptation)
  *          Original C code from libgmp.
@@ -30,38 +30,23 @@
 #undef coerceVector
 #define coerceVector             Rf_coerceVector
 
-#include "biginteger.h"
+
 
 #include <stdio.h>
 
-#include <vector>
-#include <algorithm>
+
 using namespace std;
-#include "bigintegerR.h"
+
+#include "factor.h"
 
 
-extern "C"
-{
-
-  SEXP factorR (SEXP n);
-
-}
-
-
-int flag_verbose = 0;
+static int flag_verbose = 0;
 
 static unsigned add[] = {4, 2, 4, 2, 4, 6, 2, 6};
 
-/** brief Use this to clear mpz_t structs at end-of-function automatically
- */
-struct mpz_t_sentry {
-  mpz_t& value;
-  mpz_t_sentry(mpz_t& v): value(v) {}
-  ~mpz_t_sentry() {mpz_clear(value);}
-};
 
 
-void factor_using_division (mpz_t t, unsigned int limit,  vector<bigmod> * result)
+void factor_using_division (mpz_t t, unsigned int limit,  bigvec & result)
 {
   mpz_t q, r;
   unsigned long int f;
@@ -83,8 +68,7 @@ void factor_using_division (mpz_t t, unsigned int limit,  vector<bigmod> * resul
   while (f)
     {
 
-      (*result).push_back(bigmod());
-      (*result)[(*result).size()-1].value.setValue(2);
+      (result).value.push_back(biginteger(2));
       //      printf ("2 ");
       fflush (stdout);
       --f;
@@ -98,8 +82,7 @@ void factor_using_division (mpz_t t, unsigned int limit,  vector<bigmod> * resul
       mpz_set (t, q);
       //printf ("3 ");
       fflush (stdout);
-      (*result).push_back(bigmod());
-      (*result)[(*result).size()-1].value.setValue(3);
+      (result).value.push_back(biginteger(3));
      }
 
   for (;;)
@@ -110,8 +93,7 @@ void factor_using_division (mpz_t t, unsigned int limit,  vector<bigmod> * resul
       mpz_set (t, q);
       //printf ("5 ");
       fflush (stdout);
-      (*result).push_back(bigmod());
-      (*result)[(*result).size()-1].value.setValue(5);
+      (result).value.push_back(biginteger(5));
     }
 
   failures = 0;
@@ -136,8 +118,7 @@ void factor_using_division (mpz_t t, unsigned int limit,  vector<bigmod> * resul
           //printf ("%lu ", f);
           fflush (stdout);
           failures = 0;
-          (*result).push_back(bigmod());
-          (*result)[(*result).size()-1].value.setValue(f);
+          (result).value.push_back(biginteger(f));
         }
     }
 
@@ -146,7 +127,7 @@ void factor_using_division (mpz_t t, unsigned int limit,  vector<bigmod> * resul
 }
 
 void
-factor_using_division_2kp (mpz_t t, unsigned int limit, unsigned long p,  vector<bigmod> * result)
+factor_using_division_2kp (mpz_t t, unsigned int limit, unsigned long p,  bigvec & result)
 {
   mpz_t r;
   mpz_t f;
@@ -162,8 +143,7 @@ factor_using_division_2kp (mpz_t t, unsigned int limit, unsigned long p,  vector
         {
           mpz_tdiv_q (t, t, f);
           mpz_tdiv_r (r, t, f);
-          (*result).push_back(bigmod());
-          (*result)[(*result).size()-1].value.setValue(f);
+          (result).value.push_back(biginteger(f));
           //mpz_out_str (stdout, 10, f);
           fflush (stdout);
           fputc (' ', stdout);
@@ -176,7 +156,7 @@ factor_using_division_2kp (mpz_t t, unsigned int limit, unsigned long p,  vector
 }
 
 void
-factor_using_pollard_rho (mpz_t n, int a_int, unsigned long p, vector<bigmod> * result)
+factor_using_pollard_rho (mpz_t n, int a_int, unsigned long p, bigvec & result)
 {
   mpz_t x, x1, y, P;
   mpz_t a;
@@ -286,8 +266,7 @@ S4:
       else
         {
           //mpz_out_str (stdout, 10, g);
-          (*result).push_back(biginteger());
-          (*result)[(*result).size()-1].value.setValue(g);
+          (result).value.push_back(biginteger(g));
 
           fflush (stdout);
           fputc (' ', stdout);
@@ -298,8 +277,7 @@ S4:
       mpz_mod (y, y, n);
       if (mpz_probab_prime_p (n, 3))
         {
-          (*result).push_back(biginteger());
-          (*result)[(*result).size()-1].value.setValue(n);
+          (result).value.push_back(biginteger(n));
           //mpz_out_str (stdout, 10, n);
           fflush (stdout);
           fputc (' ', stdout);
@@ -318,7 +296,7 @@ S4:
 }
 
 void
-factor (mpz_t t, unsigned long p,  vector<bigmod> * result)
+factor (mpz_t t, unsigned long p,  bigvec & result)
 {
   unsigned int division_limit;
 
@@ -346,32 +324,42 @@ factor (mpz_t t, unsigned long p,  vector<bigmod> * result)
         }
       if (mpz_probab_prime_p (t, 3))
         {
-          (*result).push_back(biginteger());
-          (*result)[(*result).size()-1].value.setValue(t);
+          (result).value.push_back(biginteger(t));
           //mpz_out_str (stdout, 10, t);
-
         }
       else
         factor_using_pollard_rho (t, 1, p,result);
     }
 }
 
-/*
- * \brief function that gets values from R and send to functions
- * factor
- */
+//
+// \brief function that gets values from R and send to functions
+// factor
+//
 SEXP factorR (SEXP n)
 {
-  vector<bigmod> v = bigintegerR::create_bignum(n);
-  vector<bigmod> result;
-    
-  result.reserve(0);
+  bigvec v = bigintegerR::create_bignum(n);
+  bigvec result;
+  int sgn;  
+   
   
   mpz_t val;
   mpz_init(val);
   mpz_t_sentry val_s(val);
   mpz_set(val,v[0].value.getValueTemp());
-  factor(val,0,&result);
+
+ 
+  sgn = mpz_sgn(val);
+  if(sgn == 0)
+    Rf_error("Cannot factorize 0");  
+  if(sgn<0)
+    {
+      mpz_abs(val,val);
+      result.value.push_back(biginteger(-1));
+    }
+
+
+  factor(val,0,result);
 
 
   return bigintegerR::create_SEXP(result);

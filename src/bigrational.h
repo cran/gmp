@@ -1,147 +1,338 @@
+/*! \file bigrational.h
+ *  \brief Description of class bigrational
+ *
+ *  \date Created: 22/05/06
+ *  \date Last modified: Time-stamp: <2006-05-25 19:53:27 antoine>
+ *
+ *  \author Antoine Lucas (adapted from biginteger class made by
+ *                         Immanuel Scholz)
+ *
+ *  \note Licence: GPL
+ */
 
+#ifndef BIGRATIONAL_HEADER_
+#define BIGRATIONAL_HEADER_ 1
 #include <gmp.h>
 #include <R.h>
 #include <Rdefines.h>
 
 #include <string>
+#include "biginteger.h"
+
 
 /**
- * A big integer. Actually a wrapper for mpz_t to work with plus 
+ * \brief Class for rational value. 
+ *
+ * A big rational. Actually a wrapper for mpq_t to work with plus 
  * some special stuff.
  *
- * The biginteger special state "NA" means, no value is assigned. 
+ * The bigrational special state "NA" means, no value is assigned. 
  * This does not mean, the internal state is not constructed, but 
  * the value explicit is "not available".
  */
-
-
-#include "biginteger.h"
-
 class bigrational
 {
-    
-public:
+
+ private:
   /**
    * The rational = n/d .
    */
+  mpq_t value ;
+  
+  /**
+   * \brief a flag: true => NA value.
+   */
+  bool na;
 
-  biginteger numerator;
-  biginteger denominator;
+ public:      
+  /**
+   * Construct a "NA" biginteger.
+   */
+  bigrational() : 
+    value(),
+    na(true) {mpq_init(value);}
 
   /**
-   * Construct a bigrational from 2 bigintegers 
+   * Construct a biginteger from a raw expression. 
+   * in fact in raw: we will store an mpz_export of
+   * either numeraotr, or denominator
    */
-  bigrational(const biginteger& numerator_ = biginteger(), 
-	 const biginteger& denominator_ = biginteger()) : numerator(numerator_),denominator(denominator_) {}
+  bigrational(void* raw);
 
-
-
-  //  const mpq_t& getQValueTemp() const ;
-  /*
-   * \brief Set a value from double
+  /**
+   * Create a biginteger from a value. Remember to free the 
+   * parameter's mpz_t if you allocated them by yourself - 
+   * biginteger will copy the value.
    */
-  void setQValue(double x);
+  bigrational(const mpq_t& value_) : 
+    value(),
+    na(false) 
+    {
+      mpq_init(value);
+      mpq_set(value, value_);
+    }
 
-  /* \brief  simplify n/d (use of mpq_canonical)
+  /**
+   * \brief create a rational from an [big] integer
+   */
+  bigrational(const mpz_t& value_) : 
+    value(),
+    na(false) 
+    {
+      mpq_init(value);
+      mpq_set_z(value, value_);
+    }
+    
+  /**
+   * Construct a biginteger from a long value.
+   */
+  bigrational(int value_) : 
+    value(),
+    na(false) {
+    mpq_init(value);
+    if(value_ ==  NA_INTEGER)
+      na = true  ;
+    else	
+      mpq_set_si(value, value_,1);
+  }
+    
+  /**
+   * Construct a biginteger from a long value.
+   */
+  bigrational(int num_, int den_) : 
+    value(),
+    na(false) {
+    mpq_init(value);
+    if((num_ ==  NA_INTEGER) || (den_ == NA_INTEGER) )
+      na = true  ;
+    else	
+      mpq_set_si(value, num_,den_);}
+    
+  /**
+   * Construct a biginteger from a double value.
+   */
+  bigrational(double value_) : 
+    value(),
+    na(false) 
+    {
+      mpq_init(value);
+      if(value_ == NA_REAL)
+	na = true  ;
+      else
+	mpq_set_d(value, value_);  
+    }
+
+  /**
+   * Construct a biginteger from a string value. it can be "4343" or "2322/4343"
+   */
+  bigrational(const std::string& value_) : 
+    value(),
+    na(false) 
+    {
+      mpq_init(value);
+      /* mpz_init.. return -1 when error, 0: ok */
+      if(mpq_set_str(value, value_.c_str(), 0))
+	na=true;
+      /*	if(mpz_init_set_str(value, value_.c_str(), 0) == -1)
+		Rf_error("Not a valid number");    */
+    }
+    
+  /**
+   *  Copy constructor (mpz_t aren't standard-copyable)
+   */
+  bigrational(const bigrational & rhs) : 
+    value(),
+    na(rhs.na) 
+    {
+      mpq_init(value);
+      mpq_set(value, rhs.value);
+    }
+
+  /**
+   * Free the owned mpz_t structs
+   */
+  virtual ~bigrational() {mpq_clear(value);}
+
+  /** \brief overload affectation operator
+   *
+   */  
+  bigrational & operator= (const bigrational& rhs);
+
+  /**
+   * Set the biginteger to state "NA".
+   */
+  void setValue() {mpq_set_si(value, 0,1); na = true;}
+
+  /**
+   * Set the biginteger to a specific value.
+   */
+  void setValue(const mpq_t value_ ) {
+    mpq_set(value, value_); na = false;
+  }
+
+  /** \brief Set Denominator: return value = value / value_ */
+  void setDenValue(const mpq_t value_ ) {
+    if(!na)
+      mpq_div(value,value, value_); 
+  }
+
+  /**
+   * \brief set value from integer
+   */
+  void setValue(int value_) {      
+    if(value_ == NA_INTEGER)
+      {mpq_set_ui(value, 0,1); na = true  ;}
+    else
+      {
+	mpq_set_si(value, value_,1); 
+	na = false;
+      }
+  }
+    
+  /** \brief set value from unsigned int
+   */
+  void setValue(unsigned long int value_) {      
+    if((int)value_ == NA_INTEGER)
+      {mpq_set_ui(value, 0,1); na = true  ;}
+    else
+      {mpq_set_ui(value, value_,1); na = false;}
+  }
+
+  /** \brief set value from float (double)
+   */
+  void setValue(double value_) {      
+    if(value_ == NA_REAL)
+      {mpq_set_ui(value, 0,1); na = true  ;}
+    else
+      {mpq_set_d(value, value_); na = false;}
+  }
+
+
+  /**
+   * \brief set value from big integer 
+   */
+  void setValue(const mpz_t & value_) {
+    mpq_set_z(value,value_);
+    na = false;
+  }
+
+  /**
+   * \brief set value from biginteger value
+   */
+  void setValue(const biginteger & value_)
+    {
+      mpq_set_z(value,value_.getValueTemp());
+      na = value_.isNA();
+    }
+    
+  /**
+   * For const-purposes, return the value. Remember, that the return value
+   * only lives as long as this class live, so do not call getValueTemp on
+   * temporary objects.
+   */
+  const mpq_t& getValueTemp() const {return value;}
+
+  /**
+   * Return true, if the value is NA.
+   */
+  bool isNA() const {return na;}
+    
+  /**
+   * Return 1, if the value is > 0;  -1 when negative, 0 when 0.
+   */
+  int sgn() const {return mpq_sgn(value);}
+    
+  /**
+   *  Convert the biginteger into a standard string.
+   */
+  std::string str(int b) const;
+
+  /**
+   * \brief Convert the biginteger into a double value 
+   * (you may loose precision)
+   */
+  double as_double() const {return mpq_get_d(value);}
+
+  /**
+   * Convert the biginteger to a raw memory block. Obtain the size needed
+   * from biginteger_raw_size() first and make sure, the buffer provided is
+   * large enough to hold the data.
+   *
+   * Also remember, that the modulus is not saved this way. To obtain a
+   * modulus raw byte use get_modulus().as_raw(void*).
+   * 
+   * @return number of bytes used (same as raw_size())
+   */
+  //  int as_raw(void* raw) const;
+
+  /**
+   * Return the number of bytes needed to store the numerator only in a
+   * continous memory block.
+   */
+  size_t raw_size() const;
+
+  /** \brief  simplify n/d (use of mpq_canonical)
    *
    */
   void  simplify ();
 
-  /*
-   * \brief Get a double value
-   */
-  double as_double() const;
-
-  /* Macro to get a mpq (mpr) from a biginteger (bigr) 
-   * Example:
-   *   mpq_t val;
-   *   GET_MPQ ( br, val,val_tmp)
-   */
-  #define GET_MPQ( bigr,mpr,tmp) mpq_init( mpr ); mpq_t_sentry tmp( mpr ); mpq_set_num(mpr,bigr.numerator.getValueTemp());  if(!bigr.denominator.isNA())  mpq_set_den(mpr,bigr.denominator.getValueTemp());
-  
-    
   /**
-   * Return as a human readible string
+   * \brief  return 1/x
    */
-  std::string str(int b) const;
+  bigrational inv();
+
+  
 };
 
-// Use this to clear mpz_t structs at end-of-function automatically
-struct mpz_t_sentry {
-  mpz_t& value;
-  mpz_t_sentry(mpz_t& v): value(v) {}
-  ~mpz_t_sentry() {mpz_clear(value);}
-};
-// Use this to clear mpq_t structs at end-of-function automatically
+
+/** \brief mpq struct.
+ *
+ * Use this to clear mpq_t structs at end-of-function automatically 
+ */
 struct mpq_t_sentry {
+  /** the bigrational */
   mpq_t& value;
+  /** initialisation */
   mpq_t_sentry(mpq_t& v): value(v) {}
-  ~mpq_t_sentry() {mpq_clear(value);}
+  /** free all */
+  ~mpq_t_sentry() 
+  {
+    mpq_clear(value);
+  }
 };
 
 
-
+/**
+ * \brief set denominator to a bigrational (in fact divide
+ * bigrational by value m.
+ */
 bigrational set_denominator(const bigrational& x, const bigrational& m);
 
 
 /**
- * Add two bigrationals together.
+ * \brief Add two bigrationals together.
  *
- * If only one has a modulus set, the result will have this
- * modulus. If both bigrationals disagree with the modulus, the result will not have
- * a modulus set. If none modulus for either bigrational is set, the result will not
- * have a modulus as well.
  */
 bigrational operator+(const bigrational& rhs, const bigrational& lhs);
 
 /**
- * Subtract two bigrationals.
- *
- * For modulus description, see operator+(bigrational, bigrational)
+ * \brief Subtract two bigrationals.
  */
 bigrational operator-(const bigrational& rhs, const bigrational& lhs);
 
 /**
- * Multiply two bigrationals.
- *
- * For modulus description, see operator+(bigrational, bigrational)
+ * \brief Multiply two bigrationals.
  */
 bigrational operator*(const bigrational& rhs, const bigrational& lhs);
 
 /**
- * Divide two bigrationals.
- *
- * For modulus description, see operator+(bigrational, bigrational)
+ *\brief  Divide two bigrationals.
  */
 bigrational operator/(const bigrational& rhs, const bigrational& lhs);
 
-/**
- * Calculate the modulus (remainder) of two bigrationals.
- *
- * The resulting bigrational will have set the intern modulus to 
- * the value of lhs, no matter what rhs.modulus or lhs.modulus
- * was before, except if rhs and lhs has both no modulus set,
- * in which case the resulting modulus will be unset too.
+
+/** \brief comparison operator
  */
-//bigrational operator%(const bigrational& rhs, const bigrational& lhs);
+//bool operator!= (const bigrational& rhs, const bigrational& lhs);
 
-/**
- * Return the power of "exp" to the base of "base" (return = base^exp).
- *
- * If both moduli are unset or unequal, this may EAT your memory alive, 
- * since then the infinite "pow" is used instead of the modulus "powm". 
- * You  may not try to pow a value this way with an exponent that does
- * not fit into a long value.
- *
- * For other modulus description, see operator+(bigrational, bigrational)
- */
-//bigrational pow(const bigrational& base, const bigrational& exp);
-
-/**
- * Return the modulo inverse to x mod m. (return = x^-1 % m)
- *
- * For modulus description, see operator+(bigrational, bigrational)
- */
-//bigrational inv(const bigrational& x, const bigrational& m);
-
-
+#endif

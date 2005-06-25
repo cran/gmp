@@ -1,10 +1,10 @@
 /*! \file bigrational.cc
- *  \brief C function for class bigrational
+ *  \brief Implementation of class bigrational
  *
  *  \version 1
  *
  *  \date Created: 12/12/04   
- *  \date Last modified: Time-stamp: <2005-02-27 09:48:06 antoine>
+ *  \date Last modified: Time-stamp: <2006-05-25 19:53:58 antoine>
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
@@ -16,121 +16,144 @@
 #define R_NO_REMAP   // avoid collisions with stl definitions
 
 #include "bigrational.h"
+#include "bigrationalR.h"
 #include <Rinternals.h>
 
 #include <stdio.h>
 
 using std::string;
 
+
+bigrational & bigrational::operator= (const bigrational& rhs)
+{
+  if(this != &rhs)
+    {      
+      mpq_set(value, rhs.getValueTemp());
+      na= rhs.na;
+    }
+  return(*this);
+
+}
+
+
 /**
  * \brief Print value
  */
-string bigrational::str(int b) const
+std::string bigrational::str(int b) const
 {
-    if (numerator.isNA() )
-	return "NA";
-
-
-   string s; // sstream seems to collide with libgmp :-(
-    if (!denominator.isNA())
-	s = "(";
-    s += numerator.str(b);
-    if (!denominator.isNA()) {
-	s += " / ";
-	s += denominator.str(b);
-	s += ")";
-    }
-    return s;
-}
-
-
-
-/*
-Well... I would like to have something like that...
-
-const mpq_t& bigrational::getQValueTemp() const
-{
-  mpq_t val;
-  mpq_init(val);
-  //  mpq_t_sentry val_s(val);
-  mpq_set_num(val,numerator.getValueTemp());
-  if(!denominator.isNA())
-    mpq_set_den(val,denominator.getValueTemp());
-  return val;
-
-}
-*/
-
-/**
- * \brief Import from double
- */
-void  bigrational::setQValue(double x)
-{
-  mpq_t val;
-  mpz_t tmpZ;
-
-  mpq_init(val);
-  mpz_init(tmpZ);
-
-  mpq_t_sentry val_s(val);
-  mpz_t_sentry tmp_s(tmpZ);
-
-  mpq_set_d (val,x);
-  mpq_get_den(tmpZ,val);
-  denominator.setValue(tmpZ);
-
-  mpq_get_num(tmpZ,val);
-
-  numerator.setValue(tmpZ);
-  /*   gmp_printf("gmp %Zd\n",den);  */
+  if (isNA())
+    return "NA";
+    
+  unsigned int totSize = mpz_sizeinbase(mpq_numref(value),b) + \
+    mpz_sizeinbase(mpq_denref(value),b) + 3 ;
+  char* buf = new char[totSize];
+  mpq_get_str(buf, b, value);
+  std::string s = buf;
+  delete [] buf;
+  return s;
 
 }
 
-/*
- * \brief convert bigrational to double
- */
-double  bigrational::as_double() const
-{
-  
-  mpq_t val;
-  double d;
-  mpq_init( val ); 
-  mpq_t_sentry val_t( val ); 
-  mpq_set_num(val,numerator.getValueTemp());  
-  if(!denominator.isNA())  
-    mpq_set_den(val,denominator.getValueTemp());
-
-  /*  printf("%f\n",mpq_get_d(val));*/
-  d  = mpq_get_d(val);
-  return(d);
-}
 
 /* \brief  simplify n/d (use of mpq_canonical)
  *
  */
 void  bigrational::simplify ()
+{  
+  mpq_canonicalize(value);
+}
+
+
+// size of numerator !!
+size_t bigrational::raw_size() const
 {
-  
-  mpq_t val;
-  mpz_t den;
-  mpz_t nomin;
+  if (isNA())
+    return sizeof(int);
 
-  mpq_init( val ); 
-  mpz_init(den);
-  mpz_init(nomin);
-      
-  mpq_t_sentry val_t(val);
-  mpz_t_sentry tmp_d(den);
-  mpz_t_sentry tmp_n(nomin);
+  int numb = 8*sizeof(int);
 
-  mpq_set_num(val,numerator.getValueTemp());  
-  if(!denominator.isNA())  
-    mpq_set_den(val,denominator.getValueTemp());
+  return sizeof(int) * (2 + (mpz_sizeinbase(mpq_numref(value),2)+numb-1) / numb);
+}
 
-  mpq_canonicalize(val);
-      
-  mpq_get_num(nomin ,val);
-  mpq_get_den(den ,val);
+// set numerator
+bigrational::bigrational(void* raw):
+  value(),
+  na(true)
+{
+  mpz_t tmpVal;
+  mpz_init(tmpVal);
+  mpz_t_sentry val_s(tmpVal);
 
+  mpq_init(value);
 
+  int* r = (int*)raw;
+  if (r[0]>0) 
+    {
+      mpz_import(tmpVal, r[0], 1, sizeof(int), 0, 0, &r[2]);
+      if(r[1]==-1)
+	mpz_neg(tmpVal,tmpVal);
+      na = false;
+      mpq_set_z(value,tmpVal);
+    }
+
+}
+
+bigrational operator+(const bigrational& lhs, const bigrational& rhs)
+{
+  return bigrationalR::create_bigrational(lhs, rhs, mpq_add);
+}
+
+/**
+ * \brief Return  a - b
+ */
+bigrational operator-(const bigrational& lhs, const bigrational& rhs)
+{
+  return bigrationalR::create_bigrational(lhs, rhs, mpq_sub);
+}
+
+/**
+ * \brief Return  a * b
+ */
+bigrational operator*(const bigrational& lhs, const bigrational& rhs)
+{
+  return bigrationalR::create_bigrational(lhs, rhs, mpq_mul);
+}
+
+/**
+ * \brief Return  a / b
+ */
+bigrational operator/(const bigrational& lhs, const bigrational& rhs)
+{
+  return bigrationalR::create_bigrational(lhs, rhs, mpq_div, false);
+}
+
+//
+bool operator!=(const bigrational& lhs, const bigrational& rhs)
+{
+  if(lhs.isNA() != rhs.isNA() )
+    return true;
+  return(mpq_cmp(lhs.getValueTemp(),rhs.getValueTemp()) != 0);
+}
+/**
+ * \brief Well... an heritage from biginteger class, this should be
+ * integrated earlier... put denominator & simplify if there is not.
+ */
+bigrational set_denominator(const bigrational& lhs, const bigrational& rhs)
+{
+  return bigrationalR::create_bigrational(lhs, rhs, mpq_div, false);
+}
+
+// return 1/x
+bigrational bigrational::inv()
+{
+  if(isNA())
+    return(bigrational());
+    
+  mpq_t tmpVal;
+  mpq_init(tmpVal);
+  mpq_t_sentry val_s(tmpVal);
+
+  mpq_inv(tmpVal,value);
+
+  return(bigrational(tmpVal));
 }

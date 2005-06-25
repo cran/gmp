@@ -92,12 +92,12 @@ sign.bigq <- function(a)
   
 
 
-"[.bigq"<- function(a,b=NA)
+"[[.bigq"<- function(a,b=NA)
 {
     .Call("bigrational_get_at", a, b, PACKAGE="gmp")
 }
 
-"[<-.bigq"<- function(dst, idx=NA, value)
+"[[<-.bigq"<- function(dst, idx=NA, value)
 {
     .Call("bigrational_set_at", dst, idx, value, PACKAGE="gmp")
 }
@@ -157,3 +157,25 @@ rep.bigq <- function(x,times,...)
 
     .Call("bigrational_rep",x,times,PACKAGE = "gmp")
   }
+
+
+solve.bigq <- function(a,b,...)
+  {
+    if(missing(b))
+      .Call("inverse_q",a,PACKAGE="gmp")
+    else
+      .Call("solve_q",a,b,PACKAGE="gmp")
+  }
+
+
+
+"[.bigq"<- function(a,b=NULL,c=NULL)
+{
+  .Call("matrix_get_at_q", a, b,c, PACKAGE="gmp")
+}
+
+
+"[<-.bigq"<- function(dst,idx=NULL,jdx=NULL,value)
+{
+  .Call("matrix_set_at_q", dst, value,idx,jdx , PACKAGE="gmp")
+}

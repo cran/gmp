@@ -70,10 +70,23 @@ inv.bigz<- function(a,b,...)
     .Call("biginteger_inv",a,b, PACKAGE= "gmp")
 }
 
+
+gcd <- function(a,b)
+      UseMethod("gcd")
+
+gcd.default <- function(a,b)
+  return(as.integer(gcd.bigz(a,b)))
+
 gcd.bigz<- function(a,b)
 {
     .Call("biginteger_gcd",a,b, PACKAGE="gmp")
 }
+
+##lcm <- function(a,b)
+##      UseMethod("lcm")
+
+lcm.default <- function(a,b)
+  return(as.integer(lcm.bigz(a,b)))
 
 lcm.bigz<- function(a,b)
 {
@@ -106,12 +119,12 @@ as.double.bigz<- function(x,...)
     .Call("biginteger_as_numeric", x, PACKAGE="gmp")
 }
 
-"[.bigz"<- function(a,b=NA)
+"[[.bigz"<- function(a,b=NA)
 {
     .Call("biginteger_get_at", a, b, PACKAGE="gmp")
 }
 
-"[<-.bigz"<- function(dst, idx=NA, value)
+"[[<-.bigz"<- function(dst, idx=NA, value)
 {
     .Call("biginteger_set_at", dst, idx, value, PACKAGE="gmp")
 }
@@ -321,4 +334,29 @@ factorize <- function(n)
          PACKAGE= "gmp"
       ) 
 
+}
+
+## overload as.vector
+as.vector.bigz <- function(x,mode="any")
+  return(x)
+
+
+
+solve.bigz <- function(a,b,...)
+  {
+    if(missing(b))
+      .Call("inverse_z",a,PACKAGE="gmp")
+    else
+      .Call("solve_z",a,b,PACKAGE="gmp")
+  }
+
+
+"[.bigz"<- function(a,b=NULL,c=NULL)
+{
+  .Call("matrix_get_at_z", a, b,c, PACKAGE="gmp")
+}
+
+"[<-.bigz"<- function(dst,idx=NULL,jdx=NULL,value)
+{
+  .Call("matrix_set_at_z", dst, value,idx,jdx , PACKAGE="gmp")
 }

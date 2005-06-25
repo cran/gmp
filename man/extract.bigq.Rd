@@ -2,6 +2,8 @@
 
 \alias{[.bigq}
 \alias{[<-.bigq}
+\alias{[[.bigq}
+\alias{[[<-.bigq}
 \alias{c.bigq}
 \alias{rep.bigq}
 \alias{length.bigq}
@@ -23,6 +25,12 @@ rep.bigq(x,times,...)
   \item{times}{Integer}
   \item{recursive}{Unused}
 }
+
+\note{
+  Unlike standard matrix, operator x[i] & x[i,] do the same.
+
+  }
+
 
 \examples{
   a <- as.bigq(123)

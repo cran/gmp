@@ -1,4 +1,4 @@
-\name{facorization}
+\name{factorization}
 \alias{factorize}
 
 \title{Factorize a number}
@@ -8,11 +8,17 @@
 \usage{factorize(n)}
 
 \arguments{
-  \item{n}{Integer}
+  \item{n}{Either integer, numeric or string value
+  (String value: ither starting with \code{0x} for hexadecimal, \code{0b} for
+  binary or without prefix for decimal values.)
+  Or an element of class bigz.}
 }
+\details{
+  The factorization function uses the Pollard Rho algorithm.
+  }
 
 \value{
-  Vector of all numbers.
+  Vector of class bigz.
 }
 
 \references{Gnu MP Library see http://swox.com/gmp}

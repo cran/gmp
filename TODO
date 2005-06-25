@@ -1,9 +1,12 @@
 
-  * provide more functions for bigintegers, such as sum, prod, min, max, ...
+
+  * provide more functions for bigintegers, such as sum, prod, min, max, sort,
+    order ...
 
   * Better integration to R with as.integer.big(q/z), as.data.frame ...
 
-  * matrix and linear algebra computation.
+  * more matrix and linear algebra computation functions (SVD, eigen values, 
+    determinant).
 
   * provide basic algorithmns and number theoretic symbols (CRA, Jacobi symbol)
 
@@ -11,4 +14,3 @@
 
   * test, test, test, ...
 
-  * as.integer functions

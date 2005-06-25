@@ -12,14 +12,16 @@ gcdex(a, b)
 }
 
 \arguments{
-  \item{a}{Integer or string from an integer}
-  \item{b}{Integer or string from an integer}
+  \item{a,b}{Either integer, numeric or string value
+  (String value: ither starting with \code{0x} for hexadecimal, \code{0b} for
+  binary or without prefix for decimal values.)
+  Or an element of class bigz.}
+
 }
 
 \value{
-  \item{g}{Integer}
-  \item{s}{Integer}
-  \item{t}{Integer}
+  3 values:
+  \item{g,s,t}{Elements of class bigz}
 
 }
 

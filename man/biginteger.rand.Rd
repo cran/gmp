@@ -4,23 +4,25 @@
 \title{Generate a random number}
 \description{
   Generate a uniformly distributed random number in the range 0 to
-  \eqn{2^size -1}{2^size - 1}, inclusive.
+  \eqn{2^{size} -1}{2^size - 1}, inclusive.
 
-  If seed is precise, a new seed is initialised.
+%  If seed is precise, a new seed is initialised.
 }
 \usage{
 urand.bigz(nb=1,size=200, seed = 0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{nb}{Integer: number of random numbers to be generated}
-  \item{size}{Integer: size of numbers}
+  \item{nb}{Integer: number of random numbers to be generated (size of
+    vector returned)}
+  \item{size}{Integer: number will be generated in the range 0 to
+  \eqn{2^{size} -1}{2^size - 1}}
   \item{seed}{Bigz: random seed initialisation}
 }
 
 
 \value{
-  A number.
+  A biginteger of class bigz.
 }
 \references{mpz\_urandomb from Gnu MP Library see http://swox.com/gmp}
 

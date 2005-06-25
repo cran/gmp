@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2005-02-27 09:42:17 antoine>
+ *  \date Last modified: Time-stamp: <2006-05-25 17:12:16 antoine>
  *
  *  \author Immanuel Scholz 
  *
@@ -21,17 +21,17 @@
 
 using std::string;
 
-biginteger::biginteger(void* raw)
+biginteger::biginteger(char* raw)
 {
-    mpz_init(value);
-    int* r = (int*)raw;
-    if (r[0]>0) {
-        mpz_import(value, r[0], 1, sizeof(int), 0, 0, &r[2]);
-	if(r[1]==-1)
-	  mpz_neg(value,value);
-	na = false;
-    } else
-	setValue();
+  mpz_init(value);
+  int* r = (int*)raw;
+  if (r[0]>0) {
+    mpz_import(value, r[0], 1, sizeof(int), 0, 0, &r[2]);
+    if(r[1]==-1)
+      mpz_neg(value,value);
+    na = false;
+  } else
+    setValue();
 }
 
 /*
@@ -40,65 +40,137 @@ biginteger::biginteger(void* raw)
 
 string biginteger::str(int b) const
 {
-    if (isNA())
-	return "NA";
-    
-    char* buf = new char[mpz_sizeinbase(value, b)+2];
-    mpz_get_str(buf, b, value);
-    string s = buf;
-    delete [] buf;
-    return s;
+  if (isNA())
+    return "NA";
+
+  // possible minus sign, size of number + '\0'    
+  char* buf = new char[mpz_sizeinbase(value, b)+2];
+  mpz_get_str(buf, b, value);
+  string s = buf;
+  delete [] buf;
+  return s;
 }
 
 
 /** 
  * \brief export mpz to R raw value
  */ 
-int biginteger::as_raw(void* raw) const
+int biginteger::as_raw(char* raw) const
 {
-    int totals = raw_size() ;
-    memset(raw, 0, totals );
-    int* r = (int*)raw;
-    r[0] = totals/sizeof(int) - 2;
-    r[1] = (int) mpz_sgn(value);
-    if (!isNA())
-        mpz_export(&r[2], 0, 1, sizeof(int), 0, 0, value);
-    return totals;
+  int totals = raw_size() ;
+  memset(raw, 0, totals );
+  int* r = (int*)raw;
+  r[0] = totals/sizeof(int) - 2;
+
+  if (!isNA())
+    {
+      r[1] = (int) mpz_sgn(value);
+      mpz_export(&r[2], 0, 1, sizeof(int), 0, 0, value);
+    }
+  return totals;
+}
+
+/** 
+ * \brief export mpz to R raw value
+ */ 
+int as_raw(void* raw,mpz_t value, bool na)
+{
+  int numb = 8*sizeof(int);
+  int totals = sizeof(int);
+  if(!na)
+    totals =  sizeof(int) * (2 + (mpz_sizeinbase(value,2)+numb-1) / numb);
+  memset(raw, 0, totals );
+  int* r = (int*)raw;
+  r[0] = totals/sizeof(int) - 2;
+  if (!na)
+    {
+      r[1] = (int) mpz_sgn(value);
+      mpz_export(&r[2], 0, 1, sizeof(int), 0, 0, value);
+    }
+  return totals;
 }
 
 size_t biginteger::raw_size() const
 {
-    if (isNA())
-	return sizeof(int);
 
-    int numb = 8*sizeof(int);
+  if (isNA())
+    return sizeof(int);
 
-    return sizeof(int) * (2 + (mpz_sizeinbase(value,2)+numb-1) / numb);
+  int numb = 8*sizeof(int);
+  return sizeof(int) * (2 + (mpz_sizeinbase(value,2)+numb-1) / numb);
+  //  return (sizeof(int) * ( 2 + (mpz_sizeinbase(value,2)/(8*sizeof(int)))  ) );
+
 }
 
 void biginteger::swap(biginteger& other)
 {
-    mpz_swap(value, other.value);
-    bool n = na;
-    na = other.na;
-    other.na = n;
+  mpz_swap(value, other.value);
+  bool n = na;
+  na = other.na;
+  other.na = n;
 }
 
 
-string bigmod::str(int b) const
+biginteger & biginteger::operator= (const biginteger& rhs)
 {
-    if (value.isNA())
-	return "NA";
-
-    string s; // sstream seems to collide with libgmp :-(
-    if (!modulus.isNA())
-	s = "(";
-    s += value.str(b);
-    if (!modulus.isNA()) {
-	s += " %% ";
-	s += modulus.str(b);
-	s += ")";
+  if(this != &rhs)
+    {
+      mpz_set(value,rhs.getValueTemp());
+      na = rhs.na;
     }
-    return s;
+  return(*this);
 }
 
+
+
+// comparison
+bool operator!=(const biginteger& rhs, const biginteger& lhs)
+{
+  if(rhs.isNA() || lhs.isNA())
+    return(false); // SHOULD RETURN NA
+  
+  return(mpz_cmp(rhs.getValueTemp(),lhs.getValueTemp())!=0);
+}
+
+// addition
+biginteger operator* (const biginteger& rhs, const biginteger& lhs)
+{
+  // one of them NA: return NA
+  if(rhs.isNA() || lhs.isNA())
+    return(biginteger());
+ 
+  mpz_t result;
+  mpz_init(result);
+  mpz_t_sentry val_s(result);
+  mpz_mul(result,rhs.getValueTemp(),lhs.getValueTemp());
+  return(biginteger(result));
+
+}
+
+// substraction
+biginteger operator- (const biginteger& rhs, const biginteger& lhs)
+{
+  // one of them NA: return NA
+  if(rhs.isNA() || lhs.isNA())
+    return(biginteger());
+
+  mpz_t result;
+  mpz_init(result);
+  mpz_t_sentry val_s(result);
+  mpz_sub(result,rhs.getValueTemp(),lhs.getValueTemp());
+  return(biginteger(result));
+}
+
+// modulus
+biginteger operator% (const biginteger& rhs, const biginteger& lhs)
+{
+  // one of them NA: return NA
+  if(rhs.isNA() || lhs.isNA())
+    return(biginteger());
+
+  mpz_t result;
+  mpz_init(result);
+  mpz_t_sentry val_s(result);
+  mpz_mod(result,rhs.getValueTemp(),lhs.getValueTemp());
+  return(biginteger(result));
+}

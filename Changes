@@ -1,4 +1,24 @@
-Thu Jan 20 2005 0.3-4
+
+Sat Jun 17 2006 0.4-0
+  * extract functions done with matrix (x[i,j] & x[i,j] <- value)
+
+Sun May 28 2006
+  * Matrix integration & solve function in Z/nZ or Q
+
+Thu May 19 2006
+  * rewritten bigrational class with mpq_t value
+  * use of 2 new class bigvec & bigvec_q that includes vector(s) + nrow value.
+  * catch bug in fibnum & lucnum when negative values or NULL.
+
+Wed Mar 15 2006
+  * catch bug when negative integer values (like as.bigz(as.integer(-4)))
+
+Tue Mar 14 2006
+  * catch bug with c.bigz(3,NULL) (and other bugs with NULL argument
+    while add cas NILSXP in create_vector
+  * check for positive values in lucnum & fibnum.
+
+Thu Jan 20 2006 0.3-4
   * minor changes on data Oakley
 
 Wed Jul 27 2005 0.3-3

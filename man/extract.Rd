@@ -2,6 +2,8 @@
 
 \alias{[.bigz}
 \alias{[<-.bigz}
+\alias{[[.bigz}
+\alias{[[<-.bigz}
 \alias{c.bigz}
 \alias{rep.bigz}
 \alias{length.bigz}
@@ -24,16 +26,35 @@ rep.bigz(x,times,...)
   \item{recursive}{Unused}
 }
 
+\note{
+  Unlike standard matrix, operator x[i] & x[i,] do the same.
+
+
+  }
+
+
 \examples{
   a <- as.bigz(123)
-  a[2] <- a[1]
+  a[2 ] <- a[ 1]
 
-  # create a vector of 3 a
+  ## create a vector of 3 a
   c(a,a,a)
 
-  # repeate a 5 times
+  ## repeate a 5 times
   rep(a,5)
 
+  ## with matrix
+  m =  matrix.bigz(1:6,3)
+
+  ## this do the same:
+  m[1,]
+  m[1]
+  m[-c(2,3),]
+  m[-c(2,3)]
+  m[c(TRUE,FALSE,FALSE)]
+
+  ## modification on matrix
+  m[2,-1] <- 11
   }
 
 \keyword{arith}
