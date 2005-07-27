@@ -12,17 +12,11 @@
   Binary operators which allow the comparison of values in atomic vectors.
 }
 \usage{
-a < b
-a > b
-a <= b
-a >= b
-a == b
-a != b
 sign.bigq(a)
 }
 
 \arguments{
-  \item{a,b}{Object or vector of class bigq}
+  \item{a}{Object or vector of class bigq}
 }
 
 \examples{

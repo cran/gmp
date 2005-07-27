@@ -12,17 +12,11 @@
 Binary operators which allow the comparison of values in atomic vectors.
 }
 \usage{
-a < b
-a > b
-a <= b
-a >= b
-a == b
-a != b
 sign.bigz(a)
 }
 
 \arguments{
-  \item{a,b}{Object or vector of class bigz}
+  \item{a}{Object or vector of class bigz}
 }
 
 \examples{
