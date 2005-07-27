@@ -1,5 +1,5 @@
 Package: gmp
-Version: 0.3-3
+Version: 0.3-4
 Date: 2005-07-27
 Title: Multiple Precision Arithmetic 
 Author: Antoine Lucas, Immanuel Scholz, Rainer Boehme <rb-gmp@reflex-studio.de>,
@@ -11,4 +11,4 @@ Depends: R (>= 2.0.0)
 SystemRequirements: gmp (>= 4.1.4)
 License: GPL
 URL: http://mulcyber.toulouse.inra.fr/projects/gmp
-Packaged: Wed Jul 27 14:38:19 2005; lucas
+Packaged: Fri Jan 20 16:27:11 2006; lucas
