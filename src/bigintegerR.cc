@@ -763,8 +763,7 @@ SEXP biginteger_rand_u (SEXP nb ,SEXP length,SEXP newseed, SEXP ok)
     {
       /*  Random number generation  */
       mpz_urandomb(bz,seed_state,len);
-      result.push_back(bigmod());
-      result[i].value.setValue(bz);
+      result.push_back(bigmod(bz));
     }
   return bigintegerR::create_SEXP(result);
 }
