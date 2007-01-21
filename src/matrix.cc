@@ -213,20 +213,20 @@ SEXP matrix_mul_z (SEXP a, SEXP b)
    */
   if(! ((sizemod_a > 1) | (sizemod_b > 1)) )
     {
-      if( (sizemod_a == 1 )&(sizemod_b == 1) )
+      if( (sizemod_a == 1 )& (sizemod_b == 1))
 	{
 	  mpz_set(common_modulus, mat_a.modulus[0].getValueTemp());
-	  if(mpz_cmp (common_modulus, mat_b.modulus[0].getValueTemp()) == 0)
+	  if( (mpz_cmp (common_modulus, mat_b.modulus[0].getValueTemp()) == 0) &&  (!mat_a.modulus[0].isNA()))
 	    useMod=1;      
 	}
       else
 	{
-	  if(sizemod_a == 1 )
+	  if( (sizemod_a == 1 ) && (!mat_a.modulus[0].isNA()))
 	    {
 	      mpz_set(common_modulus,mat_a[0].modulus.getValueTemp());
 	      useMod =1;
 	    }
-	  if( sizemod_b == 1)
+	  if( (sizemod_b == 1)&& (!mat_b.modulus[0].isNA() ) )
 	    {
 	      mpz_set(common_modulus, mat_b[0].modulus.getValueTemp());
 	      useMod =1;
@@ -243,6 +243,13 @@ SEXP matrix_mul_z (SEXP a, SEXP b)
 	for(k=0; k<p; k++)
 	  {
 	    //	 tmp = create_bigmod(mat_a [i+ k*n_c  ],mat_b[k + j*p_c], mpz_mul);
+
+	    if( mat_a.value [i+ k*n  ].isNA() )
+	      {
+		res.value[i+ j*n].setValue(0);
+		res.value[i + j*n].NA(true);
+		break;
+	      }
 	    mpz_mul(tmp_value, mat_a.value [i+ k*n  ].getValueTemp(),
 		    mat_b.value[k + j*p].getValueTemp());
 	    mpz_add(tmp_value,tmp_value,res.value[i+ j*n ].getValueTemp());

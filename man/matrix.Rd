@@ -4,6 +4,7 @@
 \alias{matrix.bigz}
 \alias{matrix.bigq}
 \alias{as.matrix.bigz}
+\alias{as.matrix.bigq}
 \alias{as.vector.bigq}
 \alias{as.vector.bigz}
 \alias{\%*\%}
@@ -21,7 +22,9 @@
 \alias{t.bigq}
 \alias{t.bigz}
 \alias{dim.bigq}
+\alias{dim<-.bigq}
 \alias{dim.bigz}
+\alias{dim<-.bigz}
   
 \title{Matrix manipulation with gmp}
 \description{
@@ -69,7 +72,7 @@ matrix.bigz(data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL, mod =
 
 \author{Antoine Lucas}
 
-\seealso{Solving linear algebra system \code{\link{solve.bigz}} }
+\seealso{Solving linear algebra system \code{\link{solve.bigz}}; \code{\link[base]{matrix}}} }
 \examples{
 
 

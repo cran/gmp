@@ -130,10 +130,28 @@ bigrational operator/(const bigrational& lhs, const bigrational& rhs)
 //
 bool operator!=(const bigrational& lhs, const bigrational& rhs)
 {
-  if(lhs.isNA() != rhs.isNA() )
-    return true;
+  if(rhs.isNA() || lhs.isNA())
+    return(false); // SHOULD RETURN NA
+
   return(mpq_cmp(lhs.getValueTemp(),rhs.getValueTemp()) != 0);
 }
+
+bool operator>(const bigrational& lhs, const bigrational& rhs)
+{
+  if(rhs.isNA() || lhs.isNA())
+    return(false); // SHOULD RETURN NA
+
+  return(mpq_cmp(lhs.getValueTemp(),rhs.getValueTemp()) > 0);
+}
+
+bool operator<(const bigrational& lhs, const bigrational& rhs)
+{
+  if(rhs.isNA() || lhs.isNA())
+    return(false); // SHOULD RETURN NA
+
+  return(mpq_cmp(lhs.getValueTemp(),rhs.getValueTemp()) < 0);
+}
+
 /**
  * \brief Well... an heritage from biginteger class, this should be
  * integrated earlier... put denominator & simplify if there is not.

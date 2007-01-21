@@ -210,13 +210,28 @@ SEXP matrix_mul_q (SEXP a, SEXP b)
     for(j=0; j<m; j++)
       {
 	mpq_set_ui(product,0,1);
+	bool isna = false;
 	for(k=0; k<p; k++)
 	  {
 	    // xij = sum aik bkj
-	    mpq_mul(tmp_value, mat_a[i+k*n].getValueTemp(),mat_b[ k + j * p].getValueTemp());
-	    mpq_add(product,tmp_value,product);
+	    if( !(mat_a[i+k*n].isNA() ||mat_b[ k + j * p].isNA()))
+	      {
+		mpq_mul(tmp_value, mat_a[i+k*n].getValueTemp(),mat_b[ k + j * p].getValueTemp());
+		mpq_add(product,tmp_value,product);
+	      }
+	    else
+	      {
+		isna = true;
+		break;
+	      }
 	  }
-	res.value[i + j*n].setValue(product);
+	if(isna)
+	  {
+	    res.value[i + j*n].setValue(0);
+	    res.value[i + j*n].NA(true);
+	  }
+	else
+	  res.value[i + j*n].setValue(product);
 	    
       }
   
@@ -269,7 +284,7 @@ bigvec_q matrixq::bigq_transpose (const  bigvec_q & mat,int nr,int nc)
   /* we compute transpose */
   for(i =0; i<nr; i++)
     for(j =0; j<nc; j++)
-	matbis.value[j+i*nc].setValue(mat.value[i+j*nr].getValueTemp());
+	matbis.value[j+i*nc].setValue(mat.value[i+j*nr]);
 
 
   return(matbis);

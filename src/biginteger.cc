@@ -18,20 +18,26 @@
 #include <Rinternals.h>
 
 #include <stdio.h>
+#include <iostream>
 
 using std::string;
 
-biginteger::biginteger(char* raw)
+biginteger::biginteger(const char* raw)
 {
   mpz_init(value);
-  int* r = (int*)raw;
-  if (r[0]>0) {
-    mpz_import(value, r[0], 1, sizeof(int), 0, 0, &r[2]);
-    if(r[1]==-1)
-      mpz_neg(value,value);
-    na = false;
-  } else
-    setValue();
+  na = true;
+  const int* r = (int*)(raw);
+  if (r[0]>0)
+    {
+      mpz_import(value, r[0], 1, sizeof(int) , 0, 0, (void*)&(r[2] ));
+      if(r[1]==-1)
+	mpz_neg(value,value);
+      na = false;
+    } 
+  else
+    mpz_set_si(value, 0);
+
+  //std::cout << "lu: "<<  this->str(10) << std::endl;
 }
 
 /*
@@ -59,6 +65,7 @@ int biginteger::as_raw(char* raw) const
 {
   int totals = raw_size() ;
   memset(raw, 0, totals );
+
   int* r = (int*)raw;
   r[0] = totals/sizeof(int) - 2;
 
@@ -67,39 +74,51 @@ int biginteger::as_raw(char* raw) const
       r[1] = (int) mpz_sgn(value);
       mpz_export(&r[2], 0, 1, sizeof(int), 0, 0, value);
     }
+
+
   return totals;
 }
 
 /** 
  * \brief export mpz to R raw value
+ *
+ * return number of byte used (if na => 2*sizeofint, else
+ * the two int + size of the big integer)
+ *
+ * \note IF size of big integer exceed value of one int => cannot store value
  */ 
-int as_raw(void* raw,mpz_t value, bool na)
+int as_raw(char* raw,mpz_t value, bool na)
 {
   int numb = 8*sizeof(int);
   int totals = sizeof(int);
   if(!na)
     totals =  sizeof(int) * (2 + (mpz_sizeinbase(value,2)+numb-1) / numb);
   memset(raw, 0, totals );
+
   int* r = (int*)raw;
   r[0] = totals/sizeof(int) - 2;
+
   if (!na)
     {
       r[1] = (int) mpz_sgn(value);
       mpz_export(&r[2], 0, 1, sizeof(int), 0, 0, value);
     }
+
   return totals;
+
 }
 
+
+// number of int used in R by on biginteger
 size_t biginteger::raw_size() const
 {
-
   if (isNA())
     return sizeof(int);
 
   int numb = 8*sizeof(int);
   return sizeof(int) * (2 + (mpz_sizeinbase(value,2)+numb-1) / numb);
-  //  return (sizeof(int) * ( 2 + (mpz_sizeinbase(value,2)/(8*sizeof(int)))  ) );
 
+  //  return (sizeof(int) * ( 2 + (mpz_sizeinbase(value,2)/(8*sizeof(int)))  ) );
 }
 
 void biginteger::swap(biginteger& other)
@@ -122,7 +141,6 @@ biginteger & biginteger::operator= (const biginteger& rhs)
 }
 
 
-
 // comparison
 bool operator!=(const biginteger& rhs, const biginteger& lhs)
 {
@@ -131,6 +149,30 @@ bool operator!=(const biginteger& rhs, const biginteger& lhs)
   
   return(mpz_cmp(rhs.getValueTemp(),lhs.getValueTemp())!=0);
 }
+
+
+
+// comparison
+bool operator<(const biginteger& rhs, const biginteger& lhs)
+{
+  if(rhs.isNA() || lhs.isNA())
+    return(false); // SHOULD RETURN NA
+  
+  return(mpz_cmp(rhs.getValueTemp(),lhs.getValueTemp())<0);
+}
+
+
+
+// comparison
+bool operator>(const biginteger& rhs, const biginteger& lhs)
+{
+  if(rhs.isNA() || lhs.isNA())
+    return(false); // SHOULD RETURN NA
+  
+  return(mpz_cmp(rhs.getValueTemp(),lhs.getValueTemp())>0);
+}
+
+
 
 // addition
 biginteger operator* (const biginteger& rhs, const biginteger& lhs)

@@ -277,6 +277,25 @@ extern "C"
    */
   SEXP lucnum2(SEXP n) ;
 
+
+  /**
+   * \brief Return max
+   */
+  SEXP biginteger_max(SEXP a, SEXP narm);
+
+  /**
+   * \brief Return min
+   */
+  SEXP biginteger_min(SEXP a, SEXP narm);
+
+  /**
+   * \brief Return cumsum
+   */
+  SEXP biginteger_cumsum(SEXP a);
+  /**
+   * \brief Return prod
+   */
+  SEXP biginteger_prod(SEXP a);
 }
 
 

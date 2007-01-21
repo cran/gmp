@@ -64,6 +64,7 @@ struct mpz_t_sentry {
 
 class biginteger
 {
+ private:
   /**
    * The actual integer value.
    */
@@ -83,7 +84,7 @@ class biginteger
   /**
    * Construct a biginteger from a raw expression. 
    */
-  biginteger(char* raw);
+  biginteger(const char* raw);
 
   /**
    * Create a biginteger from a value. Remember to free the 
@@ -134,10 +135,10 @@ class biginteger
    * Construct a biginteger from a double value.
    */
   biginteger(const double value_) : na(false) {
-    if(value_ == NA_REAL)
-      {mpz_init(value); na = true  ;}
-    else
+    if( R_FINITE(value_) )
       mpz_init_set_d(value, value_);  
+    else
+      {mpz_init(value); na = true  ;}
   }
 
   /**
@@ -160,7 +161,7 @@ class biginteger
    */
   biginteger(const biginteger& rhs) : na(rhs.na) 
     {
-      mpz_init_set(value, rhs.value);
+      mpz_init_set(value, rhs.getValueTemp());
     }
 
 
@@ -220,12 +221,20 @@ class biginteger
   /** \brief set value from a float
    */
   void setValue(double value_) {      
-    if(value_ == NA_REAL)
-      {mpz_set_ui(value, 0); na = true  ;}
-    else
+    if(R_FINITE (value_) )
       {mpz_set_d(value, value_); na = false;}
+    else
+      {mpz_set_ui(value, 0); na = true  ;}
   }
 
+
+  /** \brief set value from a biginteger
+   */
+  void setValue(biginteger value_) {      
+    setValue(value_.getValueTemp());
+    na = value_.isNA();
+
+  }
   /**
    * For const-purposes, return the value. Remember, that the return value
    * only lives as long as this class live, so do not call getValueTemp on
@@ -238,6 +247,11 @@ class biginteger
    * Return true, if the value is NA.
    */
   bool isNA() const {return na;}
+    
+  /**
+   * set NA value
+   */
+  void NA(bool value)  {na = value;}
     
   /**
    * Return true, if the value is 0.
@@ -297,9 +311,20 @@ class biginteger
 };
 
 
+
+
 /** \brief comparison operator
  */
 bool operator!= (const biginteger& rhs, const biginteger& lhs);
+
+
+/** \brief comparison operator
+ */
+bool operator> (const biginteger& rhs, const biginteger& lhs);
+
+/** \brief comparison operator
+ */
+bool operator< (const biginteger& rhs, const biginteger& lhs);
 
 /** \brief standard operator */
 biginteger operator* (const biginteger& rhs, const biginteger& lhs);
@@ -313,7 +338,7 @@ biginteger operator% (const biginteger& rhs, const biginteger& lhs);
 /** \brief function used by rational that should export
  *   mpz value 
  */
-int as_raw(void* raw,mpz_t value,bool na);
+int as_raw(char* raw,mpz_t value,bool na);
 
 
 

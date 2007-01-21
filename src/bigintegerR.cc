@@ -39,6 +39,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
 using namespace std;
 
 
@@ -56,12 +57,13 @@ namespace bigintegerR
       {	
 	// deserialise the vector. first int is the size.
 	bigvec v;
-	char* raw = (char*)RAW(param);
+	const char* raw = (char*)RAW(param);
 	int pos = sizeof(int); // position in raw[]. Starting after header.
 	int sizevec = ((int*)raw)[0];
+	//std::cout << "nb element a lire " << sizevec << std::endl;
 	v.value.resize(sizevec);
 	for (int i = 0; i < sizevec; ++i) {
-	  v.value[i] = biginteger((char*)&raw[pos]);
+	  v.value[i] = biginteger(&raw[pos]);
 	  pos += v.value[i].raw_size(); // increment number of bytes read.
 	}
 	return v;
@@ -121,6 +123,7 @@ namespace bigintegerR
     UNPROTECT(2);
 
     // try to catch biz-nrow dimension value
+    //std::cout << "import value" << std::endl;
     bigvec v = bigintegerR::create_vector(param);
 
     if (TYPEOF(dimAttr) == INTSXP) 
@@ -140,8 +143,10 @@ namespace bigintegerR
       }
 
     if (TYPEOF(modAttr) != NILSXP) 
-      v.modulus = bigintegerR::create_vector(modAttr).value;
-	
+      {
+	//std::cout << "import value" << std::endl;
+	v.modulus = bigintegerR::create_vector(modAttr).value;
+      }
     return v;
 	
   }
@@ -179,9 +184,9 @@ namespace bigintegerR
     int size = sizeof(int); // starting with vector-size-header
     for (i = 0; i < v.size(); ++i)
       size += v[i].raw_size(); // adding each bigint's needed size
-    PROTECT(ans = Rf_allocVector(RAWSXP, size));
-    char* r = (char*)RAW(ans);
-    ((int*)r)[0] = v.size(); // first int is vector-size-header
+    PROTECT(ans = Rf_allocVector(RAWSXP, size ));
+    char* r = (char*)(RAW(ans));
+    ((int*)(r))[0] = v.size(); // first int is vector-size-header
     int pos = sizeof(int); // current position in r[] (starting after vector-size-header)
     for (i = 0; i < v.size(); ++i)
       pos += v[i].as_raw(&r[pos]);
@@ -388,6 +393,7 @@ bigvec bigintegerR::biginteger_get_at_C(bigvec va,SEXP b)
     for (unsigned int i = 0; i < va.size(); ++i)
       if (vb[i%vb.size()])
 	{
+	  //std::cout << "cas LOGIC "<< std::endl;
 	  result.push_back(va[i]);
 	}
     return result;
@@ -399,6 +405,7 @@ bigvec bigintegerR::biginteger_get_at_C(bigvec va,SEXP b)
 
     // case: a[-b]
     if (vb[0] < 0) {
+      //std::cout << "cas ngatif" << std::cout;
       for (vector<int>::iterator it = vb.begin(); it != vb.end(); ++it)
 	if (*it > 0)
 	  Rf_error("only 0's may mix with negative subscripts");
@@ -418,10 +425,13 @@ bigvec bigintegerR::biginteger_get_at_C(bigvec va,SEXP b)
       // standard case: a[b] with b: integers
       result.value.reserve(vb.size());
       for (vector<int>::iterator it = vb.begin(); it != vb.end(); ++it) {
-	if (*it < 0)
+	if (*it <= 0)
 	  Rf_error("only 0's may mix with negative subscripts");
 	if (*it <= (int)va.size())
-	  result.push_back(va[(*it)-1]);
+	  {
+	    //std::cout << "on sort " << va.value[(*it)-1].str(10) << std::endl;
+	    result.push_back(va[(*it)-1]);
+	  }
 	else
 	  result.push_back(bigmod()); // NA for out of range's
       }
@@ -510,8 +520,8 @@ SEXP biginteger_setlength(SEXP vec, SEXP value)
     len = (int)*REAL(value);
     if (len < 0)
       Rf_error("vector size cannot be negative");
-    else if (len == NA_REAL)
-      Rf_error("vector size cannot be NA");
+    else if (! (R_FINITE (len ) ))
+      Rf_error("vector size cannot be NA, NaN of Inf");
     break;
   case STRSXP:
     // dunno why R spits out this strange error on "length(foo) <- -1"
@@ -550,6 +560,9 @@ SEXP biginteger_sgn(SEXP a)
 
 SEXP biginteger_c(SEXP args) 
 {
+  //if(TYPEOF( args ) != LISTSXP)
+  //  Rf_error("should be a list");
+
   int i=0,j=0; 
   bigvec result;
   bigvec v;
@@ -699,12 +712,12 @@ SEXP biginteger_gcdex(SEXP a, SEXP b)
   for(i=0; i<va.size();i++)
     {
       mpz_gcdext (g,s,t,va[i].value.getValueTemp(),vb[i].value.getValueTemp());
-      result.push_back(bigmod()); // Hem... not very elegant !
-      result.push_back(bigmod());
-      result.push_back(bigmod());
-      result[i*3].value.setValue(g);
+      result.value.push_back(biginteger(g)); // Hem... not very elegant !
+      result.value.push_back(biginteger(s));
+      result.value.push_back(biginteger(t));
+      /*      result[i*3].value.setValue(g);
       result[i*3+1].value.setValue(s);
-      result[i*3+2].value.setValue(t);
+      result[i*3+2].value.setValue(t);*/
 	
     }
   return bigintegerR::create_SEXP(result);
@@ -936,5 +949,244 @@ SEXP lucnum2(SEXP n)
   return bigintegerR::create_SEXP(result);
 
 }
+
+
+
+//Return max
+
+SEXP biginteger_max(SEXP a, SEXP narm)
+{
+
+  bigvec result;
+
+  bigvec va = bigintegerR::create_bignum(a);
+
+  if( ! va.size())
+    return bigintegerR::create_SEXP(result);
+
+  unsigned int maximum = 0;
+
+  PROTECT (a = AS_INTEGER(a));
+  int na_remove = INTEGER(a)[0];
+  UNPROTECT(1);
+
+
+  for(unsigned int i = 1 ; i < va.size(); ++i)
+    {
+      if(va.value[i].isNA() && 
+	 ( ! na_remove) )
+	return(bigintegerR::create_SEXP(result));
+      else
+	if(!(va.value[i] <  va.value[maximum] ))
+	  maximum = i; // if va.value[maximum = 0] is NA => false for the "<" => maximum changed = good
+    }
+
+  result.push_back(va.value[maximum]);
+
+
+  // now the modulus !
+  if(va.modulus.size() == 1)
+    result.modulus.push_back(va.modulus[0]);
+
+  if(va.modulus.size()>1)
+    {
+      biginteger modulus ;
+      modulus.setValue(va.modulus[0].getValueTemp());
+      for(unsigned int i = 1 ; i < va.modulus.size() ; ++i)
+	{
+	  if(modulus != va.modulus[i]) // if one is different: no modulus
+	    return(bigintegerR::create_SEXP(result));
+	}
+      result.modulus.push_back(modulus);
+    }
+
+
+
+  return(bigintegerR::create_SEXP(result));
+
+}
+
+ 
+// Return min
+SEXP biginteger_min(SEXP a, SEXP narm)
+{
+  bigvec result;
+
+  bigvec va = bigintegerR::create_bignum(a);
+
+  if( ! va.size())
+    return bigintegerR::create_SEXP(result);
+
+  unsigned int minimum = 0;
+
+  PROTECT (a = AS_INTEGER(a));
+  int na_remove = INTEGER(a)[0];
+  UNPROTECT(1);
+
+
+  for(unsigned int i = 1 ; i < va.size(); ++i)
+    {
+      if(va.value[i].isNA() && 
+	 ( ! na_remove) )
+	return bigintegerR::create_SEXP(result);
+      else
+	if(!(va.value[i] >  va.value[minimum] ))
+	  minimum = i; 
+    }
+  
+  result.push_back(va.value[minimum]);
+
+  // now the modulus !
+  if(va.modulus.size() == 1)
+    result.modulus.push_back(va.modulus[0]);
+
+  if(va.modulus.size()>1)
+    {
+      biginteger modulus ;
+      modulus.setValue(va.modulus[0].getValueTemp());
+      for(unsigned int i = 1 ; i < va.modulus.size() ; ++i)
+	{
+	  if(modulus != va.modulus[i]) // if one is different: no modulus
+	    return bigintegerR::create_SEXP(result);
+	}
+      result.modulus.push_back(modulus);
+    }
+
+  return bigintegerR::create_SEXP(result);
+
+}
+
+
+SEXP biginteger_cumsum(SEXP a)
+{
+
+  bigvec result;
+
+  bigvec va = bigintegerR::create_bignum(a);
+
+  result.value.resize(va.value.size());
+
+
+  mpz_t val;
+  mpz_init(val);
+  mpz_t_sentry val_s(val);
+ 
+  bool hasmodulus = true;
+
+  // first the modulus !
+  if(va.modulus.size()>1)
+    {
+      biginteger modulus ;
+      modulus.setValue(va.modulus[0].getValueTemp());
+      
+      for(unsigned int i = 1 ; i < va.modulus.size() ; ++i)
+	{
+	  if(modulus != va.modulus[i]) // if one is different: no modulus
+	    hasmodulus = false;
+	}
+      if(hasmodulus)
+	result.modulus.push_back(modulus);
+      
+    }
+  else
+    hasmodulus = false;
+  
+  if(va.modulus.size() == 1)
+    {
+      result.modulus.push_back(va.modulus[0]);
+      hasmodulus = true;
+   }
+
+
+
+
+  for(unsigned int i = 0 ; i < va.size(); ++i)
+    {
+      {
+	if(va.value[i].isNA() )
+	  {	
+	    break; // all last values are NA.
+	  }
+      
+	mpz_add(val,val,va.value[i].getValueTemp());
+	
+	if(hasmodulus)
+	  mpz_mod(val,val,va.modulus[0].getValueTemp() );
+	
+	result.value[i].setValue(val);
+      }
+    }
+
+  return(bigintegerR::create_SEXP(result));
+
+}
+
+
+SEXP biginteger_prod(SEXP a)
+{
+
+  bigvec result;
+
+  bigvec va = bigintegerR::create_bignum(a);
+
+  result.value.resize(1);
+
+
+  mpz_t val;
+  mpz_init(val);
+  mpz_set_ui(val,1);
+  mpz_t_sentry val_s(val);
+ 
+  bool hasmodulus = true;
+
+  // first the modulus !
+  if(va.modulus.size()>1)
+    {
+      biginteger modulus ;
+      modulus.setValue(va.modulus[0].getValueTemp());
+      
+      for(unsigned int i = 1 ; i < va.modulus.size() ; ++i)
+	{
+	  if(modulus != va.modulus[i]) // if one is different: no modulus
+	    hasmodulus = false;
+	}
+      if(hasmodulus)
+	result.modulus.push_back(modulus);
+      
+    }
+  else
+    hasmodulus = false;
+  
+  if(va.modulus.size() == 1)
+    {
+      result.modulus.push_back(va.modulus[0]);
+      hasmodulus = true;
+    }
+
+
+
+
+  for(unsigned int i = 0 ; i < va.size(); ++i)
+    {
+      {
+	if(va.value[i].isNA() )
+	  {	
+	    return (bigintegerR::create_SEXP(result));
+	  }
+      
+	mpz_mul(val,val,va.value[i].getValueTemp());
+	
+	if(hasmodulus)
+	  mpz_mod(val,val,va.modulus[0].getValueTemp() );
+	
+      }
+    }
+
+  result.value[0].setValue(val);
+
+  return(bigintegerR::create_SEXP(result));
+
+}
+
 
 

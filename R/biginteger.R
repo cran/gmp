@@ -109,9 +109,9 @@ as.bigz<- function(a,mod = NA)
   .Call("biginteger_as", a, mod, PACKAGE="gmp")
 }
 
-as.character.bigz<- function(a,b=10)
+as.character.bigz<- function(x,b=10,...)
 {
-    .Call("biginteger_as_character", a,as.integer(b), PACKAGE="gmp")
+    .Call("biginteger_as_character", x,as.integer(b), PACKAGE="gmp")
 }
 
 as.double.bigz<- function(x,...)
@@ -129,14 +129,14 @@ as.double.bigz<- function(x,...)
     .Call("biginteger_set_at", dst, idx, value, PACKAGE="gmp")
 }
 
-length.bigz<- function(a)
+length.bigz<- function(x)
 {
-    .Call("biginteger_length", a, PACKAGE="gmp")
+    .Call("biginteger_length", x, PACKAGE="gmp")
 }
 
-"length<-.bigz"<- function(vec, value)
+"length<-.bigz"<- function(x, value)
 {
-    .Call("biginteger_setlength", vec, value, PACKAGE="gmp")
+    .Call("biginteger_setlength", x, value, PACKAGE="gmp")
 }
 
 modulus <- function(a, value) 
@@ -169,9 +169,9 @@ modulus.bigz <- function(a,value)
     as.bigz(a,value)
 }
 
-is.na.bigz <- function(a) 
+is.na.bigz <- function(x) 
 {
-    .Call("biginteger_is_na", a, PACKAGE="gmp")
+    .Call("biginteger_is_na", x, PACKAGE="gmp")
 }
 
 "<.bigz" <- function(a,b) 
@@ -213,6 +213,38 @@ sign.bigz <- function(a)
   {
     .Call("biginteger_sgn",a,PACKAGE="gmp")
   }
+
+
+max.bigz <- function(...,na.rm=FALSE)
+{
+ .Call("biginteger_max",c.bigz(...),na.rm,PACKAGE="gmp")
+}
+
+min.bigz <- function(...,na.rm=FALSE)
+{
+ .Call("biginteger_min",c.bigz(...),na.rm,PACKAGE="gmp")
+}
+
+cumsum.bigz <- function(...)
+{
+ .Call("biginteger_cumsum",c.bigz(...),PACKAGE="gmp")
+}
+
+prod <- function(...)
+{
+  UseMethod("prod")
+}
+
+prod.default <- function(...)
+{
+  base::prod(...)
+}
+
+prod.bigz <- function(...)
+{
+ .Call("biginteger_prod",c.bigz(...),PACKAGE="gmp")
+}
+
 
 
 # TODO: Compute log functions directly on bigzs to increase accuracy

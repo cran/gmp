@@ -19,10 +19,14 @@
 #ifndef EXTRACT_MATRIX_HEADER_GMP_R_
 #define EXTRACT_MATRIX_HEADER_GMP_R_ 1
 
+
+
 #include <R.h>
 #include <Rdefines.h>
+
 #include "bigvec_q.h"
 #include "bigintegerR.h"
+
 
 extern "C"
 {
@@ -83,7 +87,7 @@ namespace extract_gmp_R
     // go !
     for(i= 0 ; i < A.value.size(); ++i)
       // retour[col        ]  [row        ] 
-      (retour[i / A.nrow ]).value[ i % A.nrow].setValue(A.value[i].getValueTemp());
+      (retour[i / A.nrow ]).value[ i % A.nrow].setValue(A.value[i]);
 	
     return(retour);
 
@@ -208,7 +212,10 @@ namespace extract_gmp_R
 		  if (*it  < 0)
 		    Rf_error("only 0's may mix with negative subscripts");
 		  if( static_cast<unsigned int>(*it-1) < matrice->size() )
-		    matricework->push_back( (*matrice)[*it-1] );
+		    {
+		      //printf("on sort %s",(*matrice)[(*it)-1][0].str(10).c_str());
+		      matricework->push_back( (*matrice)[*it-1] );
+		    }
 		      
 		}
 	      

@@ -1,3 +1,17 @@
+Sun Jan 21 2007: 0.4-2
+
+Sun Dec 17 2006 
+  * add apply function
+
+Sun Dec 03 2006
+  * add cumsum & prod 
+  * correct bugs on NA & not finite values.
+    move NA_REAL check to R_FINITE check
+    use carefully getValueTemp as it does not contains NA flag.
+
+Sun Nov 05 2006
+  * add max & min (bigintegers)
+
 Mon Oct 09 2006 0.4-1
   * Correction of bug on function urand.bigz()
 

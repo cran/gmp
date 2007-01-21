@@ -67,10 +67,10 @@ namespace bigrationalR
 	double* d = REAL(param);
 	bigvec_q v(d,d+LENGTH(param));
 	for (unsigned int j = 0; j < v.size(); ++j)
-	  if (d[j] == NA_REAL)
-	    v.value[j].setValue();
-	  else
+	  if ( R_FINITE ( d[j]) )
 	    v.value[j].setValue(d[j]);
+	  else
+	    v.value[j].setValue();
 	return v;
       }
     case INTSXP:
@@ -570,8 +570,8 @@ SEXP bigrational_setlength(SEXP vec, SEXP value)
     len = (int)*REAL(value);
     if (len < 0)
       Rf_error("vector size cannot be negative");
-    else if (len == NA_REAL)
-      Rf_error("vector size cannot be NA");
+    else if (! (R_FINITE (len ) ) )
+      Rf_error("vector size cannot be NA, NaN, or Inf");
     break;
   case STRSXP:
     // dunno why R spits out this strange error on "length(foo) <- -1"
@@ -598,6 +598,9 @@ SEXP bigrational_is_na(SEXP a)
 
 SEXP bigrational_c(SEXP args) 
 {
+  //  if(TYPEOF( args ) != LISTSXP)
+  //  Rf_error("should be a list");
+
   unsigned int i=0,j=0; 
   bigvec_q result;
   bigvec_q v;
@@ -653,3 +656,148 @@ SEXP bigrational_rep(SEXP x, SEXP times)
   
   return bigrationalR::create_SEXP(result);
 }
+
+
+
+// Return max
+SEXP bigrational_max(SEXP a, SEXP narm)
+{
+  bigvec_q result;
+
+  bigvec_q va = bigrationalR::create_bignum(a);
+
+  if( ! va.size())
+    return bigrationalR::create_SEXP(result);
+
+  unsigned int maximum = 0;
+
+  PROTECT (a = AS_INTEGER(a));
+  int na_remove = INTEGER(a)[0];
+  UNPROTECT(1);
+
+
+  for(unsigned int i = 1 ; i < va.size(); ++i)
+    {
+      if(va.value[i].isNA() && 
+	 ( ! na_remove) )
+	return(bigrationalR::create_SEXP(result));
+      else
+	if(!(va.value[i] <  va.value[maximum] ))
+	  maximum = i; // if va.value[maximum = 0] is NA => false for the "<" => maximum changed = good
+    }
+
+  result.push_back(va.value[maximum]);
+
+  return bigrationalR::create_SEXP(result);
+
+}
+
+ 
+// Return min
+
+SEXP bigrational_min(SEXP a, SEXP narm)
+{
+  bigvec_q result;
+
+  bigvec_q va = bigrationalR::create_bignum(a);
+
+  if( ! va.size())
+    return bigrationalR::create_SEXP(result);
+
+  unsigned int minimum = 0;
+
+  PROTECT (a = AS_INTEGER(a));
+  int na_remove = INTEGER(a)[0];
+  UNPROTECT(1);
+
+
+  for(unsigned int i = 1 ; i < va.size(); ++i)
+    {
+      if(va.value[i].isNA() && 
+	 ( ! na_remove) )
+	return(bigrationalR::create_SEXP(result));
+      else
+	if(!(va.value[i] >  va.value[minimum] ))
+	  minimum = i; // if va.value[maximum = 0] is NA => false for the "<" => maximum changed = good
+    }
+
+  result.push_back(va.value[minimum]);
+
+  return bigrationalR::create_SEXP(result);
+
+}
+
+// Return cumsum
+SEXP bigrational_cumsum(SEXP a)
+{
+  bigvec_q result;
+
+  bigvec_q va = bigrationalR::create_bignum(a);
+
+  result.value.resize(va.value.size());
+
+
+  mpq_t val;
+  mpq_init(val);
+  mpq_t_sentry val_s(val);
+ 
+
+
+
+  for(unsigned int i = 0 ; i < va.size(); ++i)
+    {
+      {
+	if(va.value[i].isNA() )
+	  {	
+	    break; // all last values are NA.
+	  }
+      
+	mpq_add(val,val,va.value[i].getValueTemp());
+		
+	result.value[i].setValue(val);
+      }
+    }
+
+  return(bigrationalR::create_SEXP(result));
+
+}
+ 
+
+// Return prod
+  
+SEXP bigrational_prod(SEXP a)
+{
+
+  bigvec_q result;
+
+  bigvec_q va = bigrationalR::create_bignum(a);
+
+  result.value.resize(1);
+
+
+  mpq_t val;
+  mpq_init(val);
+  mpq_set_ui(val,1,1);
+  mpq_t_sentry val_s(val);
+ 
+
+
+  for(unsigned int i = 0 ; i < va.size(); ++i)
+    {
+      {
+	if(va.value[i].isNA() )
+	  {	
+	    return (bigrationalR::create_SEXP(result));
+	  }
+      
+	mpq_mul(val,val,va.value[i].getValueTemp());
+	
+      }
+    }
+
+  result.value[0].setValue(val);
+
+  return(bigrationalR::create_SEXP(result));
+
+}
+

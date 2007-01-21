@@ -135,6 +135,26 @@ extern "C"
    */
   SEXP bigrational_rep(SEXP x, SEXP times) ;
 
+  /**
+   * \brief Return max
+   */
+  SEXP bigrational_max(SEXP a, SEXP narm);
+
+  /**
+   * \brief Return min
+   */
+  SEXP bigrational_min(SEXP a, SEXP narm);
+
+  /**
+   * \brief Return cumsum
+   */
+  SEXP bigrational_cumsum(SEXP a);
+  /**
+   * \brief Return prod
+   */
+  SEXP bigrational_prod(SEXP a);
+
+
 }
 
 

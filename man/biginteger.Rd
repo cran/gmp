@@ -11,11 +11,11 @@
 }
 \usage{
 as.bigz(a, mod = NA)
-as.character.bigz(a,b=10)
+as.character.bigz(x,b=10,...)
 as.double.bigz(x,...)
 %as.bigz(str, mod = NA)
 %as.bigz(big, mod = NA)
-is.na.bigz(a)
+is.na.bigz(x)
 print.bigz(x,...)
 }
 %- maybe also 'usage' for other objects documented here.

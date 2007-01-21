@@ -116,10 +116,10 @@ class bigrational
     na(false) 
     {
       mpq_init(value);
-      if(value_ == NA_REAL)
-	na = true  ;
-      else
+      if(R_FINITE( value_ ) )
 	mpq_set_d(value, value_);  
+      else
+	na = true  ;
     }
 
   /**
@@ -201,10 +201,10 @@ class bigrational
   /** \brief set value from float (double)
    */
   void setValue(double value_) {      
-    if(value_ == NA_REAL)
-      {mpq_set_ui(value, 0,1); na = true  ;}
-    else
+    if( R_FINITE (value_ ) )
       {mpq_set_d(value, value_); na = false;}
+    else
+      {mpq_set_ui(value, 0,1); na = true  ;}
   }
 
 
@@ -226,6 +226,15 @@ class bigrational
     }
     
   /**
+   * \brief set value from biginteger value
+   */
+  void setValue(const bigrational & value_)
+    {
+      mpq_set(value,value_.getValueTemp());
+      na = value_.isNA();
+    }
+    
+  /**
    * For const-purposes, return the value. Remember, that the return value
    * only lives as long as this class live, so do not call getValueTemp on
    * temporary objects.
@@ -237,6 +246,11 @@ class bigrational
    */
   bool isNA() const {return na;}
     
+  /**
+   * set NA value
+   */
+  void NA(bool value)  {na = value;}
+
   /**
    * Return 1, if the value is > 0;  -1 when negative, 0 when 0.
    */
@@ -333,6 +347,15 @@ bigrational operator/(const bigrational& rhs, const bigrational& lhs);
 
 /** \brief comparison operator
  */
-//bool operator!= (const bigrational& rhs, const bigrational& lhs);
+bool operator> (const bigrational& rhs, const bigrational& lhs);
+
+/** \brief comparison operator
+ */
+bool operator< (const bigrational& rhs, const bigrational& lhs);
+
+
+/** \brief comparison operator
+ */
+bool operator!= (const bigrational& rhs, const bigrational& lhs);
 
 #endif

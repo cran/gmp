@@ -23,8 +23,8 @@ bigmod & bigmod::operator= (const bigmod& rhs)
 {
   if(this != &rhs)
     {
-      modulus = rhs.modulus;
-      value = rhs.value;
+      modulus.setValue( rhs.modulus );
+      value.setValue(rhs.value );
     }
   return(*this);
 }

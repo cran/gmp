@@ -16,10 +16,10 @@
 }
 \usage{
 as.bigq(n, d = 1)
-as.character.bigq(a,b=10)
+as.character.bigq(x,b=10,...)
 as.double.bigq(x,...)
 as.bigz.bigq(a,mod=NA)
-is.na.bigq(a)
+is.na.bigq(x)
 print.bigq(x,...)
 denominator(x)
 numerator(x)

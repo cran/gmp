@@ -51,9 +51,9 @@ as.bigq<- function(n,d=1)
     .Call("bigrational_as", n, d, PACKAGE="gmp")
 }
 
-as.character.bigq<- function(a,b=10)
+as.character.bigq<- function(x,b=10,...)
 {
-    .Call("bigrational_as_character", a,as.integer(b), PACKAGE="gmp")
+    .Call("bigrational_as_character", x,as.integer(b), PACKAGE="gmp")
 }
 
 as.double.bigq<- function(x,...)
@@ -102,19 +102,19 @@ sign.bigq <- function(a)
     .Call("bigrational_set_at", dst, idx, value, PACKAGE="gmp")
 }
 
-length.bigq<- function(a)
+length.bigq<- function(x)
 {
-    .Call("bigrational_length", a, PACKAGE="gmp")
+    .Call("bigrational_length", x, PACKAGE="gmp")
 }
 
-"length<-.bigq"<- function(vec, value)
+"length<-.bigq"<- function(x, value)
 {
-    .Call("bigrational_setlength", vec, value, PACKAGE="gmp")
+    .Call("bigrational_setlength", x, value, PACKAGE="gmp")
 }
 
-is.na.bigq <- function(a) 
+is.na.bigq <- function(x) 
 {
-    .Call("bigrational_is_na", a, PACKAGE="gmp")
+    .Call("bigrational_is_na", x, PACKAGE="gmp")
 }
 
 "<.bigq" <- function(a,b) 
@@ -179,3 +179,25 @@ solve.bigq <- function(a,b,...)
 {
   .Call("matrix_set_at_q", dst, value,idx,jdx , PACKAGE="gmp")
 }
+
+
+max.bigq <- function(...,na.rm=FALSE)
+{
+ .Call("bigrational_max",c.bigq(...),na.rm,PACKAGE="gmp")
+}
+
+min.bigq <- function(...,na.rm=FALSE)
+{
+ .Call("bigrational_min",c.bigq(...),na.rm,PACKAGE="gmp")
+}
+
+cumsum.bigq <- function(...)
+{
+ .Call("bigrational_cumsum",c.bigq(...),PACKAGE="gmp")
+}
+
+prod.bigq <- function(...)
+{
+ .Call("bigrational_prod",c.bigq(...),PACKAGE="gmp")
+}
+

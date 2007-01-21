@@ -34,6 +34,9 @@ solve.bigq(a, b, ...)
 
 \author{Antoine Lucas}
 
+
+\seealso{\code{\link[base]{solve}}}
+
 \examples{
  x = matrix(1:4,2,2)
  ## standard solve
