@@ -204,14 +204,14 @@ is.na.bigz <- function(x)
     .Call("biginteger_neq", a, b, PACKAGE="gmp")
 }
 
-abs.bigz <- function(a)
+abs.bigz <- function(x)
   {
-    .Call("biginteger_abs",a,PACKAGE="gmp")
+    .Call("biginteger_abs",x,PACKAGE="gmp")
   }
 
-sign.bigz <- function(a)
+sign.bigz <- function(x)
   {
-    .Call("biginteger_sgn",a,PACKAGE="gmp")
+    .Call("biginteger_sgn",x,PACKAGE="gmp")
   }
 
 

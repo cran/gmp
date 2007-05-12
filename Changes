@@ -1,3 +1,9 @@
+Tue May 12 2007: 0.4-4
+  * Other corrections of S3 generic/method consistency (add parameter ... on some functions)
+
+Tue May 10 2007: 0.4-3
+  * correction of S3 generic/method consistency (add parameter ... on some functions)
+
 Sun Jan 21 2007: 0.4-2
 
 Sun Dec 17 2006 

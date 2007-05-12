@@ -20,11 +20,11 @@ add.bigq(a, b)
 sub.bigq(a, b=NULL)
 mul.bigq(a, b)
 div.bigq(a, b)
-abs.bigq(a)
+abs.bigq(x)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{a,b}{bigq, integer or string from an integer}
+  \item{a,b,x}{bigq, integer or string from an integer}
   \item{...}{Additional parameters}
 }
 \details{

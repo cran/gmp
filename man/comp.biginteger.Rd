@@ -12,11 +12,11 @@
 Binary operators which allow the comparison of values in atomic vectors.
 }
 \usage{
-sign.bigz(a)
+sign.bigz(x)
 }
 
 \arguments{
-  \item{a}{Object or vector of class bigz}
+  \item{x}{Object or vector of class bigz}
 }
 
 \examples{

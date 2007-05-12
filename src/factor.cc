@@ -40,7 +40,6 @@ using namespace std;
 #include "factor.h"
 
 
-static int flag_verbose = 0;
 
 static unsigned add[] = {4, 2, 4, 2, 4, 6, 2, 6};
 
@@ -54,12 +53,6 @@ void factor_using_division (mpz_t t, unsigned int limit,  bigvec & result)
   unsigned *addv = add;
   unsigned int failures;
 
-  if (flag_verbose)
-    {
-      printf ("[trial division (%u)] ", limit);
-      fflush (stdout);
-    }
-
   mpz_init (q);
   mpz_init (r);
 
@@ -68,9 +61,7 @@ void factor_using_division (mpz_t t, unsigned int limit,  bigvec & result)
   while (f)
     {
 
-      (result).value.push_back(biginteger(2));
-      //      printf ("2 ");
-      fflush (stdout);
+      result.value.push_back(biginteger(2));
       --f;
     }
 
@@ -80,9 +71,7 @@ void factor_using_division (mpz_t t, unsigned int limit,  bigvec & result)
       if (mpz_cmp_ui (r, 0) != 0)
         break;
       mpz_set (t, q);
-      //printf ("3 ");
-      fflush (stdout);
-      (result).value.push_back(biginteger(3));
+      result.value.push_back(biginteger(3));
      }
 
   for (;;)
@@ -91,9 +80,7 @@ void factor_using_division (mpz_t t, unsigned int limit,  bigvec & result)
       if (mpz_cmp_ui (r, 0) != 0)
         break;
       mpz_set (t, q);
-      //printf ("5 ");
-      fflush (stdout);
-      (result).value.push_back(biginteger(5));
+      result.value.push_back(biginteger(5));
     }
 
   failures = 0;
@@ -115,10 +102,8 @@ void factor_using_division (mpz_t t, unsigned int limit,  bigvec & result)
       else
         {
           mpz_swap (t, q);
-          //printf ("%lu ", f);
-          fflush (stdout);
           failures = 0;
-          (result).value.push_back(biginteger(f));
+          result.value.push_back(biginteger(f));
         }
     }
 
@@ -143,10 +128,7 @@ factor_using_division_2kp (mpz_t t, unsigned int limit, unsigned long p,  bigvec
         {
           mpz_tdiv_q (t, t, f);
           mpz_tdiv_r (r, t, f);
-          (result).value.push_back(biginteger(f));
-          //mpz_out_str (stdout, 10, f);
-          fflush (stdout);
-          fputc (' ', stdout);
+          result.value.push_back(biginteger(f));
         }
       mpz_add_ui (f, f, 2 * p);
     }
@@ -163,12 +145,6 @@ factor_using_pollard_rho (mpz_t n, int a_int, unsigned long p, bigvec & result)
   mpz_t g;
   mpz_t t1, t2;
   int k, l, c, i;
-
-  if (flag_verbose)
-    {
-      printf ("[pollard-rho (%d)] ", a_int);
-      fflush (stdout);
-    }
 
   mpz_init (g);
   mpz_init (t1);
@@ -255,21 +231,12 @@ S4:
             }
           while (a_int == -2 || a_int == 0);
 
-          if (flag_verbose)
-            {
-              printf ("[composite factor--restarting pollard-rho] ");
-              fflush (stdout);
-            }
           factor_using_pollard_rho (g, a_int, p,result);
           break;
         }
       else
         {
-          //mpz_out_str (stdout, 10, g);
-          (result).value.push_back(biginteger(g));
-
-          fflush (stdout);
-          fputc (' ', stdout);
+          result.value.push_back(biginteger(g));
         }
       mpz_div (n, n, g);
       mpz_mod (x, x, n);
@@ -277,10 +244,7 @@ S4:
       mpz_mod (y, y, n);
       if (mpz_probab_prime_p (n, 3))
         {
-          (result).value.push_back(biginteger(n));
-          //mpz_out_str (stdout, 10, n);
-          fflush (stdout);
-          fputc (' ', stdout);
+          result.value.push_back(biginteger(n));
           break;
         }
     }
@@ -317,15 +281,9 @@ factor (mpz_t t, unsigned long p,  bigvec & result)
 
   if (mpz_cmp_ui (t, 1) != 0)
     {
-      if (flag_verbose)
-        {
-          printf ("[is number prime?] ");
-          fflush (stdout);
-        }
       if (mpz_probab_prime_p (t, 3))
         {
-          (result).value.push_back(biginteger(t));
-          //mpz_out_str (stdout, 10, t);
+          result.value.push_back(biginteger(t));
         }
       else
         factor_using_pollard_rho (t, 1, p,result);

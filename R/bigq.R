@@ -81,14 +81,14 @@ as.bigz.bigq<- function(a,mod = NA)
   as.bigz(numerator(a) %/% denominator(a),mod)
 }
 
-abs.bigq <- function(a)
+abs.bigq <- function(x)
    {
-     numerator(a) <- abs(numerator(a))
-     a
+     numerator(x) <- abs(numerator(x))
+     x
    }
 
-sign.bigq <- function(a)  
-  sign(numerator(a))
+sign.bigq <- function(x)  
+  sign(numerator(x))
   
 
 
