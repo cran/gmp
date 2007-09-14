@@ -7,6 +7,7 @@
 
 \title{Returns the maxima and minima of the input values.}
 
+
 \usage{
      max.bigz(..., na.rm=FALSE)
      max.bigq(..., na.rm=FALSE)
@@ -30,14 +31,15 @@
 
 \author{Antoine Lucas}
 
+
 \examples{
   x = as.bigz(1:10)
-  ## call max.bigz => return 10
+  ##_call max.bigz => return 10
   max(x)
   min(x)
 
   x = as.bigq(1:10)
-  ## call max.bigq
+  ##_call max.bigq
   max(x)
   min(x)
   

@@ -126,14 +126,14 @@ SEXP as_matrixz (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP mod)
 SEXP bigint_transposeR(SEXP x)
 {
   int nr=0, nc;
-  SEXP dimAttr,dimName;
+  SEXP dimName;
   //  int sizemod = matrixz_utils::length_modulus(x);
 
-  PROTECT(dimAttr);
+
   PROTECT(dimName = Rf_allocVector(STRSXP,1));    
   SET_STRING_ELT(dimName, 0, Rf_mkChar("nrow"));
-  dimAttr = Rf_getAttrib(x, dimName);
-  UNPROTECT(2);
+  UNPROTECT(1);
+  SEXP dimAttr = Rf_getAttrib(x, dimName);
   if (TYPEOF(dimAttr) == INTSXP) {
     nr = INTEGER(dimAttr)[0];
   }
@@ -279,7 +279,7 @@ SEXP biginteger_rbind(SEXP args)
 
   result = bigintegerR::create_bignum(VECTOR_ELT(args,0));
   if(result.nrow ==0)
-    result.nrow == result.size();
+    result.nrow = result.size();
 
   result = matrixz::bigint_transpose(result,result.nrow,result.size() / result.nrow) ;
 

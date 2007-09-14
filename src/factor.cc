@@ -180,7 +180,7 @@ S2:
             goto S4;
           mpz_set (y, x);
         }
-S3:
+//S3:
       k--;
       if (k > 0)
         goto S2;

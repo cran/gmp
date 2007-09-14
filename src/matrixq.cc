@@ -127,13 +127,14 @@ SEXP as_matrixq (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP den)
 SEXP bigq_transposeR(SEXP x)
 {
   int nr=0, nc;
-  SEXP dimAttr,dimName;
+  SEXP dimName;
 
-  PROTECT(dimAttr);
-  PROTECT(dimName = Rf_allocVector(STRSXP,1));    
+
+  PROTECT(dimName = Rf_allocVector(STRSXP,1) );
   SET_STRING_ELT(dimName, 0, Rf_mkChar("nrow"));
-  dimAttr = Rf_getAttrib(x, dimName);
-  UNPROTECT(2);
+  UNPROTECT(1);
+  SEXP dimAttr = Rf_allocVector(STRSXP,1);
+
   if (TYPEOF(dimAttr) == INTSXP) {
     nr = INTEGER(dimAttr)[0];
   }
@@ -253,7 +254,7 @@ SEXP bigrational_rbind(SEXP args)
 
   result = bigrationalR::create_bignum(VECTOR_ELT(args,0));
   if(result.nrow ==0)
-    result.nrow == result.size();
+    result.nrow = result.size();
 
   result = matrixq::bigq_transpose(result,result.nrow,result.size() / result.nrow) ;
 

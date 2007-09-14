@@ -1,3 +1,11 @@
+
+Tue Sep 14 2007: 0.4-6
+  * correction on c++: supress all g++ warnings
+
+Tue Sep 14 2007: 0.4-5
+  * correction of bug ref 698 [abs.bigz]
+  * man pages corrected
+
 Tue May 12 2007: 0.4-4
   * Other corrections of S3 generic/method consistency (add parameter ... on some functions)
 

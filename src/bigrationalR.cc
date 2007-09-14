@@ -129,12 +129,12 @@ namespace bigrationalR
     UNPROTECT(1);
     bigvec_q v = bigrationalR::create_vector(param);
 
-    SEXP dimAttr, dimName;
-    PROTECT(dimAttr);
+
+    SEXP dimName;
     PROTECT(dimName = Rf_allocVector(STRSXP,1));    
     SET_STRING_ELT(dimName, 0, Rf_mkChar("nrow"));
-    dimAttr = Rf_getAttrib(param, dimName);
-    UNPROTECT(2);
+    UNPROTECT(1);
+    SEXP dimAttr = Rf_getAttrib(param, dimName);
     if (TYPEOF(dimAttr) == INTSXP) 
       v.nrow = INTEGER(dimAttr)[0];
     else
@@ -625,7 +625,7 @@ SEXP bigrational_cbind(SEXP args)
 
   result = bigrationalR::create_bignum(VECTOR_ELT(args,0));
   if(result.nrow ==0)
-    result.nrow == result.size();
+    result.nrow = result.size();
 
   for(i =1; i<LENGTH(args);i++)
     {

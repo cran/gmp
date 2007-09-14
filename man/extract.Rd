@@ -1,4 +1,4 @@
-\name{[.bigz}
+\name{Extract}
 
 \alias{[.bigz}
 \alias{[<-.bigz}
@@ -13,14 +13,13 @@
 Operators acting on vectors, arrays and lists to extract or replace subsets.
 }
 \usage{
-a[i]
 c.bigz(...,recursive = FALSE)
 rep.bigz(x,times,...)
 }
 
 \arguments{
-  \item{a,x}{Object or vector of class bigz}
-  \item{i}{Integer, index of the vector}
+  \item{x}{Object or vector of class bigz}
+%  \item{i}{Integer, index of the vector}
   \item{...}{Additional parameters}
   \item{times}{Integer}
   \item{recursive}{Unused}
@@ -43,7 +42,7 @@ rep.bigz(x,times,...)
   ## repeate a 5 times
   rep(a,5)
 
-  ## with matrix
+  ##_with matrix
   m =  matrix.bigz(1:6,3)
 
   ## this do the same:
@@ -53,7 +52,7 @@ rep.bigz(x,times,...)
   m[-c(2,3)]
   m[c(TRUE,FALSE,FALSE)]
 
-  ## modification on matrix
+  ##_modification on matrix
   m[2,-1] <- 11
   }
 

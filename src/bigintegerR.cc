@@ -115,12 +115,11 @@ namespace bigintegerR
     SEXP modAttr = Rf_getAttrib(param, modName);
     UNPROTECT(1);
 
-    SEXP dimAttr, dimName;
-    PROTECT(dimAttr);
+    SEXP dimName;
     PROTECT(dimName = Rf_allocVector(STRSXP,1));    
     SET_STRING_ELT(dimName, 0, Rf_mkChar("nrow"));
-    dimAttr = Rf_getAttrib(param, dimName);
-    UNPROTECT(2);
+    UNPROTECT(1);
+    SEXP dimAttr = Rf_getAttrib(param, dimName);
 
     // try to catch biz-nrow dimension value
     //std::cout << "import value" << std::endl;
@@ -580,13 +579,13 @@ SEXP biginteger_c(SEXP args)
 
 SEXP biginteger_cbind(SEXP args) 
 {
-  int i=0,j=0,nrow=0; 
+  int i=0,j=0; 
   bigvec result;
   bigvec v;
 
   result = bigintegerR::create_bignum(VECTOR_ELT(args,0));
   if(result.nrow ==0)
-    result.nrow == result.size();
+    result.nrow = result.size();
 
   for(i =1; i<LENGTH(args);i++)
     {
@@ -673,10 +672,15 @@ SEXP biginteger_abs(SEXP a)
   for (unsigned int i = 0; i < v.size(); ++i)
     {
       mpz_abs(val,v[i].value.getValueTemp());
-      result.push_back(bigmod());
-      result[i].value.setValue(val);
+      result.push_back(bigmod(val));
+
+      // TODO: understand why following lines don't work.
+      //result.push_back(bigmod());
+      //result[i].value.setValue(val);
     }
     
+  result.modulus = v.modulus;
+
   return bigintegerR::create_SEXP(result);
     
 }

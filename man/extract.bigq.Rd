@@ -13,14 +13,13 @@
   Operators acting on vectors, arrays and lists to extract or replace subsets.
 }
 \usage{
-a[i]
 c.bigq(...,recursive = FALSE)
 rep.bigq(x,times,...)
 }
 
 \arguments{
-  \item{a,x}{Object or vector of class bigz}
-  \item{i}{Integer, index of the vector}
+  \item{x}{Object or vector of class bigz}
+%  \item{i}{Integer, index of the vector}
   \item{...}{Additional parameters}
   \item{times}{Integer}
   \item{recursive}{Unused}
