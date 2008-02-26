@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2006-06-14 22:59:27 antoine>
+ *  \date Last modified: Time-stamp: <2008-02-19 21:29:21 antoine>
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
@@ -51,7 +51,7 @@ static int seed_init=0;
 namespace bigintegerR
 {
   // \brief create a vector of bigvecs, all without a modulus.
-  bigvec create_vector(SEXP param) {
+  bigvec create_vector(const SEXP & param) {
     switch (TYPEOF(param)) {
     case RAWSXP:
       {	
@@ -108,7 +108,7 @@ namespace bigintegerR
     }
   }
 
-  bigvec create_bignum(SEXP param) {
+  bigvec create_bignum(const SEXP & param) {
     SEXP modName;
     PROTECT(modName = Rf_allocVector(STRSXP,1));
     SET_STRING_ELT(modName, 0, Rf_mkChar("mod"));
@@ -150,7 +150,7 @@ namespace bigintegerR
 	
   }
 
-  std::vector<int> create_int(SEXP param) {
+  std::vector<int> create_int(const SEXP & param) {
     switch (TYPEOF(param)) {
     case REALSXP:
       {
@@ -239,7 +239,7 @@ namespace bigintegerR
    * This could also be written as a class functor (template)
    * to save one function call, but then code bloat will happen.
    */
-  SEXP biginteger_binary_operation(SEXP a, SEXP b, biginteger_binary_fn f)
+  SEXP biginteger_binary_operation(const SEXP & a,const SEXP&  b, biginteger_binary_fn f)
   {
     bigvec va = bigintegerR::create_bignum(a);
     bigvec vb = bigintegerR::create_bignum(b);
@@ -256,7 +256,7 @@ namespace bigintegerR
   }
 
 
-  SEXP biginteger_logical_binary_operation(SEXP a, SEXP b, biginteger_logical_binary_fn f)
+  SEXP biginteger_logical_binary_operation(const SEXP & a,const SEXP & b, biginteger_logical_binary_fn f)
   {
     bigvec va = bigintegerR::create_bignum(a);
     bigvec vb = bigintegerR::create_bignum(b);
@@ -398,7 +398,7 @@ bigvec bigintegerR::biginteger_get_at_C(bigvec va,SEXP b)
     return result;
   } 
   else {
-    vb.erase(remove(vb.begin(), vb.end(), 0), vb.end()); // remove all zeroes
+    std::remove(vb.begin(), vb.end(), 0); // remove all zeroes
     if (vb.empty())
       return bigvec();
 
@@ -456,7 +456,7 @@ SEXP biginteger_set_at(SEXP src, SEXP idx, SEXP value)
     return bigintegerR::create_SEXP(result);
   }
   else {
-    vidx.erase(remove(vidx.begin(), vidx.end(), 0), vidx.end()); // remove all zeroes
+    std::remove(vidx.begin(), vidx.end(), 0); // remove all zeroes
     if (vidx.empty())
       return bigintegerR::create_SEXP(result);
     // return = (src[-idx] <- value)

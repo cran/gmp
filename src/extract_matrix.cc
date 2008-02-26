@@ -77,12 +77,12 @@ SEXP matrix_set_at_z(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
   extract_gmp_R::set_at( mat,val,INDI,INDJ);
   return(bigintegerR::create_SEXP(mat));
 
- }
+}
 
- // for something like A[indi, indj] <- val
- SEXP matrix_set_at_q(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
- {
-   bigvec_q mat = bigrationalR::create_bignum(A);
+// for something like A[indi, indj] <- val
+SEXP matrix_set_at_q(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
+{
+  bigvec_q mat = bigrationalR::create_bignum(A);
 
   if(TYPEOF(INDI) != LGLSXP )
     {
@@ -94,21 +94,24 @@ SEXP matrix_set_at_z(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
 	  return( bigrational_set_at(A,INDI,VAL) );
     }
 
-   bigvec_q val = bigrationalR::create_bignum(VAL);
+  bigvec_q val = bigrationalR::create_bignum(VAL);
 
-   extract_gmp_R::set_at( mat,val,INDI,INDJ);
+  extract_gmp_R::set_at( mat,val,INDI,INDJ);
 
-   return(bigrationalR::create_SEXP(mat));
+  return(bigrationalR::create_SEXP(mat));
 
- }
-
-
- std::vector<bool> extract_gmp_R::indice_set_at (unsigned int n , SEXP & IND)
- {
+}
 
 
-   std::vector<int> vidx = bigintegerR::create_int(IND);
-   std::vector<bool> result (n,false);
+//
+// return a vector of n boolean corresponding to values that must be affected.
+//
+std::vector<bool> extract_gmp_R::indice_set_at (unsigned int n , SEXP & IND)
+{
+
+  
+  std::vector<int> vidx = bigintegerR::create_int(IND);
+  std::vector<bool> result (n,false);
 
 
   if(TYPEOF(IND) != NILSXP)	

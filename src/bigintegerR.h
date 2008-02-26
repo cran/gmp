@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2006   
- *  \date Last modified: Time-stamp: <2006-06-11 20:32:59 antoine>
+ *  \date Last modified: Time-stamp: <2008-02-17 22:25:46 antoine>
  *
  *
  *  \note Licence: GPL
@@ -33,17 +33,17 @@ namespace bigintegerR{
 
   /** \brief create a vector of bigmod, all without a modulus.
    */
-  bigvec create_vector(SEXP param);
+  bigvec create_vector(const SEXP & param);
 
   /**
    * \brief create a vector of bigmod
    */
-  bigvec create_bignum(SEXP param);
+  bigvec create_bignum(const SEXP & param);
 
   /**
    * \brief create a vector of int
    */
-  std::vector<int> create_int(SEXP param) ;
+  std::vector<int> create_int(const SEXP & param) ;
 
 
   /**
@@ -56,9 +56,9 @@ namespace bigintegerR{
    */
   SEXP create_SEXP(const bigvec & v);
   
-  SEXP biginteger_binary_operation(SEXP a, SEXP b, biginteger_binary_fn f);
+  SEXP biginteger_binary_operation(const SEXP & a,const SEXP & b, biginteger_binary_fn f);
 
-  SEXP biginteger_logical_binary_operation(SEXP a, SEXP b, biginteger_logical_binary_fn f);
+  SEXP biginteger_logical_binary_operation(const SEXP & a,const SEXP & b, biginteger_logical_binary_fn f);
 
   bool lt(const biginteger& lhs, const biginteger& rhs);
   

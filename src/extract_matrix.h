@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 25/06/11   
- *  \date Last modified: Time-stamp: <2006-06-17 23:08:24 antoine>
+ *  \date Last modified: Time-stamp: <2008-02-27 21:04:52 antoine>
  *
  *  \author A. Lucas
  *
@@ -26,7 +26,7 @@
 
 #include "bigvec_q.h"
 #include "bigintegerR.h"
-
+#include <algorithm>
 
 extern "C"
 {
@@ -55,6 +55,8 @@ namespace extract_gmp_R
    * containing boolean: true: we update line/row, flase : we do not
    * change anything
    *
+   * \return a vector of n boolean corresponding to values that must be affected.
+   *
    */
   std::vector<bool> indice_set_at (unsigned int n , SEXP & IND);
 
@@ -62,14 +64,14 @@ namespace extract_gmp_R
   
   /**
    * \brief tranform a matrix from bigvec or bigvec_q format to 
-   * vector<vector< big > > (a vector of lines)
+   * vector<vector< big > > (a vector of columns)
    *
    * \note for bigvec: it does not take into account modulus. 
    *       
    */
-  template< class T> std::vector<T> toVecVec(T& A)
+  template< class T> void  toVecVec(T& A, std::vector<T * > & retour )
   {
-    std::vector<T> retour;
+    //typename std::vector<T> retour;
     unsigned int i;
 
     // case: vector
@@ -82,19 +84,29 @@ namespace extract_gmp_R
     
     retour.resize(A.size() / A.nrow);
     for(i = 0; i < retour.size();  ++i)
-      retour[i].value.resize(A.nrow);
-
+      {
+	retour[i] = new T();
+	retour[i]->value.resize(A.nrow);
+      }
     // go !
     for(i= 0 ; i < A.value.size(); ++i)
       // retour[col        ]  [row        ] 
-      (retour[i / A.nrow ]).value[ i % A.nrow].setValue(A.value[i]);
+      (retour[i / A.nrow ])->value[ i % A.nrow].setValue(A.value[i]);
 	
-    return(retour);
+    //return(retour);
 
   }
 
 
 
+
+  template< class T> void clearVec(typename std::vector<T*> & vec )
+    {
+      for (typename std::vector<T*>::const_iterator it = vec.begin();
+	   it != vec.end();
+	   ++it)
+	delete *it;
+    }
 
 
   /**
@@ -108,17 +120,23 @@ namespace extract_gmp_R
    */
   template< class T> T get_at (T & A ,SEXP  & INDI, SEXP & INDJ)
   {
+
     // result = A[indii,indj]
     unsigned int oldnrow = A.nrow;
 
-    std::vector<int> vi = bigintegerR::create_int(INDJ);
+    std::vector<int> indJ = bigintegerR::create_int(INDJ);
 
-    std::vector<T> matricetmp = toVecVec(A);
-    std::vector<T> matricetmp2;
+    typename std::vector<T*> matricetmp ;
+    typename std::vector<T*> matricetmp2;
+    
+    toVecVec(A,matricetmp);
+    typename std::vector<T*> copyAdress( matricetmp);
+
+
 
     // only pointers
-    std::vector<T> * matrice = &matricetmp;
-    std::vector<T> * matricework = &matricetmp2; 
+    typename std::vector<T*> * matrice = &matricetmp;
+    typename std::vector<T*> * matricework = &matricetmp2; 
 
     T retour;
 
@@ -130,20 +148,24 @@ namespace extract_gmp_R
     // --------------------------
 
     if(A.size()==0)
-      return(retour);
-
+      {
+	clearVec<T>(copyAdress);
+	return(retour);
+      }
 
     if(TYPEOF(INDJ) != NILSXP)	
+      {
       //LOCICAL
       if (TYPEOF(INDJ) == LGLSXP) 
 	{
 	    
-	  // for all rows
+	  // for all columns
 	  unsigned int delta=0;
-	  for (i = 0; i < (*matrice)[0].size(); ++i)
+	  for (i = 0; i < (*matrice)[0]->size(); ++i)
 	    {
-	      if (! vi[i+delta% vi.size()]) 
+	      if (! indJ[i+delta% indJ.size()]) 
 		{
+		  // remove columns i
 		  matrice->erase(i+ matrice->begin());
 		  --i; // indice in modified matrix
 		  ++delta; // i+delta: old indice
@@ -153,34 +175,37 @@ namespace extract_gmp_R
 	}
       else //INDJ: numbers
 	{
-	  vi.erase(remove(vi.begin(), vi.end(), 0),vi.end()) ; // remove all zeroes
-	  if (vi.empty())
-	    return retour;
+	  std::remove(indJ.begin(), indJ.end(), 0) ; // remove all zeroes
+	  if (indJ.empty())
+	    {
+	      clearVec<T>(copyAdress);
+	      return retour;
+	    }
 	  
 	  // case: a[-b]
 	  // negatives...
-	  if(vi[0] < 0)
+	  if(indJ[0] < 0)
 	    {
 	      // sort in reverse order
-	      std::sort(vi.begin(),vi.end(),std::greater<int>() );
+	      std::sort(indJ.begin(),indJ.end(),std::greater<int>() );
 	      
-	      // we should have vi like -1 -3 -7 -7 -12 ...
+	      // we should have indJ like -1 -3 -7 -7 -12 ...
 
-	      // remove duplicates
-	      it = std::unique(vi.begin(),vi.end());
-	      vi.erase(it,vi.end());
+	      // remove consecutive  duplicates
+	      it = std::unique(indJ.begin(),indJ.end());
+	      //indJ.erase(it,indJ.end());
 
-	      if ( vi.back() > 0)
+	      if ( indJ.back() > 0)
 		Rf_error("only 0's may mix with negative subscripts");
 
 
 	      
-	      it=vi.begin();
+	      it=indJ.begin();
 	      unsigned int delta=0;
 	      // for all columns
 	      for (j = 0; j < matrice->size(); ++j)
 		{
-		  if(it == vi.end())
+		  if(it == indJ.end())
 		    break;
 
 		  if (*it == - static_cast<int>(j+1+delta) ) 
@@ -204,10 +229,10 @@ namespace extract_gmp_R
 	      
 	      // allocate new matrix (all will be copied)
 	      // number of columns
-	      matricework->reserve(vi.size());
+	      matricework->reserve(indJ.size());
 
 	      // for all [new] rows
-	      for( it=vi.begin(); it != vi.end(); it++)
+	      for( it=indJ.begin(); it != indJ.end(); it++)
 		{
 		  if (*it  < 0)
 		    Rf_error("only 0's may mix with negative subscripts");
@@ -226,28 +251,33 @@ namespace extract_gmp_R
 	    }//end of case: int+positive values
 	  
 	}
-
+      }      
 
     if(matrice->size()==0)
-      return(retour);
+      {	
+	clearVec<T>(copyAdress);	
+	return(retour);
+      }
 
     // --------------------------
     // PART 2:  ROWS
     // --------------------------
-    vi = bigintegerR::create_int(INDI);
+    indJ.empty();
+    std::vector<int> indI = bigintegerR::create_int(INDI);
     if(TYPEOF(INDI) != NILSXP)	
+      {
       //LOCICAL
       if (TYPEOF(INDI) == LGLSXP) 
 	{
 	  // for all rows
 	  unsigned int delta = 0;
-	  for (i = 0; i < (*matrice)[0].size(); ++i)
+	  for (i = 0; i < (*matrice)[0]->size(); ++i)
 	    {
-	      if (! vi[(i+delta)% vi.size()]) 
+	      if (! indI[(i+delta)% indI.size()]) 
 		{
-		  // for all columns
+		  // for all columns j delete row i
 		  for (j = 0; j < matrice->size(); ++j)	     
-		    (*matrice)[j].value.erase(i+(*matrice)[j].value.begin());
+		    (*matrice)[j]->value.erase(i+(*matrice)[j]->value.begin());
 		      
 		  //++newnrow;
 		  --i; // i: new indice in modified matrix
@@ -259,40 +289,43 @@ namespace extract_gmp_R
 	}
       else //INDI: numbers
 	{
-	  vi.erase(remove(vi.begin(), vi.end(), 0),vi.end()) ; // remove all zeroes
-	  if (vi.empty())
-	    return retour;
+	  std::remove(indI.begin(), indI.end(), 0) ; // remove all zeroes
+	  if (indI.empty())
+	    {
+	      clearVec<T>(copyAdress);
+	      return retour;
+	    }
 	  
 	  // case: a[-b]
 	  // negatives...
-	  if(vi[0] < 0)
+	  if(indI[0] < 0)
 	    {
-	      std::sort(vi.begin(),vi.end(),std::greater<int>() );
-	      // we should have vi like -1 -3 -7 -7 -12 ...
+	      std::sort(indI.begin(),indI.end(),std::greater<int>() );
+	      // we should have indI like -1 -3 -7 -7 -12 ...
 
 	      // remove duplicates
-	      it = std::unique(vi.begin(),vi.end());
-	      vi.erase(it,vi.end());
+	      std::unique(indI.begin(),indI.end());
+	      //indI.erase(it,indI.end());
 	    
-	      if ( vi.back() > 0)
+	      if ( indI.back() > 0)
 		Rf_error("only 0's may mix with negative subscripts");
 
 
 	     
 	      //newnrow = A.nrow;
-	      it=vi.begin();
+	      it=indI.begin();
 	      // for all rows
 	      unsigned int delta = 0;
-	      for (i = 0; i < (*matrice)[0].size(); ++i)
+	      for (i = 0; i < (*matrice)[0]->size(); ++i)
 		{
 		
-		  if(it != vi.end() )
+		  if(it != indI.end() )
 		    if (*it == - static_cast<int>(i+1+delta) ) 
 		      {
-			// for all columns
+			// for all columns j remove row i
 			for (j = 0; j < matrice->size(); ++j)
 			  {
-			    (*matrice)[j].value.erase(i+(*matrice)[j].value.begin());
+			    (*matrice)[j]->value.erase(i+(*matrice)[j]->value.begin());
 			  }
 			//--newnrow;
 			--i; // i: new indice in modified matrix
@@ -307,63 +340,73 @@ namespace extract_gmp_R
 	    // case: positive values: 1;5;7;7;9;10...
 	    {
 	      // delete too large values
-	      for(it = vi.begin(); it != vi.end(); ++it)
-		if(*it > static_cast<int>((*matrice)[0].size()))
+	      for(it = indI.begin(); it != indI.end(); ++it)
+		if(*it > static_cast<int>((*matrice)[0]->size()))
 		  {
-		    vi.erase(it);
+		    it = indI.erase(it);
 		    --it;
 		  }
 		
 	      // note : we could have duplicate and indices are not
 	      // sorted	
 	      
-	      //newnrow = vi.size();
+	      //newnrow = indI.size();
 	      
 	      // allocate new matrix (all will be copied)
 	      // number of columns
+	     
 	      matricework->resize( matrice->size());
+	      for (typename std::vector<T*>::iterator it = matricework->begin();
+		   it != matricework->end();
+		   ++it)
+		{
+		  *it = new T();
+		  copyAdress.push_back(*it);
+		}
+
 	      // number of row
 	      for (j = 0; j < matricework->size(); ++j)
-		(*matricework)[j].resize( vi.size() );
+		(*matricework)[j]->resize( indI.size() );
 	      
 
 	      // for all [new] rows
-	      for( i=0; i < vi.size(); ++i)
+	      for( i=0; i < indI.size(); ++i)
 		{
-		  if (vi[i]  < 0)
+		  if (indI[i]  < 0)
 		    Rf_error("only 0's may mix with negative subscripts");
-		  if( static_cast<unsigned int>(vi[i]-1) < (*matrice)[j].size() )
+		  if( static_cast<unsigned int>(indI[i]-1) < (*matrice)[0]->size() )
 		    {		  
 		      // for all columns
 		      for (j = 0; j < matricework->size(); ++j)
 			//newmat[i,j] = oldmat[ind[i],j]
-			( (*matricework)[j]).value[i] = ((*matrice)[j]).value[vi[i]-1];
+			( (*matricework)[j])->value[i] = ((*matrice)[j])->value[indI[i]-1];
 		    }
 		  else
 		    for (j = 0; j < matricework->size(); ++j)
-		      ( (*matricework)[j]).value[i].setValue();
+		      ( (*matricework)[j])->value[i].setValue();
 		}
 	      
 	      matrice = matricework; // change addresses
 	    }//end of case: int+positive values
 	  
 	}
-
+      }
 
     // --------------------------
     // PART 3:  COPY RESULT
     // --------------------------
 
-    newnrow =  (*matrice)[0].size();
+    newnrow =  (*matrice)[0]->size();
     retour.resize(matrice->size() * newnrow);
     retour.nrow =  newnrow;
     for(i=0; i< newnrow ; ++i)
       for(j=0; j <  matrice->size() ; ++j)
-	retour.value[i + j* newnrow ]  =  ((*matrice)[j]).value[i] ;
+	retour.value[i + j* newnrow ]  =  ((*matrice)[j])->value[i] ;
 	
     if(oldnrow <= 0)
 	retour.nrow = 0;
 
+    clearVec<T>(copyAdress);
     return(retour);
 
   }  // end get_at
@@ -387,16 +430,17 @@ namespace extract_gmp_R
     std::vector<bool> vjdx =  indice_set_at ( ncol, JDX);
     
     unsigned int k=0;
+
     for(unsigned int j = 0 ; j < ncol; ++j)
-      if(vjdx[j])
-	{
+      {
+	if(vjdx[j])
 	  for(unsigned int i = 0 ; i < src.nrow; ++i)
-	    {
-	      if(vidx[i])
+	    if(vidx[i])
+	      {
 		src.set(i + j * src.nrow, value[k % value.size()] );
-	      ++k;
-	    }
-	}
+		++k;
+	      }
+      }
     
     return;
 

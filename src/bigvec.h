@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2005   
- *  \date Last modified: Time-stamp: <2006-06-16 20:18:25 antoine>
+ *  \date Last modified: Time-stamp: <2008-02-23 22:41:57 antoine>
  *
  *
  *  \note Licence: GPL
@@ -32,21 +32,10 @@ class bigvec {
   /** \brief optional parameter used with matrix */
   unsigned int nrow ; 
     
-  /** \brief contructor 
-   *
-   */
-  bigvec() :
-    value(0),
-    modulus(0),
-    nrow(0)
-    {      }
-    
+     
   /** \brief initialize value to size i 
    */
-  bigvec(unsigned int i):
-    value(i),
-    modulus(),
-    nrow(0){};
+  bigvec(unsigned int i = 0);
 
   /**
    * \brief copy constructor
@@ -108,12 +97,12 @@ class bigvec {
   /** 
    * \brief substract lambda * line j to line i
    */
-  void subLine(unsigned int i,unsigned int j,bigvec lambda);
+  void subLine(unsigned int i,unsigned int j,const bigvec & lambda);
 
   /** 
    * \brief multiply line i by lambda
    */
-  void mulLine(unsigned int i, bigvec lambda);
+  void mulLine(unsigned int i,const bigvec & lambda);
 
   /** \brief print matrix to stdout
    * 

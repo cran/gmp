@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 19/02/06   
- *  \date Last modified: Time-stamp: <2006-06-17 23:12:02 antoine>
+ *  \date Last modified: Time-stamp: <2008-02-17 19:54:11 antoine>
  *
  *  \author A. Lucas
  *
@@ -133,8 +133,8 @@ SEXP bigq_transposeR(SEXP x)
   PROTECT(dimName = Rf_allocVector(STRSXP,1) );
   SET_STRING_ELT(dimName, 0, Rf_mkChar("nrow"));
   UNPROTECT(1);
-  SEXP dimAttr = Rf_allocVector(STRSXP,1);
-
+  SEXP dimAttr = Rf_getAttrib(x, dimName);
+ 
   if (TYPEOF(dimAttr) == INTSXP) {
     nr = INTEGER(dimAttr)[0];
   }

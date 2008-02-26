@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 04/12/04   
- *  \date Last modified: Time-stamp: <2006-05-21 21:58:46 antoine>
+ *  \date Last modified: Time-stamp: <2008-02-17 21:41:23 antoine>
  *
  *  \author Antoine Lucas (help from Immanuel Scholz) (R adaptation)
  *          Original C code from libgmp.

@@ -2,6 +2,16 @@
 
 #include "bigvec.h"
 
+/** \brief contructor 
+ *
+ */
+
+bigvec::bigvec(unsigned int i) :
+  value(i),
+  modulus(0),
+  nrow(0)
+{
+}
 
 
 bigvec::bigvec(const bigvec & vecteur) :  
@@ -216,7 +226,7 @@ bool operator!=(const bigvec & rhs, const bigvec& lhs)
 //
 // \brief substract lambda[0] * line j to line i
 //
-void bigvec::subLine(unsigned int i,unsigned int j,bigvec lambda)
+void bigvec::subLine(unsigned int i,unsigned int j,const bigvec & lambda)
 {
   if(nrow <= 0)
     Rf_error("You should have a matrix to do this operation");
@@ -239,7 +249,7 @@ void bigvec::subLine(unsigned int i,unsigned int j,bigvec lambda)
 /*
  * \brief multiply line i by lambda
  */
-void bigvec::mulLine(unsigned int i, bigvec lambda)
+void bigvec::mulLine(unsigned int i,const bigvec & lambda)
 {
   if(nrow <= 0)
     Rf_error("You should have a matrix to do this operation");

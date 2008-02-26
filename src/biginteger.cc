@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2006-05-25 17:12:16 antoine>
+ *  \date Last modified: Time-stamp: <2008-02-17 21:42:37 antoine>
  *
  *  \author Immanuel Scholz 
  *
@@ -39,6 +39,17 @@ biginteger::biginteger(const char* raw)
 
   //std::cout << "lu: "<<  this->str(10) << std::endl;
 }
+
+  /**
+   * Create a biginteger from a value. Remember to free the 
+   * parameter's mpz_t if you allocated them by yourself - 
+   * biginteger will copy the value.
+   */
+biginteger::biginteger(const mpz_t value_)
+    : na(false) 
+{
+  mpz_init_set(value, value_);
+};
 
 /*
  * Convert to string in base b; b from 2 to 36

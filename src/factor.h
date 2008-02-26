@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2005   
- *  \date Last modified: Time-stamp: <2006-05-23 19:52:42 antoine>
+ *  \date Last modified: Time-stamp: <2008-02-17 21:41:29 antoine>
  *
  *
  *  \note Licence: GPL

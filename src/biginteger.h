@@ -2,7 +2,7 @@
  *  \brief Description of class biginteger
  *
  *  \date Created: 2004
- *  \date Last modified: Time-stamp: <2006-05-25 17:25:03 antoine>
+ *  \date Last modified: Time-stamp: <2008-02-17 21:42:01 antoine>
  *
  *  \author Immanuel Scholz
  *
@@ -91,19 +91,8 @@ class biginteger
    * parameter's mpz_t if you allocated them by yourself - 
    * biginteger will copy the value.
    */
-  biginteger(const mpz_t& value_) : na(false) 
-    {
-      mpz_init_set(value, value_);
-    }
-    
-  /** \brief create a biginteger from a value
-   * 
-   */
-  biginteger(const mpz_t  value_) : na(false) 
-    {
-      mpz_init_set(value, value_);
-    }
-    
+  biginteger(const mpz_t value_);
+
   /**
    * Construct a biginteger from a int value.
    */
@@ -179,7 +168,7 @@ class biginteger
   /**
    * Set the biginteger to a specific value.
    */
-  void setValue(const mpz_t value_ ) {
+  void setValue(const mpz_t & value_ ) {
     mpz_set(value, value_); na = false;
   }
 
@@ -230,7 +219,7 @@ class biginteger
 
   /** \brief set value from a biginteger
    */
-  void setValue(biginteger value_) {      
+  void setValue(const biginteger  & value_) {      
     setValue(value_.getValueTemp());
     na = value_.isNA();
 

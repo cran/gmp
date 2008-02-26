@@ -1,3 +1,9 @@
+Mon Feb 25 2008: 0.4.8
+  * correct a bug on extract matrix (in affectation x[y]<- value #...)
+  * correct a bug on extract matrix (an invalid memory read, cause invalid result erraticly)
+
+Mon Feb 17 2008: 0.4.7
+  * suppress a bug on rational matrix.
 
 Tue Sep 14 2007: 0.4-6
   * correction on c++: supress all g++ warnings

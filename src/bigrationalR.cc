@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 12/12/04   
- *  \date Last modified: Time-stamp: <2006-06-17 23:03:54 antoine>
+ *  \date Last modified: Time-stamp: <2008-02-19 21:30:24 antoine>
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
@@ -230,7 +230,8 @@ namespace bigrationalR
     SET_STRING_ELT(denName, 0, Rf_mkChar("denominator"));
     Rf_setAttrib(ans, denName, R_denom);
 
-    if(v.nrow != 0 )
+    // set the dim attribute to "bigq"
+   if(v.nrow != 0 )
       {
 	SEXP rexpName;
 	PROTECT(rexpName = Rf_allocVector(STRSXP, 1));
@@ -427,7 +428,7 @@ SEXP bigrational_get_at(SEXP a, SEXP b)
       if (vb[i%vb.size()])
 	result.push_back(va.value[i]);
   } else {
-    vb.erase(remove(vb.begin(), vb.end(), 0), vb.end()); // remove all zeroes
+    std::remove(vb.begin(), vb.end(), 0); // remove all zeroes
     if (vb.empty())
       return bigrationalR::create_SEXP(bigvec_q());
     if (vb[0] < 0) {
@@ -470,7 +471,7 @@ SEXP bigrational_set_at(SEXP src, SEXP idx, SEXP value)
       if (vidx[i%vidx.size()])
 	result.value[i] = vvalue.value[pos++%vvalue.size()];
   } else {
-    vidx.erase(remove(vidx.begin(), vidx.end(), 0), vidx.end()); // remove all zeroes
+    std::remove(vidx.begin(), vidx.end(), 0); // remove all zeroes
     if (vidx.empty())
       return bigrationalR::create_SEXP(result);
     if (vidx[0] < 0) {
