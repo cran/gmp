@@ -106,14 +106,17 @@ bigmod pow(const bigmod& base, const bigmod& exp)
   mpz_init(val);
   mpz_t_sentry val_s(val);
   biginteger mod = get_modulus(base, exp);
-  if (mod.isNA()) {
+  if (mod.isNA()) 
+  {
     if(mpz_sgn(exp.value.getValueTemp() ) <0)
       Rf_error("Negative values not allowed");
     if (!mpz_fits_ulong_p(exp.value.getValueTemp()))
       Rf_error("exponent too large for pow");
     mpz_pow_ui(val, base.value.getValueTemp(), mpz_get_ui(exp.value.getValueTemp()));
-  } else
+  } 
+  else if( mpz_sgn(mod.getValueTemp()) != 0)  // check modulus not null
     mpz_powm(val, base.value.getValueTemp(), exp.value.getValueTemp(), mod.getValueTemp());
+  
   return bigmod(val, mod);
 }
 

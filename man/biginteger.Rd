@@ -66,14 +66,16 @@ print.bigz(x,...)
   
   The following rules for the result's modulus apply when performing
   arithmetic operations on bigzs:
-
-  \item If none of the operand has a modulus set, the result will not have a modulus.
-  \item If both operands have a different modulus, the result will not have a
-  modulus, except in case of \code{"\link{mod.bigz}"}, where the second operands 
-  value is used.
-  \item If only one of the operands has a modulus or both have a common (the
-  same), it is set and applied to the result, except in case of mod.bigz,
-  where the second operands value is used.
+  
+  \itemize{
+    \item If none of the operand has a modulus set, the result will not have a modulus.
+    \item If both operands have a different modulus, the result will not have a
+    modulus, except in case of \code{"\link{mod.bigz}"}, where the second operands 
+    value is used.
+    \item If only one of the operands has a modulus or both have a common (the
+    same), it is set and applied to the result, except in case of mod.bigz,
+    where the second operands value is used.
+  }
 }
 
 \note{

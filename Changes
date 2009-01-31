@@ -1,3 +1,7 @@
+Sat Jan 24 2009: 0.4.9
+  * move printf to Rprintf function
+  * add powm function.
+
 Mon Feb 25 2008: 0.4.8
   * correct a bug on extract matrix (in affectation x[y]<- value #...)
   * correct a bug on extract matrix (an invalid memory read, cause invalid result erraticly)

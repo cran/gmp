@@ -2,7 +2,7 @@
  *  \brief Description of class biginteger
  *
  *  \date Created: 2004
- *  \date Last modified: Time-stamp: <2008-02-17 21:42:01 antoine>
+ *  \date Last modified: Time-stamp: <2009-01-24 21:59:06 antoine>
  *
  *  \author Immanuel Scholz
  *
@@ -231,6 +231,13 @@ class biginteger
    */
   const mpz_t& getValueTemp() const {return value;}
 
+
+  /** \brief accessor on value
+   */
+  mpz_t & getValue()
+  {
+    return value;
+  }
 
   /**
    * Return true, if the value is NA.

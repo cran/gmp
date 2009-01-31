@@ -50,6 +50,8 @@ matrix.bigz(data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL, mod =
   \code{x[i]} return same value as \code{x[i,]}.
   
   Special features concerning bigz class: modulus can be
+ 
+  \itemize{
   \item{Unset}{Just play with large numbers}
   \item{Set with a vector of size 1}{Example:
     \code{matrix.bigz(1:6,nrow=2,ncol=3,mod=7)}
@@ -62,6 +64,7 @@ matrix.bigz(data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL, mod =
     with a different modulus at each row
   }
   \item{Set with same size as data}{Modulus is defined for each cell}
+}  
 }
 \value{
   A matrix of class bigz or bigq
@@ -72,7 +75,7 @@ matrix.bigz(data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL, mod =
 
 \author{Antoine Lucas}
 
-\seealso{Solving linear algebra system \code{\link{solve.bigz}}; \code{\link[base]{matrix}}} }
+\seealso{Solving linear algebra system \code{\link{solve.bigz}}; \code{\link[base]{matrix}}}
 \examples{
 
 

@@ -20,6 +20,7 @@ modulus                 Modulus
 nextprime               Next prime number
 Oakley                  RFC 2409 Oakley Groups - Standardized
                         Parameters for Diffie-Hellman Key Exchange
+powm                    Exponentiation function
 sizeinbase              Compute size of a bigz in a base
 solve.bigz              Solve a system of equation
 urand.bigz              Generate a random number

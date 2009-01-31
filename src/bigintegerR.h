@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2006   
- *  \date Last modified: Time-stamp: <2008-02-17 22:25:46 antoine>
+ *  \date Last modified: Time-stamp: <2009-01-22 22:34:25 antoine>
  *
  *
  *  \note Licence: GPL
@@ -71,6 +71,7 @@ namespace bigintegerR{
   bool eq(const biginteger& lhs, const biginteger& rhs);
 
   bool neq(const biginteger& lhs, const biginteger& rhs);
+
 
   /** \brief return va[b] */
   bigvec biginteger_get_at_C(bigvec va,SEXP b);
@@ -148,6 +149,7 @@ extern "C"
    * as.biginteger(value, modulus)
    */
   SEXP biginteger_as(SEXP a, SEXP mod);
+
 
   /**
    * \brief Convert from a biginteger vector to a character string vector.
@@ -296,6 +298,11 @@ extern "C"
    * \brief Return prod
    */
   SEXP biginteger_prod(SEXP a);
+
+
+  /** \brief Return x ^ y [ n ]
+   */
+  SEXP biginteger_powm(SEXP x, SEXP y, SEXP n);
 }
 
 

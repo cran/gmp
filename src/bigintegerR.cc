@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2008-02-19 21:29:21 antoine>
+ *  \date Last modified: Time-stamp: <2009-01-24 22:26:52 antoine>
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
@@ -763,12 +763,12 @@ SEXP biginteger_rand_u (SEXP nb ,SEXP length,SEXP newseed, SEXP ok)
   if(seed_init==0)
     {
       gmp_randinit_default(seed_state);
-      printf("Seed default initialisation\n");
+      Rprintf("Seed default initialisation\n");
     }
   if(flag == 1)
     {
       gmp_randseed(seed_state,va[0].value.getValueTemp());
-      printf("Seed initialisation\n");
+      Rprintf("Seed initialisation\n");
     }
 
   seed_init = 1;
@@ -1192,5 +1192,31 @@ SEXP biginteger_prod(SEXP a)
 
 }
 
+// return x ^ y [n]
+SEXP biginteger_powm(SEXP x, SEXP y, SEXP n)
+{
+  bigvec result;
+
+  bigvec vx = bigintegerR::create_bignum(x);
+  bigvec vy = bigintegerR::create_bignum(y);
+  bigvec vn = bigintegerR::create_bignum(n);
+ 
+  result.value.resize(vx.value.size());
+
+  for (int i = 0 ; i < vx.value.size(); i++)
+  {
+
+    result.value[i].NA(false);
+    // check if n != 0
+    if(mpz_sgn(vn.value[i % vn.value.size()].getValueTemp()) != 0)
+      mpz_powm(result.value[i].getValue(),
+	       vx.value[i].getValueTemp(),
+	       vy.value[i % vy.value.size()].getValueTemp(),
+	       vn.value[i % vn.value.size()].getValueTemp());
+
+  }
+  
+  return bigintegerR::create_SEXP(result);
+}
 
 

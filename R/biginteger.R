@@ -392,3 +392,8 @@ solve.bigz <- function(a,b,...)
 {
   .Call("matrix_set_at_z", dst, value,idx,jdx , PACKAGE="gmp")
 }
+
+powm <- function(x,y,n)
+{
+ .Call("biginteger_powm",x,y,n,PACKAGE="gmp")
+}
