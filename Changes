@@ -1,3 +1,6 @@
+Tue Oct 27 2009: 0.4.11
+  * minor R & cpp warnings fix
+
 Sat Jan 24 2009: 0.4.9
   * move printf to Rprintf function
   * add powm function.

@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2009-01-24 22:26:52 antoine>
+ *  \date Last modified: Time-stamp: <2009-10-27 17:32:05 antoine>
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
@@ -1203,7 +1203,7 @@ SEXP biginteger_powm(SEXP x, SEXP y, SEXP n)
  
   result.value.resize(vx.value.size());
 
-  for (int i = 0 ; i < vx.value.size(); i++)
+  for (unsigned int i = 0 ; i < vx.value.size(); i++)
   {
 
     result.value[i].NA(false);

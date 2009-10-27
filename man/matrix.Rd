@@ -79,6 +79,22 @@ matrix.bigz(data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL, mod =
 \examples{
 
 
+## a matrix
+x=diag(1:4)
+## invert this matrix
+solve(x) 
+
+## matrix in Z/7Z
+y = as.bigz(x,7)
+## invert this matrix (result is not the same as solve(x))
+solve(y)
+
+## matrix in Q
+z =  as.bigq(x)
+## invert this matrix (result is the same as solve(x))
+solve(z)
+
+
 }
 
 \keyword{arith}

@@ -2,7 +2,7 @@
  *  \brief Description of class bigrational
  *
  *  \date Created: 22/05/06
- *  \date Last modified: Time-stamp: <2006-05-25 19:53:27 antoine>
+ *  \date Last modified: Time-stamp: <2009-10-27 17:28:06 antoine>
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
@@ -249,7 +249,7 @@ class bigrational
   /**
    * set NA value
    */
-  void NA(bool value)  {na = value;}
+  void NA(bool value_p)  {na = value_p;}
 
   /**
    * Return 1, if the value is > 0;  -1 when negative, 0 when 0.

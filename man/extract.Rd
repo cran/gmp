@@ -8,6 +8,14 @@
 \alias{rep.bigz}
 \alias{length.bigz}
 \alias{length<-.bigz}
+\alias{[.bigq}
+\alias{[<-.bigq}
+\alias{[[.bigq}
+\alias{[[<-.bigq}
+\alias{c.bigq}
+\alias{rep.bigq}
+\alias{length.bigq}
+\alias{length<-.bigq}
 \title{Extract or Replace Parts of an Object}
 \description{
 Operators acting on vectors, arrays and lists to extract or replace subsets.
@@ -15,6 +23,8 @@ Operators acting on vectors, arrays and lists to extract or replace subsets.
 \usage{
 c.bigz(...,recursive = FALSE)
 rep.bigz(x,times,...)
+c.bigq(...,recursive = FALSE)
+rep.bigq(x,times,...)
 }
 
 \arguments{

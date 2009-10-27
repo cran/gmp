@@ -3,7 +3,6 @@ add.bigz                Basic arithmetic operators for large integers
 apply                   apply over a matrix
 bigq                    Large sized rationals
 ==.bigq                 Relational Operators
-[.bigq                  Extract or Replace Parts of an Object
 bigz                    Large sized integer values
 ==.bigz                 Relational Operators
 [.bigz                  Extract or Replace Parts of an Object

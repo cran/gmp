@@ -2,7 +2,7 @@
  *  \brief Description of class biginteger
  *
  *  \date Created: 2004
- *  \date Last modified: Time-stamp: <2009-01-24 21:59:06 antoine>
+ *  \date Last modified: Time-stamp: <2009-10-27 17:27:37 antoine>
  *
  *  \author Immanuel Scholz
  *
@@ -247,7 +247,7 @@ class biginteger
   /**
    * set NA value
    */
-  void NA(bool value)  {na = value;}
+  void NA(bool value_p)  {na = value_p;}
     
   /**
    * Return true, if the value is 0.
