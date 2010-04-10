@@ -1,6 +1,8 @@
 \name{cumsum}
 \alias{cumsum.bigz}
 \alias{cumsum.bigq}
+\alias{sum.bigz}
+\alias{sum.bigq}
 \alias{prod}
 \alias{prod.bigz}
 \alias{prod.bigq}
@@ -11,11 +13,13 @@
 \usage{
 cumsum.bigz(...)
 cumsum.bigq(...)
+sum.bigz(...)
+sum.bigq(...)
 prod(...)
 }
 
 \description{
-  Theses functions overload cumsum and prod function for big rationals and
+  Theses functions overload sum, cumsum and prod function for big rationals and
   big integers
 }
 
@@ -34,11 +38,12 @@ prod(...)
   x = as.bigz(1:12)
   cumsum(x)
   prod(x)
-  
+  sum(x)
+
   x = as.bigq(1:12)
   cumsum(x)
   prod(x)
-  
+  sum(x)
 }
 
 \keyword{arith}

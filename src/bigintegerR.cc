@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04   
- *  \date Last modified: Time-stamp: <2009-10-27 17:32:05 antoine>
+ *  \date Last modified: Time-stamp: <2010-04-10 19:23:28 antoine>
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
@@ -1120,6 +1120,73 @@ SEXP biginteger_cumsum(SEXP a)
 	result.value[i].setValue(val);
       }
     }
+
+  return(bigintegerR::create_SEXP(result));
+
+}
+
+
+
+SEXP biginteger_sum(SEXP a)
+{
+
+  bigvec result;
+
+  bigvec va = bigintegerR::create_bignum(a);
+
+  result.value.resize(1);
+
+
+  mpz_t val;
+  mpz_init(val);
+  mpz_t_sentry val_s(val);
+ 
+  bool hasmodulus = true;
+
+  // first the modulus !
+  if(va.modulus.size()>1)
+    {
+      biginteger modulus ;
+      modulus.setValue(va.modulus[0].getValueTemp());
+      
+      for(unsigned int i = 1 ; i < va.modulus.size() ; ++i)
+	{
+	  if(modulus != va.modulus[i]) // if one is different: no modulus
+	    hasmodulus = false;
+	}
+      if(hasmodulus)
+	result.modulus.push_back(modulus);
+      
+    }
+  else
+    hasmodulus = false;
+  
+  if(va.modulus.size() == 1)
+    {
+      result.modulus.push_back(va.modulus[0]);
+      hasmodulus = true;
+   }
+
+
+
+
+  for(unsigned int i = 0 ; i < va.size(); ++i)
+    {
+      {
+	if(va.value[i].isNA() )
+	  {	
+	    break; // all last values are NA.
+	  }
+      
+	mpz_add(val,val,va.value[i].getValueTemp());
+	
+	if(hasmodulus)
+	  mpz_mod(val,val,va.modulus[0].getValueTemp() );
+	
+      }
+    }
+  
+  result.value[0].setValue(val);
 
   return(bigintegerR::create_SEXP(result));
 

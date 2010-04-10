@@ -2,7 +2,7 @@
  *  \brief Description of class biginteger
  *
  *  \date Created: 2004
- *  \date Last modified: Time-stamp: <2009-10-27 17:27:37 antoine>
+ *  \date Last modified: Time-stamp: <2010-04-10 19:09:32 antoine>
  *
  *  \author Immanuel Scholz
  *
@@ -12,12 +12,13 @@
 #ifndef biginteger_HEADER
 #define biginteger_HEADER 1
 
+#include <string>
+#include <vector>
+
 #include <gmp.h>
 #include <R.h>
 #include <Rdefines.h>
 
-#include <string>
-#include <vector>
 /** \mainpage Gmp package for R language.
  *
  * Theses pages made to help developpers to enter into the C++ code related to

@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2006   
- *  \date Last modified: Time-stamp: <2009-01-22 22:34:25 antoine>
+ *  \date Last modified: Time-stamp: <2010-04-10 19:21:20 antoine>
  *
  *
  *  \note Licence: GPL
@@ -294,6 +294,12 @@ extern "C"
    * \brief Return cumsum
    */
   SEXP biginteger_cumsum(SEXP a);
+
+  /**
+   * \brief Return sum
+   */
+  SEXP biginteger_sum(SEXP a);
+
   /**
    * \brief Return prod
    */

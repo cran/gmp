@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 12/12/04   
- *  \date Last modified: Time-stamp: <2008-02-19 21:30:24 antoine>
+ *  \date Last modified: Time-stamp: <2010-04-10 19:28:24 antoine>
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
@@ -758,6 +758,42 @@ SEXP bigrational_cumsum(SEXP a)
 	result.value[i].setValue(val);
       }
     }
+
+  return(bigrationalR::create_SEXP(result));
+
+}
+
+
+// Return sum
+SEXP bigrational_sum(SEXP a)
+{
+  bigvec_q result;
+
+  bigvec_q va = bigrationalR::create_bignum(a);
+
+  result.value.resize(1);
+
+
+  mpq_t val;
+  mpq_init(val);
+  mpq_t_sentry val_s(val);
+ 
+
+
+
+  for(unsigned int i = 0 ; i < va.size(); ++i)
+    {
+      {
+	if(va.value[i].isNA() )
+	  {	
+	    break; // all last values are NA.
+	  }
+      
+	mpq_add(val,val,va.value[i].getValueTemp());
+		
+      }
+    }
+  result.value[0].setValue(val);
 
   return(bigrationalR::create_SEXP(result));
 

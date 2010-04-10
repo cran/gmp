@@ -191,6 +191,11 @@ min.bigq <- function(...,na.rm=FALSE)
  .Call("bigrational_min",c.bigq(...),na.rm,PACKAGE="gmp")
 }
 
+sum.bigq <- function(...)
+{
+ .Call("bigrational_sum",c.bigq(...),PACKAGE="gmp")
+}
+
 cumsum.bigq <- function(...)
 {
  .Call("bigrational_cumsum",c.bigq(...),PACKAGE="gmp")

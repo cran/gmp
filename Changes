@@ -1,3 +1,7 @@
+Sat Apr 10 2010: 0.4.12
+  * fix for sun c++ compiler
+  * add sum() functions.
+
 Tue Oct 27 2009: 0.4.11
   * minor R & cpp warnings fix
 

@@ -230,6 +230,11 @@ cumsum.bigz <- function(...)
  .Call("biginteger_cumsum",c.bigz(...),PACKAGE="gmp")
 }
 
+sum.bigz <- function(...)
+{
+ .Call("biginteger_sum",c.bigz(...),PACKAGE="gmp")
+}
+
 prod <- function(...)
 {
   UseMethod("prod")
