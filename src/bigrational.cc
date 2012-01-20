@@ -3,7 +3,7 @@
  *
  *  \version 1
  *
- *  \date Created: 12/12/04   
+ *  \date Created: 12/12/04
  *  \date Last modified: Time-stamp: <2006-05-25 19:53:58 antoine>
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
@@ -27,7 +27,7 @@ using std::string;
 bigrational & bigrational::operator= (const bigrational& rhs)
 {
   if(this != &rhs)
-    {      
+    {
       mpq_set(value, rhs.getValueTemp());
       na= rhs.na;
     }
@@ -43,7 +43,7 @@ std::string bigrational::str(int b) const
 {
   if (isNA())
     return "NA";
-    
+
   unsigned int totSize = mpz_sizeinbase(mpq_numref(value),b) + \
     mpz_sizeinbase(mpq_denref(value),b) + 3 ;
   char* buf = new char[totSize];
@@ -59,7 +59,7 @@ std::string bigrational::str(int b) const
  *
  */
 void  bigrational::simplify ()
-{  
+{
   mpq_canonicalize(value);
 }
 
@@ -87,7 +87,7 @@ bigrational::bigrational(void* raw):
   mpq_init(value);
 
   int* r = (int*)raw;
-  if (r[0]>0) 
+  if (r[0]>0)
     {
       mpz_import(tmpVal, r[0], 1, sizeof(int), 0, 0, &r[2]);
       if(r[1]==-1)
@@ -156,6 +156,7 @@ bool operator<(const bigrational& lhs, const bigrational& rhs)
  * \brief Well... an heritage from biginteger class, this should be
  * integrated earlier... put denominator & simplify if there is not.
  */
+// R  as.bigq() :
 bigrational set_denominator(const bigrational& lhs, const bigrational& rhs)
 {
   return bigrationalR::create_bigrational(lhs, rhs, mpq_div, false);
@@ -166,7 +167,7 @@ bigrational bigrational::inv()
 {
   if(isNA())
     return(bigrational());
-    
+
   mpq_t tmpVal;
   mpq_init(tmpVal);
   mpq_t_sentry val_s(tmpVal);

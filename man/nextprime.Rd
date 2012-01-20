@@ -20,7 +20,7 @@ nextprime(n)
 \value{
   A (probably) prime  number
 }
-\references{Gnu MP Library see http://swox.com/gmp}
+\references{The GNU MP Library, see \url{http://gmplib.org}}
 
 \author{Antoine Lucas}
 

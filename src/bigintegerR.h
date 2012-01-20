@@ -3,7 +3,7 @@
  *
  *  \version 1
  *
- *  \date Created: 2006   
+ *  \date Created: 2006
  *  \date Last modified: Time-stamp: <2010-04-10 19:21:20 antoine>
  *
  *
@@ -43,26 +43,26 @@ namespace bigintegerR{
   /**
    * \brief create a vector of int
    */
-  std::vector<int> create_int(const SEXP & param) ;
+  std::vector<int> create_int(const SEXP & param);
 
 
   /**
    * \brief export vector of biginteger to R value
    */
-  SEXP create_SEXP(const std::vector<biginteger>& v) ;
+  SEXP create_SEXP(const std::vector<biginteger>& v);
 
   /**
    * \brief export bigvec to R value
    */
   SEXP create_SEXP(const bigvec & v);
-  
+
   SEXP biginteger_binary_operation(const SEXP & a,const SEXP & b, biginteger_binary_fn f);
 
   SEXP biginteger_logical_binary_operation(const SEXP & a,const SEXP & b, biginteger_logical_binary_fn f);
 
   bool lt(const biginteger& lhs, const biginteger& rhs);
-  
-  bool gt(const biginteger& lhs, const biginteger& rhs) ;
+
+  bool gt(const biginteger& lhs, const biginteger& rhs);
 
   bool lte(const biginteger& lhs, const biginteger& rhs);
 
@@ -80,6 +80,12 @@ namespace bigintegerR{
 
 extern "C"
 {
+  /**
+   * \brief GMP version
+   */
+  SEXP R_gmp_get_version();
+
+
   /**
    * \brief Addition of a and b
    */
@@ -124,28 +130,27 @@ extern "C"
    * \brief Least common multiply of a and b
    */
   SEXP biginteger_lcm(SEXP a, SEXP b);
-    
+
   /**
    * \brief Sets the intern modulus of a to b
    */
-  SEXP biginteger_setmod(SEXP a, SEXP b);
+  // SEXP biginteger_setmod(SEXP a, SEXP b);
 
-   
   /**
    * \brief Return from vector a all elements specified in vector b
    */
   SEXP biginteger_get_at(SEXP a, SEXP b);
-    
+
   /**
-   * \brief Return a vector with the values from src specified by 
+   * \brief Return a vector with the values from src specified by
    * idx to sequentiell values from "value".
    */
   SEXP biginteger_set_at(SEXP src, SEXP idx, SEXP value);
-    
+
   /**
    * \brief Convert from an long value or a string into biginteger.
    *
-   * If you want a modulus-set-bigint, just use 
+   * If you want a modulus-set-bigint, just use
    * as.biginteger(value, modulus)
    */
   SEXP biginteger_as(SEXP a, SEXP mod);
@@ -160,6 +165,11 @@ extern "C"
    * \brief Convert from a biginteger vector to a real vector.
    */
   SEXP biginteger_as_numeric(SEXP a);
+
+  /**
+   * \brief Convert from a biginteger vector to a integer vector.
+   */
+  SEXP biginteger_as_integer(SEXP a);
 
   /**
    * \brief Return the length of the vector
@@ -180,33 +190,33 @@ extern "C"
   /**
    * \brief Return sign of a
    */
-  SEXP biginteger_sgn(SEXP a) ;
+  SEXP biginteger_sgn(SEXP a);
 
   /**
    * \brief Return whether a < b
    */
   SEXP biginteger_lt(SEXP a, SEXP b);
-    
+
   /**
    * \brief Return whether a > b
    */
   SEXP biginteger_gt(SEXP a, SEXP b);
-    
+
   /**
    * \brief Return whether a <= b
    */
   SEXP biginteger_lte(SEXP a, SEXP b);
-    
+
   /**
    * \brief Return whether a >= b
    */
   SEXP biginteger_gte(SEXP a, SEXP b);
-    
+
   /**
    * \brief Return whether a == b
    */
   SEXP biginteger_eq(SEXP a, SEXP b);
-    
+
   /**
    * \brief Return whether a != b
    */
@@ -215,69 +225,84 @@ extern "C"
   /**
    * \brief For function c()
    */
-  SEXP biginteger_c(SEXP args) ;
-  
+  SEXP biginteger_c(SEXP args);
+
   /** \brief for function cbind()
    */
 
-  SEXP biginteger_cbind(SEXP args) ;
+  SEXP biginteger_cbind(SEXP args);
 
   /**
    * \brief Create vector as n times x
    */
-  SEXP biginteger_rep(SEXP x, SEXP times) ;
+  SEXP biginteger_rep(SEXP x, SEXP times);
 
   /**
    * \brief Return if a is prime with a proba test
    */
-  SEXP biginteger_is_prime(SEXP a, SEXP reps) ;  
+  SEXP biginteger_is_prime(SEXP a, SEXP reps);
 
   /**
    * \brief Return next prime with a proba test
    */
-  SEXP biginteger_nextprime(SEXP a) ;
+  SEXP biginteger_nextprime(SEXP a);
 
 
   /**
    * \brief Return absolute value of a
    */
-  SEXP biginteger_abs(SEXP a) ;
+  SEXP biginteger_abs(SEXP a);
 
   /**
    * \brief Return bezoult coefficients
    */
-  SEXP biginteger_gcdex(SEXP a, SEXP b) ;
+  SEXP biginteger_gcdex(SEXP a, SEXP b);
 
-  /** 
+  /**
    * \brief Random number generation
-   */ 
+   */
   SEXP biginteger_rand_u (SEXP nb ,SEXP length,SEXP newseed, SEXP ok);
 
   /**
-   * \brief Give size of integer 
+   * \brief Give size of integer
    */
   SEXP biginteger_sizeinbase (SEXP x, SEXP exp);
 
+  /**
+   * \brief Compute {d, ex} === frexp(x):  x = d * 2^ex,
+   *        where 1/2 <= d < 1.
+   */
+  SEXP bigI_frexp(SEXP x);
+
+  /**
+   * \brief Compute Binomial Coefficient
+   */
+  SEXP bigI_choose(SEXP n, SEXP k);
+
+  /**
+   * \brief Compute Factorial
+   */
+  SEXP bigI_factorial(SEXP n);
 
   /**
    * \brief Compute Fibonacci number
    */
-  SEXP fibnum(SEXP n) ;
+  SEXP bigI_fibnum(SEXP n);
 
   /**
    * \brief Compute Fibonacci number
    */
 
-  SEXP fibnum2(SEXP n) ;
+  SEXP bigI_fibnum2(SEXP n);
   /**
    * \brief Compute lucas number
    */
-  SEXP lucnum(SEXP n) ;
+  SEXP bigI_lucnum(SEXP n);
 
   /**
    * \brief Compute lucas number
    */
-  SEXP lucnum2(SEXP n) ;
+  SEXP bigI_lucnum2(SEXP n);
 
 
   /**
@@ -309,8 +334,12 @@ extern "C"
   /** \brief Return x ^ y [ n ]
    */
   SEXP biginteger_powm(SEXP x, SEXP y, SEXP n);
+
+  /**
+   * \brief Return log2(.)  and  natural log(.):
+   */
+  SEXP biginteger_log2(SEXP x);
+  SEXP biginteger_log (SEXP x);
 }
-
-
 
 #endif

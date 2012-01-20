@@ -1,93 +1,46 @@
-matrix.bigq <- function(data=NA,nrow=1, ncol=1, byrow=FALSE,dimnames =NULL,
-                        den=NA,...)
-  {
-    .Call("as_matrixq",data,
-          as.integer(nrow),
-          as.integer(ncol),
-          as.integer(byrow),
-          den,
-          PACKAGE="gmp")
-  }
-
-
-as.matrix.bigq <- function(x, ...)
-  {
-    n <- length(x)
-    p <- 1
-    if((class(x) == ("matrix") )| (class(x) == "data.frame") | (class(x) == "bigq"))
-      {
-        n=dim(x)[1]
-        p=dim(x)[2]        
-      }
-    matrix.bigz(x,nrow=n,ncol=p)
-  }
-
-
-as.vector.bigq <- function(x, mode="any")
-  {
-    attr(x,"nrow")<- NULL
-    return(x)
-  }
-
-
-dim.bigq <- function(x)
-  return(c(attr(x,"nrow"),length(x)/attr(x,"nrow")))
-
-"dim<-.bigq" <- function(x,value)
+matrix.bigq <- function(data=NA,nrow=1, ncol=1, byrow=FALSE,
+                        dimnames =NULL, den = NA, ...)
 {
-  ## TODO: check...
-  attr(x,"nrow") <- as.integer(value[1])
-  x
+    if(!is.null(dimnames))
+        warning("'dimnames' are not implemented for this class")
+    .Call(as_matrixq,
+          data, as.integer(nrow), as.integer(ncol),
+	  as.integer(byrow), den)
 }
 
-nrow.bigq <- function(x)
-  return(attr(x,"nrow"))
 
-ncol.bigq <- function(x)
-  return(length(x)/attr(x,"nrow"))
+as.matrix.bigq <- function(x, ...) {
+    if(is.matrix(x) || is.data.frame(x) || inherits(x, "bigq")) {
+	d <- dim(x)
+	n <- d[1L]
+	p <- d[2L]
+    } else {
+        n <- length(x)
+        p <- 1L
+    }
+    matrix.bigq(x, nrow=n, ncol=p)
+}
 
-t.bigq <- function(x)
-  {
-    .Call("bigq_transposeR",
-          x,    
-          PACKAGE="gmp")
-  }
+as.vector.bigq <- function(x, mode="any") {
+    attr(x,"nrow") <- NULL
+    x
+}
 
 
-"%*%.bigq" <- function(x,y)
-  {
-    .Call("matrix_mul_q",
-          x,
-          y,
-          PACKAGE="gmp")
-  }
-
+t.bigq <- function(x) .Call(bigq_transposeR, x)
 
 cbind.bigq <- function(..., recursive = FALSE)
-  {
-    a <- list(...)
-
-    return(.Call("bigrational_cbind",a,PACKAGE = "gmp"))
-  }
+    .Call(bigrational_cbind, list(...))
 
 rbind.bigq <- function(..., recursive = FALSE)
-  {
-    a <- list(...)
+    .Call(bigrational_rbind, list(...))
 
-    return(.Call("bigrational_rbind",a,PACKAGE = "gmp"))
-  }
-
-
-
-apply.bigq <- function(X, MARGIN,FUN)
+apply.bigq <- function(X, MARGIN, FUN, ...)
 {
-  ## This change matrix to a list.
-  X = .Call("gmpMatToListQ",X,as.integer(MARGIN),PACKAGE="gmp")
-  ## here: std lapply
-  lst = lapply(X,FUN)
-
-  ## to change list to vector
-  .Call("bigrational_c",lst)
+  ## change matrix to a list:
+  X <- .Call(gmpMatToListQ, X, as.integer(MARGIN))
+  ## then use std lapply() and convert back to vector:
+  .Call(bigrational_c, lapply(X, FUN, ...))
 }
 
 

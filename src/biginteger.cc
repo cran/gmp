@@ -3,10 +3,10 @@
  *
  *  \version 1
  *
- *  \date Created: 27/10/04   
+ *  \date Created: 27/10/04
  *  \date Last modified: Time-stamp: <2008-02-17 21:42:37 antoine>
  *
- *  \author Immanuel Scholz 
+ *  \author Immanuel Scholz
  *
  *  \note Licence: GPL
  */
@@ -33,7 +33,7 @@ biginteger::biginteger(const char* raw)
       if(r[1]==-1)
 	mpz_neg(value,value);
       na = false;
-    } 
+    }
   else
     mpz_set_si(value, 0);
 
@@ -41,15 +41,15 @@ biginteger::biginteger(const char* raw)
 }
 
   /**
-   * Create a biginteger from a value. Remember to free the 
-   * parameter's mpz_t if you allocated them by yourself - 
+   * Create a biginteger from a value. Remember to free the
+   * parameter's mpz_t if you allocated them by yourself -
    * biginteger will copy the value.
    */
 biginteger::biginteger(const mpz_t value_)
-    : na(false) 
+    : na(false)
 {
   mpz_init_set(value, value_);
-};
+}
 
 /*
  * Convert to string in base b; b from 2 to 36
@@ -60,7 +60,7 @@ string biginteger::str(int b) const
   if (isNA())
     return "NA";
 
-  // possible minus sign, size of number + '\0'    
+  // possible minus sign, size of number + '\0'
   char* buf = new char[mpz_sizeinbase(value, b)+2];
   mpz_get_str(buf, b, value);
   string s = buf;
@@ -69,9 +69,9 @@ string biginteger::str(int b) const
 }
 
 
-/** 
+/**
  * \brief export mpz to R raw value
- */ 
+ */
 int biginteger::as_raw(char* raw) const
 {
   int totals = raw_size() ;
@@ -90,14 +90,14 @@ int biginteger::as_raw(char* raw) const
   return totals;
 }
 
-/** 
+/**
  * \brief export mpz to R raw value
  *
  * return number of byte used (if na => 2*sizeofint, else
  * the two int + size of the big integer)
  *
  * \note IF size of big integer exceed value of one int => cannot store value
- */ 
+ */
 int as_raw(char* raw,mpz_t value, bool na)
 {
   int numb = 8*sizeof(int);
@@ -157,7 +157,7 @@ bool operator!=(const biginteger& rhs, const biginteger& lhs)
 {
   if(rhs.isNA() || lhs.isNA())
     return(false); // SHOULD RETURN NA
-  
+
   return(mpz_cmp(rhs.getValueTemp(),lhs.getValueTemp())!=0);
 }
 
@@ -168,7 +168,7 @@ bool operator<(const biginteger& rhs, const biginteger& lhs)
 {
   if(rhs.isNA() || lhs.isNA())
     return(false); // SHOULD RETURN NA
-  
+
   return(mpz_cmp(rhs.getValueTemp(),lhs.getValueTemp())<0);
 }
 
@@ -179,7 +179,7 @@ bool operator>(const biginteger& rhs, const biginteger& lhs)
 {
   if(rhs.isNA() || lhs.isNA())
     return(false); // SHOULD RETURN NA
-  
+
   return(mpz_cmp(rhs.getValueTemp(),lhs.getValueTemp())>0);
 }
 
@@ -191,7 +191,7 @@ biginteger operator* (const biginteger& rhs, const biginteger& lhs)
   // one of them NA: return NA
   if(rhs.isNA() || lhs.isNA())
     return(biginteger());
- 
+
   mpz_t result;
   mpz_init(result);
   mpz_t_sentry val_s(result);

@@ -5,127 +5,139 @@
 \alias{as.double.bigz}
 \alias{print.bigz}
 \alias{is.na.bigz}
-\title{Large sized integer values}
+\title{Large Sized Integer Values}
 \description{
-  Type class supporting arithmetic operations on very large integers.
+  Class \code{"bigz"} encodes arbitrarily large integers (via GMP)
 }
 \usage{
 as.bigz(a, mod = NA)
-as.character.bigz(x,b=10,...)
-as.double.bigz(x,...)
-%as.bigz(str, mod = NA)
-%as.bigz(big, mod = NA)
-is.na.bigz(x)
-print.bigz(x,...)
+\S3method{as.character}{bigz}(x, b = 10, ...)
+% \S3method{as.double}{bigz}(x,...)
+\S3method{is.na}{bigz}(x)
+\S3method{print}{bigz}(x, quote=FALSE, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-%  \item{int}{Integer value (or logical, which will be interpreted as 1 resp. 0)}
-%  \item{num}{Numeric value}
-%  \item{str}{String value, either starting with \code{0x} for hexadecimal, \code{0b} for
-%  binary or without prefix for decimal values. Any format error results in \code{0}}
-%  \item{big}{A bigz value (class of type \code{"\link{bigz}"})}
-\item{a}{Either integer, numeric or string value
-  (String value: ither starting with \code{0x} for hexadecimal, \code{0b} for
-  binary, \code{0} for octal or without prefix for decimal values.
-  Any format error results return an Error message)}
-\item{b}{Base: from 2 to 32}
-\item{x}{Numeric value}
-\item{...}{Additional parameters}
-\item{mod}{An integer, numeric, string or bigz of the internal modulus, see below.}
+  \item{a}{either \code{\link{integer}}, \code{\link{numeric}} (i.e.,
+    \code{\link{double}}) or \code{\link{character}} vector.
+
+    If character: the strings either start with \code{0x} for hexadecimal, \code{0b} for
+    binary, \code{0} for octal, or without a \code{0*} prefix for decimal values.
+    Formatting errors are signalled as with \code{\link{stop}}.}
+  \item{b}{base: from 2 to 36}
+  \item{x}{numeric value}
+  \item{...}{additional arguments passed to methods}
+  \item{mod}{an integer, numeric, string or bigz of the internal modulus, see below.}
+  \item{quote}{(for printing:) logical indicating if the numbers
+    should be quoted (as characters are);  the default used to be
+    \code{TRUE} (implicitly) till 2011.}
 }
 \value{
-  A bigz class representing the parameter value.
+  An \R object of (S3) class \code{"bigz"}, representing the argument \code{x}.
 }
 \details{
-  Bigzs are integers of infinite, but given length (means: only
-  restricted by the host memory). Basic arithmetic operations can be performed
+  Bigz's are integers of arbitrary, but given length (means: only
+  restricted by the host memory).  Basic arithmetic operations can be performed
   on bigzs as addition, subtraction, multiplication, division, modulation
   (remainder of division), power, multiplicative inverse, calculating of the
-  greatest common divisor, test whether the integer is prime and other things
-  that comes in need when performing standard cryptographic operations.
+  greatest common divisor, test whether the integer is prime and other operations
+  needed when performing standard cryptographic operations.
 
-  For a review of basic arithmetics, see \code{"\link{add.bigz}"}.
+  For a review of basic arithmetics, see \code{\link{add.bigz}}.
 
-  The most important logical operators are supported, such as \code{"=="}, \code{"!="},
+  Comparison are supported, i.e., \code{"=="}, \code{"!="},
   \code{"<"}, \code{"<="}, \code{">"}, and \code{">="}.
 
-  Objects of class \code{"\link{bigz}"} may have an attribute \code{mod} 
-  which specifies a modulus that is applied after each arithmetic operation. 
-  If the result is going to have a modulus, 
-  
-    \code{result = mod.bigz(result, modulus)}
-    
-  is called after performing the arithmetic operation and the result will have the 
+  Objects of class \code{"bigz"} may have an attribute \code{mod}
+  which specifies a modulus that is applied after each arithmetic operation.
+  When the object has such a modulus \eqn{m}, all arithmetic is performed
+  \emph{\dQuote{modulo m}}, i.e.,
+\preformatted{
+      result <- mod.bigz(result, m)  ## == result \%\% m
+}
+  is called after performing the arithmetic operation and the result will have the
   attribute \code{mod} set accordingly.
 
   Powers of bigzs can only be performed, if either a modulus is going to
   be applied to the result bigz or if the exponent fits into an integer
-  value. So if you want to calculate a power in a finite group, don't use 
-  \code{a ^ b \%\% c}, but use \code{as.bigz(a,c) ^ b}, instead.
-  
+  value.  So, if you want to calculate a power in a finite group
+  (\dQuote{modulo c}), for large \eqn{c} do not use
+  \code{a ^ b \%\% c}, but rather \code{as.bigz(a,c) ^ b}.
+
   The following rules for the result's modulus apply when performing
-  arithmetic operations on bigzs:
-  
+  arithmetic operations on \code{bigz}s:
   \itemize{
     \item If none of the operand has a modulus set, the result will not have a modulus.
     \item If both operands have a different modulus, the result will not have a
-    modulus, except in case of \code{"\link{mod.bigz}"}, where the second operands 
+    modulus, except in case of \code{\link{mod.bigz}}, where the second operand's
     value is used.
     \item If only one of the operands has a modulus or both have a common (the
-    same), it is set and applied to the result, except in case of mod.bigz,
-    where the second operands value is used.
+    same), it is set and applied to the result, except in case of \code{mod.bigz},
+    where the second operand's value is used.
   }
 }
 
 \note{
-  x = as.bigz(1234567890123456789012345678901234567890)
-  will not work as integer will be first converted to a double
-  and then converted to a "bigz" element.
+  \preformatted{
+    x <- as.bigz(1234567890123456789012345678901234567890)
+  }
+  will not work as \R converts the number to a double, losing precision
+  and only then convert to a \code{"bigz"} object.
 
-  Correct syntaxe:
-  x = as.bigz("1234567890123456789012345678901234567890")
+  Instead, use the syntax
+  \preformatted{
+    x <- as.bigz("1234567890123456789012345678901234567890")
+  }
 }
 
-
-\references{Gnu MP Library see http://swox.com/gmp}
-
-%\references{ ~put references to the literature/web site here ~ }
+\references{The GNU MP Library, see \url{http://gmplib.org}}
 \author{Immanuel Scholz}
-%\note{ ~~further notes~~ }
-
-% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
 ## 1+1=2
-a = as.bigz(1)
+a <- as.bigz(1)
 a + a
 
-\dontrun{
-## calculate c = x^e mod n
+## Two non-small Mersenne primes:
+two <- as.bigz(2)
+p1 <- two^107 -1 ; isprime(p1); p1
+p2 <- two^127 -1 ; isprime(p2); p2
+
+
+## Calculate c = x^e mod n
+## --------------------------------------------------------------------
 x <- as.bigz("0x123456789abcdef") # my secret message
 e <- as.bigz(3) # something smelling like a dangerous public RSA exponent
-n <- as.bigz("0x4378a27...")  # probably a product of two primes
+(n <- p1 * p2) #  a product of two primes
+as.character(n, b=16)# as both primes were Mersenne's..
+
+## recreate the three numbers above [for demo below]:
+n. <- n; x. <- x; e. <- e # save
+Rev <- function() { n <<- n.; x <<- x.; e <<- e.}
 
 # first way to do it right
 modulus(x) <- n
-c <- x ^ e
+c <- x ^ e ; c ; Rev()
 
-# similar second way (maybe more sensefull if you reuse e) to do it right
+# similar second way (makes more sense if you reuse e) to do it right
 modulus(e) <- n
-c <- x ^ e
+c2 <- x ^ e
+stopifnot(identical(c2, c)) ; Rev()
 
 # third way to do it right
-c <- x ^ as.bigz(e, n)
+c3 <- x ^ as.bigz(e, n) ; stopifnot(identical(c3, c))
 
-# WRONG! (although very beautiful. Maybe ok for small examples)
-c <- x ^ e %% n
+# fourth way to do it right
+c4 <- as.bigz(x, n) ^ e ; stopifnot(identical(c4, c))
+
+# WRONG! (although very beautiful. Ok only for very small 'e' as here)
+cc <- x ^ e \%\% n
+cc == c
 
 # Return result in hexa
-as.character(c,b=16)
-}
+as.character(c, b=16)
+
 }
 
 \keyword{arith}
-%\keyword{bigz}
+
 

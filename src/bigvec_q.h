@@ -1,9 +1,9 @@
-/*! \file bigvec_q.h
+/*! \file bigve_cq.h
  *  \brief bigvec_q class definition
  *
  *  \version 1
  *
- *  \date Created: 2005   
+ *  \date Created: 2005
  *  \date Last modified: Time-stamp: <2006-06-16 20:19:01 antoine>
  *
  *
@@ -27,29 +27,29 @@ class bigvec_q {
 
   /** \brief The real value */
   std::vector<bigrational> value;
-  /** \brief an optional parameter used with matrix set to 0 by default */
-  unsigned int nrow ; 
-    
-  /** \brief contructor
+  /** \brief optional parameter used with matrix -- set to -1 for non-matrix */
+  int nrow ;
+
+  /** \brief constructor
    */
   bigvec_q() :
     value(),
-    nrow(0)
+    nrow(-1)
     {      }
 
   /** \brief  strange constructors ! */
   bigvec_q(double * & a, double * b):
-    value(a,b),nrow(0) {};
+    value(a,b),nrow(-1) {};
   /** \brief strange constructors ! */
   bigvec_q(int * & a, int * b):
-    value(a,b),nrow(0) {};
-    
+    value(a,b),nrow(-1) {};
+
   /**  \brief create empty vector of size i */
   bigvec_q(unsigned int i):
     value(i),
-    nrow(0){};
+    nrow(-1){};
 
-  /**  \brief copy contructor */
+  /**  \brief copy constructor */
   bigvec_q(const bigvec_q & rhs);
 
   /** \brief create from bigintegers */
@@ -63,7 +63,7 @@ class bigvec_q {
    * \note it returns a copy of the value.
    */
   bigrational  operator[] (unsigned int i) const;
-    
+
   /**
    * \brief Set a value
    */
@@ -77,10 +77,10 @@ class bigvec_q {
 
 
   /**
-   * \brief add a value 
+   * \brief add a value
    */
   void push_back(const bigrational &i);
-    
+
   /**
    * \brief return size
    */
@@ -96,18 +96,18 @@ class bigvec_q {
    */
   void clear();
 
-  /** 
+  /**
    * \brief substract lambda[0] * line j to line i
    */
   void subLine(unsigned int i,unsigned int j,bigvec_q lambda);
 
-  /** 
+  /**
    * \brief multiply line i by lambda[0]
    */
    void mulLine(unsigned int i, bigvec_q lambda);
 
    /** \brief print matrix to stdout
-    * 
+    *
     * use for debug purpose
     */
    void print();

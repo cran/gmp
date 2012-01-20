@@ -4,20 +4,19 @@
 \alias{min.bigz}
 \alias{min.bigq}
 
-
-\title{Returns the maxima and minima of the input values.}
-
+\title{Extrema (Maxima and Minima)}
 
 \usage{
-     max.bigz(..., na.rm=FALSE)
-     max.bigq(..., na.rm=FALSE)
-     min.bigz(..., na.rm=FALSE)
-     min.bigq(..., na.rm=FALSE)
+\method{max}{bigz}(..., na.rm=FALSE)
+\method{max}{bigq}(..., na.rm=FALSE)
+\method{min}{bigz}(..., na.rm=FALSE)
+\method{min}{bigq}(..., na.rm=FALSE)
 }
 
 \description{
-  Theses functions overload min and max function for big rationals and
-  big integers
+  We provide S3 \code{\link{methods}} for \code{\link{min}} and
+  \code{\link{max}} for big rationals (\code{bigq}) and big integers
+  (\code{biqz});  consequently, \code{\link{range}()} works as well.
 }
 
 \arguments{
@@ -31,18 +30,17 @@
 
 \author{Antoine Lucas}
 
-
 \examples{
-  x = as.bigz(1:10)
-  ##_call max.bigz => return 10
-  max(x)
-  min(x)
+ x <- as.bigz(1:10)
+ max(x)
+ min(x)
+ range(x) # works correctly via default method
 
-  x = as.bigq(1:10)
-  ##_call max.bigq
-  max(x)
-  min(x)
-  
+ Q <- as.bigq(1:10, 3)
+ max(Q)
+ min(Q)
+
+stopifnot(range(x) == c(1,10), 3*range(Q) == c(1,10))
 }
 
 \seealso{\code{\link[base]{max}}}

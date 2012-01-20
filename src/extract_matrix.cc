@@ -11,28 +11,28 @@ SEXP matrix_get_at_q(SEXP A,SEXP INDI, SEXP INDJ)
   return(bigrationalR::create_SEXP(extract_gmp_R::get_at( mat,INDI,INDJ)));
 }
 
-// for something like x = A[indi, indj]
+// for something like x = A[indi, indj], but also simply  a[ind]
 SEXP matrix_get_at_z(SEXP A,SEXP INDI, SEXP INDJ)
 {
 
   bigvec mat = bigintegerR::create_bignum(A);
   bigvec mat2 = extract_gmp_R::get_at( mat,INDI,INDJ);
-  
+
   // now modulus !
-  // cell based modulus 
+  // cell based modulus
   if(mat.modulus.size() == mat.value.size())
     {
       for(unsigned int i = 0; i< mat.size(); ++i)
 	mat.value[i] = mat.modulus[i];
 
       mat = extract_gmp_R::get_at( mat,INDI,INDJ);
-	
+
       mat2.modulus.resize(mat.size());
       for(unsigned int i = 0; i< mat.size(); ++i)
 	mat2.modulus[i] = mat.value[i];
     }
   // row base modulus
-  else if(mat.modulus.size() == mat.nrow )
+  else if((int)mat.modulus.size() == mat.nrow)
     {
       for(unsigned int i = 0; i< mat.size(); ++i)
 	mat.value[i] = mat.modulus[i];
@@ -44,8 +44,8 @@ SEXP matrix_get_at_z(SEXP A,SEXP INDI, SEXP INDJ)
       mat2.modulus.resize(mat.size());
       for(unsigned int i = 0; i< mat.size(); ++i)
 	mat2.modulus[i] = mat.value[i];
-      
-    } 
+
+    }
   //global modulus
   else if(mat.modulus.size() == 1)
     {
@@ -67,7 +67,7 @@ SEXP matrix_set_at_z(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
   if(TYPEOF(INDI) != LGLSXP )
     {
       std::vector<int> vidx = bigintegerR::create_int(INDI);
-      for(std::vector<int>::const_iterator it = vidx.begin(); 
+      for(std::vector<int>::const_iterator it = vidx.begin();
 	  it != vidx.end();
 	  ++it)
 	if(*it >= static_cast<int>(mat.size())) // in this case: we extend the vector
@@ -87,7 +87,7 @@ SEXP matrix_set_at_q(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
   if(TYPEOF(INDI) != LGLSXP )
     {
       std::vector<int> vidx = bigintegerR::create_int(INDI);
-      for(std::vector<int>::const_iterator it = vidx.begin(); 
+      for(std::vector<int>::const_iterator it = vidx.begin();
 	  it != vidx.end();
 	  ++it)
 	if(*it >= static_cast<int>(mat.size())) // in this case: we extend the vector
@@ -109,14 +109,14 @@ SEXP matrix_set_at_q(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
 std::vector<bool> extract_gmp_R::indice_set_at (unsigned int n , SEXP & IND)
 {
 
-  
+
   std::vector<int> vidx = bigintegerR::create_int(IND);
   std::vector<bool> result (n,false);
 
 
-  if(TYPEOF(IND) != NILSXP)	
+  if(TYPEOF(IND) != NILSXP)
     //LOCICAL
-    if (TYPEOF(IND) == LGLSXP) 
+    if (TYPEOF(IND) == LGLSXP)
       {
 	for(unsigned int i = 0; i< n; ++i)
 	  result[i] = static_cast<bool>( vidx[i % vidx.size() ] );
@@ -125,24 +125,24 @@ std::vector<bool> extract_gmp_R::indice_set_at (unsigned int n , SEXP & IND)
       //INTEGERS
       {
 	//negatives integers: all except indices will be modified
-	if (vidx[0] < 0) 
+	if (vidx[0] < 0)
 	  {
 	    for (std::vector<bool>::iterator it = result.begin(); it != result.end(); ++it)
 	      *it = true;
 	    for (std::vector<int>::const_iterator jt = vidx.begin(); jt != vidx.end(); ++jt)
 	      {
 		if(*jt > 0)
-		  Rf_error("only 0's may mix with negative subscripts");
+		  error(_("only 0's may mix with negative subscripts"));
 		if( (*jt != 0) && (*jt >= - static_cast<int>(n)))
 		  result[-(*jt)-1] = false;
 	      }
 	  }
 	else
-	  //INTEGERS (and positive)  
+	  //INTEGERS (and positive)
 	  for (std::vector<int>::const_iterator jt = vidx.begin(); jt != vidx.end(); ++jt)
 	    {
 	      if(*jt < 0)
-		Rf_error("only 0's may mix with negative subscripts");
+		error(_("only 0's may mix with negative subscripts"));
 
 	      if((*jt != 0) && (*jt <= static_cast<int>(n)))
 		result[*jt-1] = true;
@@ -155,6 +155,6 @@ std::vector<bool> extract_gmp_R::indice_set_at (unsigned int n , SEXP & IND)
 
 
   return(result);
-  
+
 }//end of indice_set_at
 

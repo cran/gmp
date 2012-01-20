@@ -1,9 +1,7 @@
 .noGenerics <- TRUE
 .conflicts.OK <- TRUE
 
-.onLoad <- .First.lib <- function(lib, pkg)
-{
-    library.dynam("gmp", pkg, lib)
-
-}
+.gmpVersion <- function() .Call(R_gmp_get_version)
+gmpVersion <- function()
+    numeric_version(sub("^([0-9]+\\.[0-9]+\\.[0-9]+).*","\\1", .gmpVersion()))
 

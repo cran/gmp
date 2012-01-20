@@ -3,7 +3,7 @@
  *
  *  \version 1
  *
- *  \date Created: 2005   
+ *  \date Created: 2005
  *  \date Last modified: Time-stamp: <2008-02-23 22:41:57 antoine>
  *
  *
@@ -20,7 +20,7 @@
 /** \brief class bigvec
  *
  * It a class composed of 2 vectors, (value & modulus) that
- * can be of different size and a nrow 
+ * can be of different size and a nrow
  * parameter (for matrix support)
  */
 class bigvec {
@@ -29,11 +29,10 @@ class bigvec {
   std::vector<biginteger> value;
   /** \brief modulus */
   std::vector<biginteger> modulus;
-  /** \brief optional parameter used with matrix */
-  unsigned int nrow ; 
-    
-     
-  /** \brief initialize value to size i 
+  /** \brief optional parameter used with matrix -- set to -1 for non-matrix */
+  int nrow ;
+
+  /** \brief initialize value to size i
    */
   bigvec(unsigned int i = 0);
 
@@ -49,8 +48,8 @@ class bigvec {
    *
    * \note should  not used for assignement
    */
-  bigmod  operator[] (unsigned int i) const;  
-    
+  bigmod  operator[] (unsigned int i) const;
+
 
   /**
    * \brief assign a value at indice i
@@ -61,15 +60,15 @@ class bigvec {
    * \brief extend our vectors.
    *
    * This function will check if modulus should be added.
-   * Modulus can be set "globaly" i.e. one modulus for the 
+   * Modulus can be set "globaly" i.e. one modulus for the
    * whole vector/matrix.
    * Or set by row (a constant modulus for each row)
-   * Or set by cell (as many modulus as value) 
+   * Or set by cell (as many modulus as value)
    */
   void push_back(const bigmod &i);
-    
-  /** 
-   * \brief return size of vector value 
+
+  /**
+   * \brief return size of vector value
    */
   unsigned int size() const ;
 
@@ -94,23 +93,23 @@ class bigvec {
   bigvec & operator= (const bigvec & rhs);
 
 
-  /** 
+  /**
    * \brief substract lambda * line j to line i
    */
   void subLine(unsigned int i,unsigned int j,const bigvec & lambda);
 
-  /** 
+  /**
    * \brief multiply line i by lambda
    */
   void mulLine(unsigned int i,const bigvec & lambda);
 
   /** \brief print matrix to stdout
-   * 
+   *
    * use for debug purpose
    */
   void print();
 
-  
+
 
 };
 //

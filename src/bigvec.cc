@@ -1,27 +1,25 @@
 
-
 #include "bigvec.h"
 
-/** \brief contructor 
+/** \brief constructor
  *
  */
-
 bigvec::bigvec(unsigned int i) :
   value(i),
   modulus(0),
-  nrow(0)
+  nrow(-1)
 {
 }
 
 
-bigvec::bigvec(const bigvec & vecteur) :  
+bigvec::bigvec(const bigvec & vecteur) :
   value(vecteur.value.size()),
-  modulus(vecteur.modulus.size()), 
+  modulus(vecteur.modulus.size()),
   nrow(vecteur.nrow)
 {
   //  *this = vecteur;
-  value.resize(vecteur.value.size());  
-  modulus.resize(vecteur.modulus.size());  
+  value.resize(vecteur.value.size());
+  modulus.resize(vecteur.modulus.size());
   std::vector<biginteger>::const_iterator jt=vecteur.modulus.begin();
   std::vector<biginteger>::iterator it = modulus.begin();
   while(it != modulus.end())
@@ -97,15 +95,13 @@ void bigvec::set(unsigned int i,const bigmod & val)
       for(unsigned int j = nrow_mod; j< i;++j)
 	modulus.push_back(modulus[j % nrow_mod]);
       modulus.push_back(val.modulus);
-	
+
     }
 }
 
 void bigvec::push_back(const bigmod & number)
 {
-  int nrow_mod = nrow;
-  if(nrow<1)
-    nrow_mod =1;
+  int nrow_mod = (nrow < 0) ? 1 : nrow;
 
   value.push_back(number.value);
 
@@ -114,7 +110,7 @@ void bigvec::push_back(const bigmod & number)
       // pathologic case: value.size >0 ; modulus.size =0
       // we assume previous mod where NA
       if((modulus.size() ==0) && (value.size()>0))
-	{	 
+	{
 	  modulus.resize(value.size()-1);
 	  modulus.push_back( number.modulus);
 	  return;
@@ -122,11 +118,11 @@ void bigvec::push_back(const bigmod & number)
 
       // standard cas
       if((modulus.size() != 1 ) && (static_cast<int>(modulus.size()) != nrow_mod) )
-	{	
+	{
 	  modulus.push_back(number.modulus);
 	  return;
 	}
-     
+
       // pathologic case:
       //  value modulus [nrow=4]
       //  2     2  push_back: ok
@@ -135,7 +131,7 @@ void bigvec::push_back(const bigmod & number)
       // note nrow_mod is either 1 ither nrow (when nrow >1)
       nrow_mod = modulus.size();
       if(modulus[(value.size() -1)% nrow_mod ] != number.modulus)
-	{	 
+	{
 	  // we add "previous"
 	  for(unsigned int i = nrow_mod; i< value.size()-1;i++)
 	    modulus.push_back(modulus[i % nrow_mod]);
@@ -146,7 +142,7 @@ void bigvec::push_back(const bigmod & number)
 
 
 // return size of value
-unsigned int bigvec::size() const 
+unsigned int bigvec::size() const
 {
   return(value.size());
 }
@@ -165,11 +161,11 @@ void bigvec::clear()
 {
   value.clear();
   modulus.clear();
-  nrow = 0;
+  nrow = -1;
 }
 
 
-// assignement operator
+// assignment operator
 bigvec & bigvec::operator= (const bigvec & rhs)
 {
   if(this != &rhs)
@@ -229,11 +225,10 @@ bool operator!=(const bigvec & rhs, const bigvec& lhs)
 void bigvec::subLine(unsigned int i,unsigned int j,const bigvec & lambda)
 {
   if(nrow <= 0)
-    Rf_error("You should have a matrix to do this operation");
-  
-  unsigned int k;
-  unsigned int n = value.size() / (unsigned int) nrow;
-  if(modulus.size() != 1) 
+    error(_("Need matrix with at least one row to do this operation"));
+
+  unsigned int k, n = value.size() / (unsigned int) nrow;
+  if(modulus.size() != 1)
     {
       for(k=0; k < n; ++k)
 	value[i + k*nrow] =  value[i + k*nrow] - ( value[j + k*nrow] * lambda.value[0] ) ;
@@ -252,12 +247,12 @@ void bigvec::subLine(unsigned int i,unsigned int j,const bigvec & lambda)
 void bigvec::mulLine(unsigned int i,const bigvec & lambda)
 {
   if(nrow <= 0)
-    Rf_error("You should have a matrix to do this operation");
+    error(_("Need matrix with at least one row to do this operation"));
 
   unsigned int k;
   // n number of columns
-  unsigned int n = value.size() / (unsigned int) nrow; 
-  if(modulus.size() != 1) 
+  unsigned int n = value.size() / (unsigned int) nrow;
+  if(modulus.size() != 1)
     {
       for(k=0; k < n; ++k)
 	value[i + k*nrow] =  value[i + k*nrow]  * lambda.value[0]  ;
@@ -271,22 +266,20 @@ void bigvec::mulLine(unsigned int i,const bigvec & lambda)
 }
 
 
+// never used
 void bigvec::print()
 {
-  unsigned int i,j;
-  if(nrow>0)
-    {
-      for(i=0; i<  nrow; ++i)
-	{
-	  for(j=0; j< (value.size() / nrow); ++j)
-	    printf("%s\t", value[i+j* nrow].str(10).c_str() );
-	  printf("\n");
-	}
-    }
-  else
-    {
-      for(i=0; i< value.size(); ++i)
-	printf("%s\t", value[i].str(10).c_str() );
-      printf("\n");
-    }
+  if(nrow > 0) {
+    for(int i=0; i < nrow; ++i)
+      {
+	for(int j=0; j < (value.size() / nrow); ++j)
+	  Rprintf("%s\t", value[i+j* nrow].str(10).c_str() );
+	Rprintf("\n");
+      }
+  }
+  else {
+    for(unsigned int i=0; i < value.size(); ++i)
+      Rprintf("%s\t", value[i].str(10).c_str() );
+    Rprintf("\n");
+  }
 }

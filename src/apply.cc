@@ -1,6 +1,8 @@
 
 #include <R.h>
-#include <Rdefines.h>
+#include <Rinternals.h>
+// and one thing from Rdefines.h :
+#define NEW_LIST(n) allocVector(VECSXP,n)
 
 #include "apply.h"
 #include "bigintegerR.h"
@@ -12,7 +14,7 @@
 //
 SEXP gmpMatToListZ(SEXP X, SEXP line)
 {
-  
+
   SEXP ans;
   // dangerous... no check => use with care in R
   bool lines =  INTEGER(line)[0];
@@ -32,18 +34,18 @@ SEXP gmpMatToListZ(SEXP X, SEXP line)
 	  for(unsigned int j = 0; j < ncol; ++j)
 	    {
 	      oneLine.value.push_back(matrix.value[i+j*nrow]);
-	      
+
 	      // modulus, if one by cell
 	      if(matrix.modulus.size() ==matrix.value.size() )
 		oneLine.modulus.push_back(matrix.modulus[i+j*nrow]);
-	      
+
 	    }
-	      
+
 	  // modulus, if one by line
 	  if(((matrix.modulus.size() == nrow ) || (matrix.modulus.size() == 1) ) && (matrix.modulus.size() !=matrix.value.size()) )
 	    oneLine.modulus.push_back(matrix.modulus[i % matrix.modulus.size() ]);
-	  
-	
+
+
 	  SET_VECTOR_ELT(ans, i,bigintegerR::create_SEXP(oneLine));
 
 	}
@@ -59,25 +61,25 @@ SEXP gmpMatToListZ(SEXP X, SEXP line)
 	  for(unsigned int i = 0; i < nrow; ++i)
 	    {
 	      oneLine.value.push_back(matrix.value[i+j*nrow]);
-	      
+
 	      // modulus, if one by cell
 	      if(matrix.modulus.size() ==matrix.value.size() )
 		oneLine.modulus.push_back(matrix.modulus[i+j*nrow]);
-	      
+
 	    }
-	      
+
 	  // modulus, if one by line
 	  if( (matrix.modulus.size() == 1)  && (matrix.modulus.size() !=matrix.value.size()) )
 	    oneLine.modulus.push_back(matrix.modulus[0 ]);
-	  
-	
+
+
 	  SET_VECTOR_ELT(ans, j,bigintegerR::create_SEXP(oneLine));
 
 	}
       UNPROTECT(1);
 
     }
-  
+
   return(ans);
 }
 
@@ -87,7 +89,7 @@ SEXP gmpMatToListZ(SEXP X, SEXP line)
 //
 SEXP gmpMatToListQ(SEXP X, SEXP line)
 {
-  
+
   SEXP ans;
   // dangerous... no check => use with care in R
   bool lines =  INTEGER(line)[0];
@@ -124,14 +126,14 @@ SEXP gmpMatToListQ(SEXP X, SEXP line)
 	    {
 	      oneLine.value.push_back(matrix.value[i+j*nrow]);
 	    }
-	      
+
 	  SET_VECTOR_ELT(ans, j,bigrationalR::create_SEXP(oneLine));
 
 	}
       UNPROTECT(1);
 
     }
-  
+
   return(ans);
 }
 

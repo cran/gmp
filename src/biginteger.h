@@ -15,9 +15,7 @@
 #include <string>
 #include <vector>
 
-#include <gmp.h>
-#include <R.h>
-#include <Rdefines.h>
+#include "Rgmp.h"
 
 /** \mainpage Gmp package for R language.
  *
@@ -26,8 +24,8 @@
  *
  * \section sec_intro Introduction
  *
- * Gmp package use directly the gmp C/C++ library (http://swox/com/gmp)
- * to provide powerfull computation of big integers and rational within R.
+ * The gmp R package uses directly the gmp C/C++ library (http://gmplib.org)
+ * to provide powerful computation of big integers and rational within R.
  * This package is more than a simple wrapper as it allows to handle
  *    - easy computation in Z/nZ (it is an option of bigz class)
  *    - matrix computation
@@ -51,11 +49,11 @@ struct mpz_t_sentry {
 
 /** \brief Class biginteger
  *
- * A big integer. Actually a wrapper for mpz_t to work with plus 
+ * A big integer. Actually a wrapper for mpz_t to work with plus
  * some special stuff.
  *
- * The biginteger special state "NA" means, no value is assigned. 
- * This does not mean, the internal state is not constructed, but 
+ * The biginteger special state "NA" means, no value is assigned.
+ * This does not mean, the internal state is not constructed, but
  * the value explicit is "not available".
  */
 
@@ -75,7 +73,7 @@ class biginteger
    * True, if the value is "NA".
    */
   bool na;
-    
+
  public:
   /**
    * Construct a "NA" biginteger.
@@ -83,13 +81,13 @@ class biginteger
   biginteger() : na(true) {mpz_init(value);}
 
   /**
-   * Construct a biginteger from a raw expression. 
+   * Construct a biginteger from a raw expression.
    */
   biginteger(const char* raw);
 
   /**
-   * Create a biginteger from a value. Remember to free the 
-   * parameter's mpz_t if you allocated them by yourself - 
+   * Create a biginteger from a value. Remember to free the
+   * parameter's mpz_t if you allocated them by yourself -
    * biginteger will copy the value.
    */
   biginteger(const mpz_t value_);
@@ -100,33 +98,33 @@ class biginteger
   biginteger(const int value_) : na(false) {
     if(value_ ==  NA_INTEGER)
       {mpz_init(value); na = true  ;}
-    else	
+    else
       mpz_init_set_si(value, value_);}
-    
+
   /**
    * Construct a biginteger from a long value.
    */
   biginteger(const long int value_) : na(false) {
     if(value_ ==  NA_INTEGER)
       {mpz_init(value); na = true  ;}
-    else	
+    else
       mpz_init_set_si(value, value_);}
-    
+
   /**
    * Construct a biginteger from a unsigned long value.
    */
   biginteger(const unsigned long int value_) : na(false) {
     if(value_ == (unsigned long int) NA_INTEGER)
       {mpz_init(value); na = true  ;}
-    else	
+    else
       mpz_init_set_ui(value, value_);}
-    
+
   /**
    * Construct a biginteger from a double value.
    */
   biginteger(const double value_) : na(false) {
     if( R_FINITE(value_) )
-      mpz_init_set_d(value, value_);  
+      mpz_init_set_d(value, value_);
     else
       {mpz_init(value); na = true  ;}
   }
@@ -134,7 +132,7 @@ class biginteger
   /**
    * Construct a biginteger from a string value.
    */
-  biginteger(const std::string& value_) : na(false) 
+  biginteger(const std::string& value_) : na(false)
     {
       /* mpz_init.. return -1 when error, 0: ok */
       if(mpz_init_set_str(value, value_.c_str(), 0))
@@ -145,11 +143,11 @@ class biginteger
       /*	if(mpz_init_set_str(value, value_.c_str(), 0) == -1)
 		Rf_error("Not a valid number");    */
     }
-    
+
   /**
    *  Copy constructor (mpz_t aren't standard-copyable)
    */
-  biginteger(const biginteger& rhs) : na(rhs.na) 
+  biginteger(const biginteger& rhs) : na(rhs.na)
     {
       mpz_init_set(value, rhs.getValueTemp());
     }
@@ -173,44 +171,44 @@ class biginteger
     mpz_set(value, value_); na = false;
   }
 
-  /** \brief set value from an integer 
+  /** \brief set value from an integer
    */
-  void setValue(int value_) {      
+  void setValue(int value_) {
     if(value_ == NA_INTEGER)
       {mpz_set_ui(value, 0); na = true  ;}
     else
       {
-	mpz_set_si(value, value_); 
+	mpz_set_si(value, value_);
 	na = false;
       }
   }
-  /** \brief set value from a long integer 
+  /** \brief set value from a long integer
    */
-  void setValue(long int value_) {      
+  void setValue(long int value_) {
     if(value_ == NA_INTEGER)
       {mpz_set_ui(value, 0); na = true  ;}
     else
       {
-	mpz_set_si(value, value_); 
+	mpz_set_si(value, value_);
 	na = false;
       }
   }
 
   /** \brief set value from an unsigned int
    */
-  void setValue(unsigned long int value_) {      
+  void setValue(unsigned long int value_) {
     if((int)value_ == NA_INTEGER)
       {mpz_set_ui(value, 0); na = true  ;}
     else
       {
-	mpz_set_ui(value, value_); 
+	mpz_set_ui(value, value_);
 	na = false;
       }
   }
 
   /** \brief set value from a float
    */
-  void setValue(double value_) {      
+  void setValue(double value_) {
     if(R_FINITE (value_) )
       {mpz_set_d(value, value_); na = false;}
     else
@@ -220,7 +218,7 @@ class biginteger
 
   /** \brief set value from a biginteger
    */
-  void setValue(const biginteger  & value_) {      
+  void setValue(const biginteger  & value_) {
     setValue(value_.getValueTemp());
     na = value_.isNA();
 
@@ -244,17 +242,17 @@ class biginteger
    * Return true, if the value is NA.
    */
   bool isNA() const {return na;}
-    
+
   /**
    * set NA value
    */
   void NA(bool value_p)  {na = value_p;}
-    
+
   /**
    * Return true, if the value is 0.
    */
   int sgn() const {return mpz_sgn(value);}
-    
+
   /**
    *  Convert the biginteger into a standard string.
    */
@@ -267,7 +265,7 @@ class biginteger
   long as_long() const {return mpz_get_si(value);}
 
   /**
-   * \brief Convert the biginteger into a double value 
+   * \brief Convert the biginteger into a double value
    * (you may loose precision)
    */
   double as_double() const {return mpz_get_d(value);}
@@ -279,7 +277,7 @@ class biginteger
    *
    * Also remember, that the modulus is not saved this way. To obtain a
    * modulus raw byte use get_modulus().as_raw(void*).
-   * 
+   *
    * @return number of bytes used (same as raw_size())
    */
   int as_raw(char* raw) const;
@@ -295,7 +293,7 @@ class biginteger
    */
   void swap(biginteger& other);
 
-  /** 
+  /**
    * Test prime numbers
    */
   int isprime(int reps){return  mpz_probab_prime_p(value,reps);}
@@ -333,7 +331,7 @@ biginteger operator- (const biginteger& rhs, const biginteger& lhs);
 biginteger operator% (const biginteger& rhs, const biginteger& lhs);
 
 /** \brief function used by rational that should export
- *   mpz value 
+ *   mpz value
  */
 int as_raw(char* raw,mpz_t value,bool na);
 

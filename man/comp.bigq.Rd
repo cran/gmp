@@ -12,11 +12,17 @@
   Binary operators which allow the comparison of values in atomic vectors.
 }
 \usage{
-sign.bigq(x)
-}
+\method{sign}{bigq}(x)
 
+\method{<}{bigq}(e1, e2)
+\method{<=}{bigq}(e1, e2)
+\method{==}{bigq}(e1, e2)
+\method{>=}{bigq}(e1, e2)
+\method{>}{bigq}(e1, e2)
+\method{!=}{bigq}(e1, e2)
+}
 \arguments{
-  \item{x}{Object or vector of class bigq}
+  \item{x, e1, e2}{Object or vector of class \code{\link{bigq}}}
 }
 
 \examples{

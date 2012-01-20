@@ -1,16 +1,16 @@
 /*! \file matrix.h
- *  \brief C++ function to add matrix support 
+ *  \brief C++ function to add matrix support
  *
  *  \version 1
  *
- *  \date Created: 25/05/06   
+ *  \date Created: 25/05/06
  *  \date Last modified: Time-stamp: <2006-05-26 14:28:09 antoine>
  *
  *  \author A. Lucas
  *
  * \note
  *  as usually, matrix x[i,j] (n x p) is represented by a vector
- *              x[i + j x n]  (i=0..n-1 ; j=0..p-1) 
+ *              x[i + j x n]  (i=0..n-1 ; j=0..p-1)
  *
  *  \note Licence: GPL
  */
@@ -33,13 +33,10 @@ extern "C"
    */
   SEXP bigint_transposeR(SEXP x);
 
-  /** \brief  matrix multiplication
-   *  
-   * returns matrix multiplication axb (a %*% b with R notation). 
-   * \param a is of dimension nxp
-   * \param b is of dimension pxm
-   */
-  SEXP matrix_mul_z (SEXP a, SEXP b);
+  /** \brief  matrix cross product */
+  SEXP matrix_crossp_z (SEXP a, SEXP trans);
+  /** \brief  matrix multiplication */
+  SEXP matrix_mul_z (SEXP a, SEXP b, SEXP op);
 
 
   /** \brief for function rbind
@@ -54,7 +51,7 @@ namespace matrixz{
 
   /** \brief C function use to transpose a matrix */
   bigvec bigint_transpose ( bigvec & mat,int nr,int nc);
-  
+
   /** \brief Check dimension compatibility */
   int checkDims(int  dima,int  dimb);
 }

@@ -1,7 +1,7 @@
 /*! \file matrixq.h
  *  \brief header for rational matrix functions set
  *
- *  \date Created: 2005   
+ *  \date Created: 2005
  *  \date Last modified: Time-stamp: <2006-05-26 14:35:51 antoine>
  *
  *
@@ -24,10 +24,10 @@ extern "C"
    */
   SEXP bigq_transposeR(SEXP x);
 
-  /**
-   * \brief matrix multiplication
-   */
-  SEXP matrix_mul_q (SEXP a, SEXP b);
+  /** \brief  matrix cross product */
+  SEXP matrix_crossp_q (SEXP a, SEXP trans);
+  /** \brief  matrix multiplication */
+  SEXP matrix_mul_q (SEXP a, SEXP b, SEXP op);
 
   /** \brief for function rbind
    */

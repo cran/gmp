@@ -1,0 +1,62 @@
+2012-01-20 Antoine Lucas
+	* update gmp-test
+
+2012-01-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* NAMESPACE,
+	* src/init.cc: new file, providing proper registration
+	* R/zzz.R: new gmpVersion() [to get GMP C library version].
+
+2012-01-09  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/biginteger.R (as.bigz): mod=NULL now is equivalent to NA;
+	 important for  'modulus(x) <- NULL' to work.
+
+2012-01-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/modulus.Rd: example, (and FIXME)
+
+	* TODO: as.bigz(integer()) and as.bigq(integer()) now both work and
+	give a 0-length object; analogously, the basic functions now work
+	with the 0-length big[qz] vectors and return 0-length.
+
+	* src/bigintegerR.cc (create_SEXP): ensure the modulus also has
+	class "bigz".
+
+2012-01-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/matrix-prods.R: new file, containing all %*%, and new
+	crossprod, tcrossprod methods.
+	<bigz> %*% <double>  now works, too.
+
+2011-12-31  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/bigintegerR.cc (biginteger_as_integer): new
+	(biginteger_log, biginteger_log2): new --> allowing proper log().
+
+	* R/biginteger.R (as.integer.bigz): new -- gave nonsense!
+	* R/biginteger.R (log.bigz): now work correctly also for large numbers.
+
+2011-12-29  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/bigintegerR.cc (bigI_frexp): new, with R interface
+	* man/frexpZ.Rd:
+
+	* R/bigq.R (Math.bigq): define a "fall-back" group method
+	* R/biginteger.R (Math.bigz): ditto
+
+	* R/biginteger.R (print.bigz, print.bigq): Mention class and length,
+	and then do *not* quote, by default.
+
+2011-12-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.5-0
+
+	* src/bigintegerR.cc (biginteger_max): na_remove now correct from R code
+	* src/bigrationalR.cc (bigrational_max): ditto
+
+	* R/biginteger.R (factorialZ, chooseZ): new
+
+2010-04-10  Antoine Lucas <antoinelucas@gmail.com>
+
+	* ./Changes : see for 0.4-12 and everything older.

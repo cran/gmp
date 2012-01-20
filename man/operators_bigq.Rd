@@ -7,51 +7,47 @@
 \alias{*.bigq}
 \alias{div.bigq}
 \alias{/.bigq}
-\alias{\%/\%.bigq}
 \alias{abs.bigq}
 
 \title{Basic arithmetic operators for large rationals}
 \description{
-  Addition, substraction, multiplication, division.
-
+  Addition, subtraction, multiplication, division, and absolute value for
+  large rationals, i.e. \code{"\link{bigq}"} class \R objects.
 }
 \usage{
-add.bigq(a, b)
-sub.bigq(a, b=NULL)
-mul.bigq(a, b)
-div.bigq(a, b)
-abs.bigq(x)
+add.bigq(e1, e2)
+\method{+}{bigq}(e1, e2)
+
+sub.bigq(e1, e2=NULL)
+\method{-}{bigq}(e1, e2)
+
+mul.bigq(e1, e2)
+\method{*}{bigq}(e1, e2)
+
+div.bigq(e1, e2)
+\method{/}{bigq}(e1, e2)
+
+\method{abs}{bigq}(x)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{a,b,x}{bigq, integer or string from an integer}
-  \item{...}{Additional parameters}
+  \item{e1,e2, x}{of class \code{"\link{bigq}"}, or (\code{e1} and
+    \code{e2}) integer or string from an integer}
 }
 \details{
-  Operators can be use directly when objects are of class bigq:
+  Operators can be use directly when the objects are of class \code{"\link{bigq}"}:
   a + b, a * b, etc.
-
 }
 \value{
   A bigq class representing the result of the arithmetic operation.
 }
-
-\references{http://mulcyber.toulouse.inra.fr/projects/gmp/}
-
-%\references{ ~put references to the literature/web site here ~ }
+\references{
+  \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
+}
 \author{Immanuel Scholz and Antoine Lucas}
-%\note{ ~~further notes~~ }
-
-% ~Make other sections like Warning with \section{Warning }{....} ~
-
 
 \examples{
-# 1/3+1=4/3
+## 1/3 + 1 = 4/3 :
 as.bigq(1,3) + 1
-
-
 }
-
 \keyword{arith}
-%\keyword{bigz}
 

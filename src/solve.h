@@ -1,16 +1,16 @@
 /*! \file solve.h
- *  \brief functions to solve matrix 
+ *  \brief functions to solve matrix
  *
  *  \version 1
  *
- *  \date Created: 25/05/06   
- *  \date Last modified: Time-stamp: <2006-05-25 23:02:09 antoine>
+ *  \date Created: 25/05/06
+ *  \date Last modified: $Date: 2012-01-12 17:46:59 $
  *
  *  \author A. Lucas
  *
  * \note
  *  as usually, matrix x[i,j] (n x p) is represented by a vector
- *              x[i + j x n]  (i=0..n-1 ; j=0..p-1) 
+ *              x[i + j x n]  (i=0..n-1 ; j=0..p-1)
  *
  *  \note Licence: GPL
  */
@@ -20,7 +20,8 @@
 #define SOLVE_HEADER_GMP_R_ 1
 
 #include <R.h>
-#include <Rdefines.h>
+#include <Rinternals.h>
+
 #include "bigvec_q.h"
 
 extern "C"
@@ -37,7 +38,6 @@ extern "C"
 
   /** \brief solve matrix system AX=B in Z/nZ*/
   SEXP solve_z(SEXP A,SEXP B);
-
 
 }
 
@@ -56,7 +56,7 @@ namespace solve_gmp_R
     {
       // n = A.nrow
       unsigned int i;
-      
+
       // a temp value
       T tmpValeur(1);
 
@@ -70,7 +70,7 @@ namespace solve_gmp_R
 	  tmpValeur.set(0, A[k + k*A.nrow].inv() );
 	  A.mulLine(k,tmpValeur);
 	  B.mulLine(k,tmpValeur);
-	  
+
 	  for(i = 0; i< A.nrow; ++i)
 	    {
 	      if(i == k)
@@ -81,12 +81,12 @@ namespace solve_gmp_R
 	      B.subLine(i,k, tmpValeur) ;
 	    }
 	}
-      
+
     }
 
 
   /** \brief inverse a rational matrix
-   * 
+   *
    */
   SEXP inverse_q(bigvec_q A);
 

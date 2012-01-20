@@ -3,7 +3,7 @@
  *
  *  \version 1
  *
- *  \date Created: 04/12/04   
+ *  \date Created: 04/12/04
  *  \date Last modified: Time-stamp: <2008-02-17 21:41:23 antoine>
  *
  *  \author Antoine Lucas (help from Immanuel Scholz) (R adaptation)
@@ -12,38 +12,14 @@
  *  \note Licence: GPL
  */
 
-
-#define USE_RINTERNALS
-
-#define R_NO_REMAP    	// avoid collisions with stl definitions
-
-#include <math.h>
-#include <gmp.h>
-
-#include <R.h>
-#include <Rdefines.h>
-
-#undef PROTECT
-#undef UNPROTECT
-#define PROTECT(x) Rf_protect(x)	// but use some handy defs anyways
-#define UNPROTECT(x) Rf_unprotect(x)
-#undef coerceVector
-#define coerceVector             Rf_coerceVector
-
-
-
-#include <stdio.h>
-
+#include "Rgmp.h"
 
 using namespace std;
 
+
 #include "factor.h"
 
-
-
 static unsigned add[] = {4, 2, 4, 2, 4, 6, 2, 6};
-
-
 
 void factor_using_division (mpz_t t, unsigned int limit,  bigvec & result)
 {
@@ -58,12 +34,10 @@ void factor_using_division (mpz_t t, unsigned int limit,  bigvec & result)
 
   f = mpz_scan1 (t, 0);
   mpz_div_2exp (t, t, f);
-  while (f)
-    {
-
-      result.value.push_back(biginteger(2));
-      --f;
-    }
+  while (f) {
+    result.value.push_back(biginteger(2));
+    --f;
+  }
 
   for (;;)
     {
@@ -211,7 +185,7 @@ S4:
         {
           if (p != 0)
             {
-              mpz_powm_ui (y, y, p, n); mpz_add (y, y, a); 
+              mpz_powm_ui (y, y, p, n); mpz_add (y, y, a);
             }
           else
             {
@@ -282,9 +256,7 @@ factor (mpz_t t, unsigned long p,  bigvec & result)
   if (mpz_cmp_ui (t, 1) != 0)
     {
       if (mpz_probab_prime_p (t, 3))
-        {
-          result.value.push_back(biginteger(t));
-        }
+	result.value.push_back(biginteger(t));
       else
         factor_using_pollard_rho (t, 1, p,result);
     }
@@ -296,30 +268,22 @@ factor (mpz_t t, unsigned long p,  bigvec & result)
 //
 SEXP factorR (SEXP n)
 {
-  bigvec v = bigintegerR::create_bignum(n);
-  bigvec result;
-  int sgn;  
-   
-  
-  mpz_t val;
-  mpz_init(val);
-  mpz_t_sentry val_s(val);
-  mpz_set(val,v[0].value.getValueTemp());
+  bigvec v = bigintegerR::create_bignum(n), result;
+  if(v.size() > 0) {
+    mpz_t val;
+    mpz_init(val);
+    mpz_t_sentry val_s(val);
+    mpz_set(val,v[0].value.getValueTemp());
 
- 
-  sgn = mpz_sgn(val);
-  if(sgn == 0)
-    Rf_error("Cannot factorize 0");  
-  if(sgn<0)
-    {
-      mpz_abs(val,val);
-      result.value.push_back(biginteger(-1));
-    }
-
-
-  factor(val,0,result);
-
-
+    int sgn = mpz_sgn(val);
+    if(sgn == 0)
+      error(_("Cannot factorize 0"));
+    if(sgn<0)
+      {
+	mpz_abs(val,val);
+	result.value.push_back(biginteger(-1));
+      }
+    factor(val,0,result);
+  }
   return bigintegerR::create_SEXP(result);
-
 }

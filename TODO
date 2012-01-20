@@ -1,16 +1,49 @@
+* Bug Fixes								-*-org-*-
+
+***  chooseZ() is *not* vectorized; neither factorialZ(), fibnum(), etc
+
+***  as.bigz(1:4) + as.bigq(7)  fails
+
+***  <bigq> ^ 2  fails
 
 
-  * provide more functions for bigintegers, such as sum, prod, min, max, sort,
-    order ...
+* Matrix things
 
-  * Better integration to R with as.integer.big(q/z), as.data.frame ...
+***  3*M and M*3  are not the same: the first forgets the "nrow" ...
 
-  * more matrix and linear algebra computation functions (SVD, eigen values, 
+***  x <- as.bigz(2:5); x[1] <- -1; x # --- is a matrix !!!!
+
+***  also want different  M[1,] and M[1] for big[zq] matrices
+
+***  as.matrix(as.bigq(1:4)),  as.matrix(as.bigz(1:4)) both fail:
+   MM: I'd want   as.matrix(<big* matrix>) to convert *back* to
+   double/integer matrix, as we have no other convenient way for that yet.
+
+***  abs(.) or sign(<big..matrix>) {and probably many others!}
+     return vector instead of matrix, i.e.., lose the "nrow" attribute.
+
+***  cbind(<bigz>, <bigq>)  returns raw ...
+
+* More general, previous 'TODO':
+
+***  The print() method is improved; but matrices are not "noted" yet.
+   Still needs discussion; should be shorter for length 1 ?
+   We could have an option() .. to suppress the initial line. Fine for
+   bigq, but not for bigz
+
+***  provide more functions for bigintegers, such as
+   sort, order ...
+
+*** more matrix and linear algebra computation functions (SVD, eigen values,
     determinant).
 
-  * provide basic algorithmns and number theoretic symbols (CRA, Jacobi symbol)
+*** provide basic algorithms and number theoretic symbols (CRA, Jacobi symbol)
 
-  * provide binary-to-biginteger interface with bitwise operations (i.e., bit access to big integers)
+*** provide binary-to-biginteger interface with bitwise operations (i.e., bit access to big integers)
 
-  * test, test, test, ...
+* Systematic Testing
+
+*** Arithmetic, Comparison, etc: ensure pairwise compatibility <bigz>, <bigq>, <numeric>
+
+*** tests/gmp-test.R: contains Antoine's previous test suite,
 

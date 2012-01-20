@@ -13,7 +13,7 @@ bigvec_q::bigvec_q(const bigvec_q & rhs):
 bigvec_q::bigvec_q(const bigvec & rhs):
   value(rhs.value.size()),
   nrow(rhs.nrow)
-{  
+{
   for(unsigned int i=0; i< rhs.size(); ++i)
     {
       value[i].setValue(rhs.value[i]);
@@ -24,7 +24,7 @@ bigvec_q & bigvec_q::operator= (const bigvec_q & rhs)
 
 {
   if(this != &rhs)
-    {      
+    {
       nrow = rhs.nrow;
       value.resize(rhs.value.size());
       std::vector<bigrational>::iterator it = value.begin();
@@ -37,11 +37,11 @@ bigvec_q & bigvec_q::operator= (const bigvec_q & rhs)
 	}
     }
   return(*this);
-  
+
 }
 
 
-bigrational  bigvec_q::operator[] (unsigned int i) const 
+bigrational  bigvec_q::operator[] (unsigned int i) const
 {
   return(value[i]);
 }
@@ -51,7 +51,7 @@ void bigvec_q::set(unsigned int i,const bigrational & val)
   //DEBUG !!
   if(i>=value.size())
     {
-      printf("t nul a bigvec_q_set\n");
+      Rprintf("t nul a bigvec_q_set\n");
       return;
     }
   value[i] = val;
@@ -61,7 +61,7 @@ void bigvec_q::set(unsigned int i,const mpq_t & val)
 
   if(i>=value.size())
     {
-      printf("t nul a bigvec_q_set_mpq __LINE__ \n");
+      Rprintf("t nul a bigvec_q_set_mpq __LINE__ \n");
       return;
     }
 
@@ -73,8 +73,8 @@ void bigvec_q::push_back(const bigrational &i)
 {
   value.push_back(i);
 }
-    
-unsigned int bigvec_q::size() const 
+
+unsigned int bigvec_q::size() const
 {
   return(value.size());
 }
@@ -98,14 +98,11 @@ void bigvec_q::clear()
 void bigvec_q::subLine(unsigned int i,unsigned int j,bigvec_q lambda)
 {
   if(nrow <= 0)
-    Rf_error("You should have a matrix to do this operation");
-  
-  unsigned int k;
-  unsigned int n = value.size() /  nrow;
+    error(_("Need matrix with at least one row to do this operation"));
 
+  unsigned int k, n = value.size() /  nrow;
   for(k=0; k < n; ++k)
       value[i + k*nrow] =  value[i + k*nrow] - ( value[j + k*nrow] * lambda.value[0] ) ;
-
 }
 
 
@@ -115,32 +112,27 @@ void bigvec_q::subLine(unsigned int i,unsigned int j,bigvec_q lambda)
 void bigvec_q::mulLine(unsigned int i, bigvec_q lambda)
 {
   if(nrow <= 0)
-    Rf_error("You should have a matrix to do this operation");
+    error(_("Need matrix with at least one row to do this operation"));
 
-
-  unsigned int k;
-  unsigned int n = value.size() / nrow;
+  unsigned int k, n = value.size() / nrow;
   for(k=0; k < n; ++k)
       value[i + k*nrow] =  value[i + k*nrow]  * lambda.value[0];
-
 }
 
+// never used
 void bigvec_q::print()
 {
-  unsigned int i,j;
-  if(nrow>0)
-    {
-      for(i=0; i<  nrow; ++i)
-	{
-	  for(j=0; j< (value.size() / nrow); ++j)
-	    printf("%s\t", value[i+j* nrow].str(10).c_str() );
-	  printf("\n");
-	}
-    }
-  else
-    {
-      for(i=0; i< value.size(); ++i)
-	printf("%s\t", value[i].str(10).c_str() );
-      printf("\n");
-    }
+  if(nrow>0) {
+    for(int i=0; i < nrow; ++i)
+      {
+	for(unsigned int j=0; j < (value.size() / nrow); ++j)
+	  Rprintf("%s\t", value[i+j* nrow].str(10).c_str() );
+	Rprintf("\n");
+      }
+  }
+  else {
+    for(unsigned int i=0; i < value.size(); ++i)
+      Rprintf("%s\t", value[i].str(10).c_str() );
+    Rprintf("\n");
+  }
 }

@@ -1,128 +1,108 @@
-matrix <- function(...)
+matrix <- function(data=NA, nrow=1, ncol=1, byrow=FALSE, ...)
   UseMethod("matrix")
 
-matrix.default <- function(...)
-{
-  base::matrix(...)
-}
+matrix.default <- function(...) base::matrix(...)
+##
+## looks "better", but results wrongly, e.g. matrix(1:6, 3) :
+## matrix.default <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
+##                            dimnames = NULL, ...)
+##     ## here, rightly, any "..." will give an error from base::matrix
+##     base::matrix(data, nrow=nrow, ncol=ncol, byrow=byrow,
+##                  dimnames=dimnames, ...)
 
-matrix.bigz <- function(data=NA,nrow=1, ncol=1, byrow=FALSE,dimnames =NULL,
-                        mod=NA,...)
+matrix.bigz <- function(data=NA, nrow=1, ncol=1, byrow=FALSE, dimnames=NULL,
+                        mod=NA, ...)
   {
-    .Call("as_matrixz",data,
-          as.integer(nrow),
-          as.integer(ncol),
-          as.integer(byrow),
-          mod,
-          PACKAGE="gmp")
+    if(!is.null(dimnames))
+        warning("'dimnames' are not implemented for this class")
+    .Call(as_matrixz, data,
+          as.integer(nrow), as.integer(ncol), as.integer(byrow),
+          mod)
   }
 
 
 as.matrix.bigz <- function(x, ...)
-  {
-    n <- length(x)
-    p <- 1
-    if((class(x) == ("matrix") )| (class(x) == "data.frame") | (class(x) == "bigz"))
-      {
-        n=dim(x)[1]
-        p=dim(x)[2]        
-      }
-    matrix.bigz(x,nrow=n,ncol=p)
-  }
+{
+    if(is.matrix(x) || is.data.frame(x) || inherits(x, "bigz")) {
+	d <- dim(x)
+	n <- d[1L]
+	p <- d[2L]
+    } else {
+        n <- length(x)
+        p <- 1L
+    }
+    matrix.bigz(x, nrow=n, ncol=p)
+}
 
 
-as.vector.bigz <- function(x, mode="any")
-  {
-    attr(x,"nrow")<- NULL
-    return(x)
-  }
+as.vector.bigz <- function(x, mode="any") {
+  attr(x,"nrow") <- NULL
+  x
+}
 
-t.bigz <- function(x)
-  {
-    .Call("bigint_transposeR",
-          x,    
-          PACKAGE="gmp")
-  }
+t.bigz <- function(x) .Call(bigint_transposeR, x)
 
-  
+
 ##aperm.bigz <- function(a,perm, resize= TRUE)
 ##  {
 ##    dims <- dim(a)
-##    if (missing(perm)) 
+##    if (missing(perm))
 ##      perm <- c(1,2)
 ##    if(perm[1] > perm[2])
 ##      ans = .Call("bigint_transposeR",
-##        a,    
+##        a,
 ##       PACKAGE="gmp")
 ##   else
-##     ans = a  
+##     ans = a
 ##    if(!resize)
 ##      dim(ans) <- dims
 ##    ans
 ##}
 
 
-"%*%" <- function(x,y)
-  UseMethod("%*%")
-
-"%*%.default" <- function(x,y)
-{
-  base::"%*%"(x,y)
+.dimZQ <- function(x) {
+    n <- attr(x,"nrow")
+    c(n, length(x)/n)
 }
 
-"%*%.bigz" <- function(x,y)
-  {
-    .Call("matrix_mul_z",
-          x,
-          y,
-          PACKAGE="gmp")
-  }
-
-dim.bigz <- function(x)
-  return(c(attr(x,"nrow"),length(x)/attr(x,"nrow")))
-
-"dim<-.bigz" <- function(x,value)
+.dimsetZQ <- function(x,value)
 {
-  ## TODO: check...
-  attr(x,"nrow") <- as.integer(value[1])
+  stopifnot(value == (v <- as.integer(value)), v >= 0, prod(v) == length(x))
+  attr(x,"nrow") <- v[1]
   x
 }
+.nrowZQ <- function(x) attr(x,"nrow")
+## MM: what about 0-row matrices --> ncol(.) gives NaN  ---> proof that we should store 'dim', not 'nrow'
+.ncolZQ <- function(x) length(x)/attr(x,"nrow")
 
-nrow.bigz <- function(x)
-  return(attr(x,"nrow"))
+dim.bigz <- .dimZQ
+dim.bigq <- .dimZQ
+`dim<-.bigz` <- .dimsetZQ
+`dim<-.bigq` <- .dimsetZQ
 
-ncol.bigz <- function(x)
-  return(length(x)/attr(x,"nrow"))
+nrow.bigz <- .nrowZQ
+nrow.bigq <- .nrowZQ
+ncol.bigz <- .ncolZQ
+ncol.bigq <- .ncolZQ
 
 
 cbind.bigz <- function(..., recursive = FALSE)
-  {
-    a <- list(...)
-    return(.Call("biginteger_cbind",a,PACKAGE = "gmp"))
-  }
+    .Call(biginteger_cbind, list(...))
 
 rbind.bigz <- function(..., recursive = FALSE)
-  {
-    a <- list(...)
-    return(.Call("biginteger_rbind",a,PACKAGE = "gmp"))
-  }
+    .Call(biginteger_rbind, list(...))
 
-apply <- function(X, MARGIN,FUN)
-  UseMethod("apply")
+apply <- function(X, MARGIN, FUN, ...)
+    UseMethod("apply")
+apply.default <- function(X, MARGIN, FUN, ...)
+    base::apply(X, MARGIN, FUN, ...)
 
-apply.default <- function(X, MARGIN,FUN)
-  base::apply(X, MARGIN,FUN)
-
-
-apply.bigz <- function(X, MARGIN,FUN)
+apply.bigz <- function(X, MARGIN, FUN, ...)
 {
-  ## This change matrix to a list.
-  X = .Call("gmpMatToListZ",X,as.integer(MARGIN),PACKAGE="gmp")
-  ## here: std lapply
-  lst = lapply(X,FUN)
-
-  ## to change list to vector
-  .Call("biginteger_c",lst)
+  ## change matrix to a list:
+  X <- .Call(gmpMatToListZ, X, as.integer(MARGIN))
+  ## then use std lapply() and convert back to vector:
+  .Call(biginteger_c, lapply(X, FUN, ...))
 }
 
 

@@ -16,43 +16,41 @@
 }
 \usage{
 as.bigq(n, d = 1)
-as.character.bigq(x,b=10,...)
-as.double.bigq(x,...)
-as.bigz.bigq(a,mod=NA)
-is.na.bigq(x)
-print.bigq(x,...)
+\S3method{as.character}{bigq}(x, b=10,...)
+\S3method{as.double}{bigq}(x,...)
+as.bigz.bigq(a, mod=NA)
+\S3method{is.na}{bigq}(x)
+\S3method{print}{bigq}(x, quote=FALSE, ...)
 denominator(x)
 numerator(x)
 }
 
 \arguments{
-
-  \item{n,d}{Either integer, numeric or string value
-    (String value: ither starting with \code{0x} for hexadecimal, \code{0b} for
+  \item{n,d}{either integer, numeric or string value
+    (String value: either starting with \code{0x} for hexadecimal, \code{0b} for
     binary or without prefix for decimal values.
     Any format error results in \code{0}).
-    n stands for numerator, d for denominator}
-  \item{a}{An element of class bigq}
-  \item{mod}{Optional modulus to convert into biginteger}
-  \item{x}{Numeric value}
-  \item{b}{Base: from 2 to 32}
-  \item{...}{Additional parameters}
+    \code{n} stands for numerator, \code{d} for denominator}
+  \item{a}{an element of class \code{"bigq"}}
+  \item{mod}{optional modulus to convert into biginteger}
+  \item{x}{numeric value}
+  \item{b}{base: from 2 to 36}
+  \item{...}{additional arguments passed to methods}
+  \item{quote}{(for printing:) logical indicating if the numbers
+    should be quoted (as characters are);  the default used to be
+    \code{TRUE} (implicitly) till 2011.}
 }
 \value{
-  A bigq class representing the parameter value.
+  An \R object of (S3) class \code{"bigq"} representing the parameter value.
 }
 \details{
-  as.bigz.bigq returns the smallest integers not less than the
+  \code{as.bigz.bigq()} returns the smallest integers not less than the
   corresponding rationals bigq.
 }
 
-\references{http://mulcyber.toulouse.inra.fr/projects/gmp/}
-
+\references{\url{http://mulcyber.toulouse.inra.fr/projects/gmp/}}
 
 \author{Antoine Lucas}
-%\note{ ~~further notes~~ }
-
-
 
 \examples{
 x <- as.bigq(21,6)
@@ -62,17 +60,15 @@ x
 
 y <- as.bigq(5,3)
 
-# addition work !
+# addition works !
 x + y
 
 # You can even try multiplication, division...
-x * y / 13 
+x * y / 13
 
 # convert to string, double
 as.character(x)
 as.double(x)
-
-
 }
 
 \keyword{arith}

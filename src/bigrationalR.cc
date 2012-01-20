@@ -4,8 +4,8 @@
  *
  *  \version 1
  *
- *  \date Created: 12/12/04   
- *  \date Last modified: Time-stamp: <2010-04-10 19:28:24 antoine>
+ *  \date Created: 12/12/04
+ *  \date Last modified: $Id: bigrationalR.cc,v 1.18 2012-01-08 01:11:29 mmaechler Exp $
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
@@ -13,27 +13,9 @@
  *  \note Licence: GPL
  */
 
-#define USE_RINTERNALS
-
-#define R_NO_REMAP 			// avoid collisions with stl definitions
-
-#include <math.h>
-#include <gmp.h>
-
-#include <R.h>
-#include <Rdefines.h>
-
-#undef PROTECT
-#undef UNPROTECT
-#define PROTECT(x) Rf_protect(x)	// but use some handy defs anyways
-#define UNPROTECT(x) Rf_unprotect(x)
-#undef coerceVector
-#define coerceVector             Rf_coerceVector
+#include "Rgmp.h"
 
 #include "bigvec_q.h"
-
-
-#include <stdio.h>
 
 #include <vector>
 #include <algorithm>
@@ -99,11 +81,11 @@ namespace bigrationalR
       {
 	/* vector of size 0 */
 	return bigvec_q();
-      }	  
+      }
     }
   }
 
-  bigvec_q create_bignum(SEXP param) 
+  bigvec_q create_bignum(SEXP param)
   {
     /*
     // First check if it is a bigz class
@@ -111,7 +93,7 @@ namespace bigrationalR
     // a bigq operator like add.bigq(z1,z2)...
 
     // this should be decommented when
-    // biqg will not be exported in mpz format 
+    // biqg will not be exported in mpz format
     SEXP className;
     PROTECT(className = Rf_allocVector(STRSXP,1));
     SET_STRING_ELT(className, 0, Rf_mkChar("class"));
@@ -122,65 +104,42 @@ namespace bigrationalR
 	return(bigvec_q(bigintegerR::create_bignum(param)) );
     */
 
-    SEXP denName;
-    PROTECT(denName = Rf_allocVector(STRSXP,1));
-    SET_STRING_ELT(denName, 0, Rf_mkChar("denominator"));
-    SEXP denAttr = Rf_getAttrib(param, denName);
-    UNPROTECT(1);
     bigvec_q v = bigrationalR::create_vector(param);
-
-
-    SEXP dimName;
-    PROTECT(dimName = Rf_allocVector(STRSXP,1));    
-    SET_STRING_ELT(dimName, 0, Rf_mkChar("nrow"));
-    UNPROTECT(1);
-    SEXP dimAttr = Rf_getAttrib(param, dimName);
-    if (TYPEOF(dimAttr) == INTSXP) 
+    SEXP denAttr = Rf_getAttrib(param, Rf_mkString("denominator"));
+    SEXP dimAttr = Rf_getAttrib(param, Rf_mkString("nrow"));
+    if (TYPEOF(dimAttr) == INTSXP)
       v.nrow = INTEGER(dimAttr)[0];
-    else
-      {
+    else {
 	// catch to get std matrix dimensions value
-	PROTECT(dimAttr);
-	PROTECT(dimName = Rf_allocVector(STRSXP,1));    
-	SET_STRING_ELT(dimName, 0, Rf_mkChar("dim"));
-	dimAttr = Rf_getAttrib(param, dimName);
-	UNPROTECT(2);
-	if (TYPEOF(dimAttr) == INTSXP) 
-	  v.nrow = INTEGER(dimAttr)[0];
-	else
-	  v.nrow = 0;
+	dimAttr = Rf_getAttrib(param, Rf_mkString("dim"));
+	v.nrow = (TYPEOF(dimAttr) == INTSXP) ? INTEGER(dimAttr)[0] : -1;
       }
-    if (TYPEOF(denAttr) != NILSXP) 
-      {      
+    if (TYPEOF(denAttr) != NILSXP)
+      {
 	bigvec_q attrib = bigrationalR::create_vector(denAttr);
 	if (!attrib.value.empty()) // sanity check
 	  for (unsigned int i = 0; i < v.size(); ++i)
 	    {
-	      if( attrib[i%attrib.size()].sgn() != 0) 
-		v.value[i].setDenValue (attrib.value[i%attrib.size()].getValueTemp()) ; 
-	      
+	      if( attrib[i%attrib.size()].sgn() != 0)
+		v.value[i].setDenValue (attrib.value[i%attrib.size()].getValueTemp()) ;
 	    }
-      } 
+      }
     return v;
-
   }
-  
-  SEXP create_SEXP(const bigvec_q & v) 
+
+  SEXP create_SEXP(const bigvec_q & v)
   {
 
-    SEXP ans;
-    SEXP R_denom;
-    int sizedenum ,sizenum = sizeof(int); // starting with vector-size-header
+    SEXP ans, R_denom;
+    int sizenum = sizeof(int), // starting with vector-size-header
+	sizedenum = sizenum;
     unsigned int i;
-    sizedenum=sizenum;
-    mpz_t  num ;
-    mpz_t  den;
+    mpz_t  num, den;
 
     mpz_init(num);
     mpz_init(den);
     mpz_t_sentry val_n(num);
     mpz_t_sentry val_d(den);
-
 
     int numb = 8*sizeof(int);
 
@@ -199,9 +158,9 @@ namespace bigrationalR
 	    //*den = mpq_denref(v.value[i].getValueTemp());
 	    mpq_get_num(num,v.value[i].getValueTemp());
 	    mpq_get_den(den,v.value[i].getValueTemp());
-	    
+
 	    sizenum += sizeof(int) * (2 + (mpz_sizeinbase(num,2)+numb-1) / numb); // adding each bigint's needed size
-	    sizedenum += sizeof(int) * (2 + (mpz_sizeinbase(den,2)+numb-1) / numb); 
+	    sizedenum += sizeof(int) * (2 + (mpz_sizeinbase(den,2)+numb-1) / numb);
 	  }
       }
     PROTECT(ans = Rf_allocVector(RAWSXP, sizenum));
@@ -220,30 +179,14 @@ namespace bigrationalR
       }
 
     // set the class attribute to "bigrational"
-    SEXP className;
-    PROTECT(className = Rf_allocVector(STRSXP, 1));
-    SET_STRING_ELT(className, 0, Rf_mkChar("bigq"));
-    Rf_setAttrib(ans, R_ClassSymbol, className);
-
-    SEXP denName;
-    PROTECT(denName = Rf_allocVector(STRSXP,1));
-    SET_STRING_ELT(denName, 0, Rf_mkChar("denominator"));
-    Rf_setAttrib(ans, denName, R_denom);
+    Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("bigq"));
+    Rf_setAttrib(ans, Rf_mkString("denominator"), R_denom);
 
     // set the dim attribute to "bigq"
-   if(v.nrow != 0 )
-      {
-	SEXP rexpName;
-	PROTECT(rexpName = Rf_allocVector(STRSXP, 1));
-	SET_STRING_ELT(rexpName, 0, Rf_mkChar("nrow"));
-	SEXP nRow;
-	PROTECT(nRow = Rf_allocVector(INTSXP, 1));
-	INTEGER(nRow)[0] = (int) v.nrow;
-	Rf_setAttrib(ans, rexpName,nRow);
-	UNPROTECT(2);
-      }
+    if(v.nrow >= 0)
+      Rf_setAttrib(ans, Rf_mkString("nrow"), Rf_ScalarInteger((int) v.nrow));
 
-    UNPROTECT(4);
+    UNPROTECT(2);
     return ans;
   }
 
@@ -257,27 +200,27 @@ namespace bigrationalR
   SEXP bigrational_binary_operation(SEXP a, SEXP b, bigrational_binary_fn f)
   {
     bigvec_q va = bigrationalR::create_bignum(a);
-    bigvec_q vb = bigrationalR::create_bignum(b);
-    if (va.value.empty() || vb.value.empty())
-      Rf_error("argument must not be an empty list.");
-    bigvec_q result;
-    int size = max(va.size(), vb.size());
+    bigvec_q vb = bigrationalR::create_bignum(b), result;
+    // MM: I think, 0 length vector operations should work too!
+    // if (va.value.empty() || vb.value.empty())
+    //   error(_("argument must not be an empty list"));
+    int size = (va.value.empty() || vb.value.empty()) ? 0 : max(va.size(), vb.size());
     result.value.reserve(size);
     for (int i = 0; i < size; ++i)
       result.push_back(f(va.value[i%va.size()], vb.value[i%vb.size()]));
     result.nrow = matrixz::checkDims(va.nrow,vb.nrow) ;
     return bigrationalR::create_SEXP(result);
   }
-  
+
   SEXP bigrational_logical_binary_operation(SEXP a, SEXP b, bigrational_logical_binary_fn f)
   {
     bigvec_q va = bigrationalR::create_bignum(a);
-    bigvec_q vb = bigrationalR::create_bignum(b);
-    if (va.value.empty() || vb.value.empty())
-      Rf_error("argument must not be an empty list.");
-    int size = max(va.size(), vb.size());
-    SEXP ans;
-    PROTECT(ans = Rf_allocVector(LGLSXP, size));
+    bigvec_q vb = bigrationalR::create_bignum(b), result;
+    // MM: I think, 0 length vector operations should work too!
+    // if (va.value.empty() || vb.value.empty())
+    //   error(_("argument must not be an empty list"));
+    int size = (va.value.empty() || vb.value.empty()) ? 0 : max(va.size(), vb.size());
+    SEXP ans = PROTECT(Rf_allocVector(LGLSXP, size));
     for (int i = 0; i < size; ++i) {
       bigrational am = va.value[i % va.size()];
       bigrational bm = vb.value[i % vb.size()];
@@ -290,16 +233,14 @@ namespace bigrationalR
     int nrow = matrixz::checkDims(va.nrow,vb.nrow) ;
 
     // Add dimension parameter when available
-    if(nrow>0)
+    if(nrow >= 0)
       {
-	SEXP dimName,dimVal;
-	PROTECT(dimName = Rf_allocVector(STRSXP, 1));
+	SEXP dimVal;
 	PROTECT(dimVal = Rf_allocVector(INTSXP, 2));
-	SET_STRING_ELT(dimName, 0, Rf_mkChar("dim"));
 	INTEGER(dimVal)[0] = (int) nrow;
 	INTEGER(dimVal)[1] = (int) size / nrow;
-	Rf_setAttrib(ans, dimName,dimVal);
-	UNPROTECT(2);
+	Rf_setAttrib(ans, Rf_mkString("dim"), dimVal);
+	UNPROTECT(1);
       }
 
     UNPROTECT(1);
@@ -310,7 +251,7 @@ namespace bigrationalR
   {
     return mpq_cmp(lhs.getValueTemp(), rhs.getValueTemp()) < 0;
   }
-  bool gt(const bigrational& lhs, const bigrational& rhs) 
+  bool gt(const bigrational& lhs, const bigrational& rhs)
   {
     return mpq_cmp(lhs.getValueTemp(), rhs.getValueTemp()) > 0;
   }
@@ -332,16 +273,13 @@ namespace bigrationalR
   }
 
 
-
   // Create a bigrational from a binary combination of two other bigrationals
   bigrational create_bigrational(const bigrational& lhs, const bigrational& rhs, gmpq_binary f,  bool zeroRhsAllowed ) {
     if (lhs.isNA() || rhs.isNA())
       return bigrational();
 
     if (!zeroRhsAllowed && ( mpq_sgn(rhs.getValueTemp()) == 0))
-      {
-	Rf_error("division by zero");
-      }
+      error(_("division by zero"));
 
     mpq_t val;
     mpq_init(val);
@@ -349,13 +287,13 @@ namespace bigrationalR
 
     f(val,lhs.getValueTemp(),rhs.getValueTemp());
 
-    /* Simplify numerator and denominator */	
+    /* Simplify numerator and denominator */
     mpq_canonicalize(val);
 
     return bigrational(val);
   }
-  
-  
+
+
 }
 
 /* End of namespace bigrationalR*/
@@ -377,28 +315,23 @@ SEXP bigrational_neq (SEXP a, SEXP b) {return bigrationalR::bigrational_logical_
 
 
 
-SEXP bigrational_as_character(SEXP a,SEXP b)
+SEXP bigrational_as_character(SEXP a, SEXP b)
 {
   bigvec_q v = bigrationalR::create_bignum(a);
-  SEXP ans;
-  int base;
-  base = *INTEGER(b);
-  PROTECT(ans = Rf_allocVector(STRSXP, v.size()));
+
+  int base = Rf_asInteger(b);
+  SEXP ans = PROTECT(Rf_allocVector(STRSXP, v.size()));
   for (unsigned int i = 0; i < v.size(); ++i)
     SET_STRING_ELT(ans, i, Rf_mkChar(v.value[i].str(base).c_str()));
 
   // matrix part
-  if(v.nrow > 0)
+  if(v.nrow >= 0)
     {
-      SEXP rexpName,nRow;
-      PROTECT(rexpName = Rf_allocVector(STRSXP, 1));
-      SET_STRING_ELT(rexpName, 0, Rf_mkChar("dim"));
-      PROTECT(nRow = Rf_allocVector(INTSXP, 2));
+      SEXP nRow = PROTECT(Rf_allocVector(INTSXP, 2));
       INTEGER(nRow)[0] = v.nrow;
       INTEGER(nRow)[1] = v.value.size() / v.nrow;
-      Rf_setAttrib(ans, rexpName,nRow);
-      UNPROTECT(2);
-
+      Rf_setAttrib(ans, Rf_mkString("dim"), nRow);
+      UNPROTECT(1);
     }
 
   UNPROTECT(1);
@@ -408,12 +341,10 @@ SEXP bigrational_as_character(SEXP a,SEXP b)
 SEXP bigrational_as_numeric(SEXP a)
 {
   bigvec_q v = bigrationalR::create_bignum(a);
-  SEXP ans;
-  PROTECT(ans = Rf_allocVector(REALSXP,v.size()));
+  SEXP ans = PROTECT(Rf_allocVector(REALSXP,v.size()));
+  double *r = REAL(ans);
   for (unsigned int i = 0; i < v.size(); ++i)
-    {      
-      REAL(ans)[i] = v.value[i].as_double();
-    }
+      r[i] = v.value[i].as_double();
   UNPROTECT(1);
   return ans;
 }
@@ -434,9 +365,9 @@ SEXP bigrational_get_at(SEXP a, SEXP b)
     if (vb[0] < 0) {
       for (vector<int>::iterator it = vb.begin(); it != vb.end(); ++it)
 	if (*it > 0)
-	  Rf_error("only 0's may mix with negative subscripts");
+	  error(_("only 0's may mix with negative subscripts"));
 	else if (-(*it)-1 >= (int)va.size())
-	  Rf_error("subscript out of bounds");
+	  error(_("subscript out of bounds"));
       // TODO: This is optimized for large va.size and small vb.size.
       // Maybe add a condition to use a different approach for large vb's
       result.value.reserve(va.size()-vb.size());
@@ -447,7 +378,7 @@ SEXP bigrational_get_at(SEXP a, SEXP b)
       result.value.reserve(vb.size());
       for (vector<int>::iterator it = vb.begin(); it != vb.end(); ++it) {
 	if (*it < 0)
-	  Rf_error("only 0's may mix with negative subscripts");
+	  error(_("only 0's may mix with negative subscripts"));
 	if (*it <= (int)va.size())
 	  result.push_back(va.value[(*it)-1]);
 	else
@@ -477,9 +408,9 @@ SEXP bigrational_set_at(SEXP src, SEXP idx, SEXP value)
     if (vidx[0] < 0) {
       for ( it = vidx.begin(); it != vidx.end(); ++it)
 	if (*it > 0)
-	  Rf_error("only 0's may mix with negative subscripts");
+	  error(_("only 0's may mix with negative subscripts"));
 	else if (-(*it)-1 >= (int)result.size())
-	  Rf_error("subscript out of bounds");
+	  error(_("subscript out of bounds"));
       pos = 0;
       for ( i = 0; i < (int)result.size(); ++i)
 	if (find(vidx.begin(), vidx.end(), -i-1) == vidx.end())
@@ -494,7 +425,7 @@ SEXP bigrational_set_at(SEXP src, SEXP idx, SEXP value)
       pos = 0;
       for (it = vidx.begin(); it != vidx.end(); ++it) {
 	if (*it < 0)
-	  Rf_error("only 0's may mix with negative subscripts");
+	  error(_("only 0's may mix with negative subscripts"));
 	result.value[(*it)-1] = vvalue[pos++%vvalue.size()];
       }
     }
@@ -504,51 +435,39 @@ SEXP bigrational_set_at(SEXP src, SEXP idx, SEXP value)
 
 SEXP bigrational_length(SEXP a)
 {
-  SEXP ans;
-  PROTECT(ans = Rf_allocVector(INTSXP,1));
-  INTEGER(ans)[0] = bigrationalR::create_bignum(a).size();
-  UNPROTECT(1);
-  return ans;
+  return Rf_ScalarInteger(bigrationalR::create_bignum(a).size());
 }
 
 SEXP bigrational_den(SEXP a)
 {
-  mpz_t tmpValue;
-  mpz_init(tmpValue);
+  mpz_t z_tmp;
+  mpz_init(z_tmp);
   bigvec_q v =bigrationalR::create_bignum(a);
   bigvec result;
-    
   result.value.resize(v.size());
-    
-  for (unsigned int i = 0; i < v.size(); ++i)
-    {
-      mpq_get_den(tmpValue,v.value[i].getValueTemp());
-      result.value[i].setValue(tmpValue);      
-    }
-  mpz_clear(tmpValue);
 
+  for (unsigned int i = 0; i < v.size(); ++i) {
+    mpq_get_den(z_tmp,v.value[i].getValueTemp());
+    result.value[i].setValue(z_tmp);
+  }
+  mpz_clear(z_tmp);
   return bigintegerR::create_SEXP(result);
 }
 
-
-
 SEXP bigrational_num(SEXP a)
 {
-  mpz_t tmpValue;
-  mpz_init(tmpValue);
+  mpz_t z_tmp;
+  mpz_init(z_tmp);
   bigvec_q v =bigrationalR::create_bignum(a);
   bigvec result;
-    
   result.resize(v.size());
-    
-  for (unsigned int i = 0; i < v.size(); ++i)
-   {
-     mpq_get_num(tmpValue,v.value[i].getValueTemp());
-     result.value[i].setValue(tmpValue);      
-   }
- 
-  mpz_clear(tmpValue);
- return bigintegerR::create_SEXP(result);
+
+  for (unsigned int i = 0; i < v.size(); ++i) {
+    mpq_get_num(z_tmp,v.value[i].getValueTemp());
+    result.value[i].setValue(z_tmp);
+  }
+  mpz_clear(z_tmp);
+  return bigintegerR::create_SEXP(result);
 }
 
 SEXP bigrational_setlength(SEXP vec, SEXP value)
@@ -558,58 +477,53 @@ SEXP bigrational_setlength(SEXP vec, SEXP value)
   case INTSXP:
   case LGLSXP:
     if (LENGTH(value) != 1)
-      Rf_error("invalid second argument");
+      error(_("invalid second argument"));
     len = *INTEGER(value);
     if (len < 0)
-      Rf_error("vector size cannot be negative");
+      error(_("vector size cannot be negative"));
     else if (len == NA_INTEGER)
-      Rf_error("vector size cannot be NA");
+      error(_("vector size cannot be NA"));
     break;
   case REALSXP:
     if (LENGTH(value) != 1)
-      Rf_error("invalid second argument");
+      error(_("invalid second argument"));
     len = (int)*REAL(value);
     if (len < 0)
-      Rf_error("vector size cannot be negative");
+      error(_("vector size cannot be negative"));
     else if (! (R_FINITE (len ) ) )
-      Rf_error("vector size cannot be NA, NaN, or Inf");
+      error(_("vector size cannot be NA, NaN, or Inf"));
     break;
   case STRSXP:
-    // dunno why R spits out this strange error on "length(foo) <- -1"
+    // dunno why R spits out this strange error on "Length(foo) <- -1"
     // but I always follow the holy standard ;-)
-    Rf_error("negative length vectors are not allowed");
+    error(_("negative length vectors are not allowed"));
   default:
-    Rf_error("invalid second argument");
+    error(_("invalid second argument"));
   }
   bigvec_q v =bigrationalR::create_bignum(vec);
   v.value.resize(len);
   return bigrationalR::create_SEXP(v);
 }
 
-SEXP bigrational_is_na(SEXP a) 
+SEXP bigrational_is_na(SEXP a)
 {
   bigvec_q v = bigrationalR::create_bignum(a);
-  SEXP ans;
-  PROTECT(ans = Rf_allocVector(LGLSXP, v.size()));
+  SEXP ans = PROTECT(Rf_allocVector(LGLSXP, v.size()));
+  int *a_ = LOGICAL(ans);
   for (unsigned int i = 0; i < v.size(); ++i)
-    LOGICAL(ans)[i] = v.value[i].isNA();
+    a_[i] = v.value[i].isNA();
   UNPROTECT(1);
   return ans;
 }
 
-SEXP bigrational_c(SEXP args) 
+SEXP bigrational_c(SEXP args)
 {
   //  if(TYPEOF( args ) != LISTSXP)
-  //  Rf_error("should be a list");
-
-  unsigned int i=0,j=0; 
+  //  error(_("should be a list"));
   bigvec_q result;
-  bigvec_q v;
-
-  for(i =0; i<(unsigned int)LENGTH(args);i++)
-    {
-      v = bigrationalR::create_bignum(VECTOR_ELT(args,i));
-      for(j=0; j< v.size() ; j++)
+  for(int i = 0; i < Length(args); i++) {
+      bigvec_q v = bigrationalR::create_bignum(VECTOR_ELT(args,i));
+      for(unsigned int j=0; j < v.size(); j++)
 	result.push_back(v.value[j]);
       v.value.clear();
     }
@@ -618,20 +532,16 @@ SEXP bigrational_c(SEXP args)
 }
 
 
-SEXP bigrational_cbind(SEXP args) 
+SEXP bigrational_cbind(SEXP args)
 {
-  int i=0,j=0; 
-  bigvec_q result;
-  bigvec_q v;
-
-  result = bigrationalR::create_bignum(VECTOR_ELT(args,0));
-  if(result.nrow ==0)
+  bigvec_q result = bigrationalR::create_bignum(VECTOR_ELT(args,0));
+  if(result.nrow <= 0)
     result.nrow = result.size();
 
-  for(i =1; i<LENGTH(args);i++)
+  for(int i= 1; i < Length(args); i++)
     {
-      v = bigrationalR::create_bignum(VECTOR_ELT(args,i));
-      for(j=0; j< (int)v.size() ; j++)
+      bigvec_q v = bigrationalR::create_bignum(VECTOR_ELT(args,i));
+      for(int j=0; j < (int)v.size() ; j++)
 	result.push_back(v[j]);
       v.clear();
     }
@@ -640,21 +550,16 @@ SEXP bigrational_cbind(SEXP args)
 }
 
 
-SEXP bigrational_rep(SEXP x, SEXP times) 
+SEXP bigrational_rep(SEXP x, SEXP times)
 {
-  bigvec_q v = bigrationalR::create_bignum(x);
-  bigvec_q result;
-  unsigned int i,j,rep;
-  
-  PROTECT(times= AS_INTEGER(times));
-  rep = (unsigned int )INTEGER(times)[0];
-  UNPROTECT(1);
+  bigvec_q v = bigrationalR::create_bignum(x), result;
+  unsigned int i,j, rep = (unsigned int )INTEGER(AS_INTEGER(times))[0];
 
   result.value.reserve(v.size()*rep);
   for(i = 0 ; i< rep ; i++)
     for(j = 0 ; j < v.size() ; j++)
       result.push_back(v.value[j]);
-  
+
   return bigrationalR::create_SEXP(result);
 }
 
@@ -663,24 +568,16 @@ SEXP bigrational_rep(SEXP x, SEXP times)
 // Return max
 SEXP bigrational_max(SEXP a, SEXP narm)
 {
-  bigvec_q result;
-
-  bigvec_q va = bigrationalR::create_bignum(a);
-
-  if( ! va.size())
+  bigvec_q va = bigrationalR::create_bignum(a), result;
+  if(! va.size())
     return bigrationalR::create_SEXP(result);
 
   unsigned int maximum = 0;
-
-  PROTECT (a = AS_INTEGER(a));
-  int na_remove = INTEGER(a)[0];
-  UNPROTECT(1);
-
+  int na_remove = Rf_asInteger(narm);
 
   for(unsigned int i = 1 ; i < va.size(); ++i)
     {
-      if(va.value[i].isNA() && 
-	 ( ! na_remove) )
+      if(va.value[i].isNA() && ! na_remove)
 	return(bigrationalR::create_SEXP(result));
       else
 	if(!(va.value[i] <  va.value[maximum] ))
@@ -690,32 +587,23 @@ SEXP bigrational_max(SEXP a, SEXP narm)
   result.push_back(va.value[maximum]);
 
   return bigrationalR::create_SEXP(result);
-
 }
 
- 
+
 // Return min
 
 SEXP bigrational_min(SEXP a, SEXP narm)
 {
-  bigvec_q result;
-
-  bigvec_q va = bigrationalR::create_bignum(a);
-
-  if( ! va.size())
+  bigvec_q result, va = bigrationalR::create_bignum(a);
+  if (! va.size())
     return bigrationalR::create_SEXP(result);
 
   unsigned int minimum = 0;
-
-  PROTECT (a = AS_INTEGER(a));
-  int na_remove = INTEGER(a)[0];
-  UNPROTECT(1);
-
+  int na_remove = Rf_asInteger(narm);
 
   for(unsigned int i = 1 ; i < va.size(); ++i)
     {
-      if(va.value[i].isNA() && 
-	 ( ! na_remove) )
+      if(va.value[i].isNA() && !na_remove)
 	return(bigrationalR::create_SEXP(result));
       else
 	if(!(va.value[i] >  va.value[minimum] ))
@@ -725,116 +613,70 @@ SEXP bigrational_min(SEXP a, SEXP narm)
   result.push_back(va.value[minimum]);
 
   return bigrationalR::create_SEXP(result);
-
 }
 
 // Return cumsum
 SEXP bigrational_cumsum(SEXP a)
 {
-  bigvec_q result;
-
-  bigvec_q va = bigrationalR::create_bignum(a);
-
+  bigvec_q result, va = bigrationalR::create_bignum(a);
   result.value.resize(va.value.size());
-
 
   mpq_t val;
   mpq_init(val);
   mpq_t_sentry val_s(val);
- 
 
-
-
-  for(unsigned int i = 0 ; i < va.size(); ++i)
-    {
-      {
-	if(va.value[i].isNA() )
-	  {	
-	    break; // all last values are NA.
-	  }
-      
-	mpq_add(val,val,va.value[i].getValueTemp());
-		
-	result.value[i].setValue(val);
+  for(unsigned int i = 0 ; i < va.size(); ++i) {
+      if(va.value[i].isNA() ) {
+	  break; // all last values are NA.
       }
-    }
+      mpq_add(val,val,va.value[i].getValueTemp());
 
+      result.value[i].setValue(val);
+  }
   return(bigrationalR::create_SEXP(result));
-
 }
 
 
 // Return sum
 SEXP bigrational_sum(SEXP a)
 {
-  bigvec_q result;
-
-  bigvec_q va = bigrationalR::create_bignum(a);
-
+  bigvec_q result, va = bigrationalR::create_bignum(a);
   result.value.resize(1);
-
 
   mpq_t val;
   mpq_init(val);
   mpq_t_sentry val_s(val);
- 
 
-
-
-  for(unsigned int i = 0 ; i < va.size(); ++i)
-    {
-      {
-	if(va.value[i].isNA() )
-	  {	
-	    break; // all last values are NA.
-	  }
-      
-	mpq_add(val,val,va.value[i].getValueTemp());
-		
-      }
+  for(unsigned int i = 0 ; i < va.size(); ++i) {
+    if(va.value[i].isNA()) {
+      break; // all last values are NA.
     }
+    mpq_add(val,val,va.value[i].getValueTemp());
+  }
   result.value[0].setValue(val);
-
   return(bigrationalR::create_SEXP(result));
-
 }
- 
+
 
 // Return prod
-  
+
 SEXP bigrational_prod(SEXP a)
 {
-
-  bigvec_q result;
-
-  bigvec_q va = bigrationalR::create_bignum(a);
-
+  bigvec_q result, va = bigrationalR::create_bignum(a);
   result.value.resize(1);
-
 
   mpq_t val;
   mpq_init(val);
   mpq_set_ui(val,1,1);
   mpq_t_sentry val_s(val);
- 
 
-
-  for(unsigned int i = 0 ; i < va.size(); ++i)
-    {
-      {
-	if(va.value[i].isNA() )
-	  {	
-	    return (bigrationalR::create_SEXP(result));
-	  }
-      
-	mpq_mul(val,val,va.value[i].getValueTemp());
-	
-      }
+  for(unsigned int i = 0 ; i < va.size(); ++i) {
+    if(va.value[i].isNA() ) {
+      return (bigrationalR::create_SEXP(result));
     }
-
+    mpq_mul(val,val,va.value[i].getValueTemp());
+  }
   result.value[0].setValue(val);
-
   return(bigrationalR::create_SEXP(result));
-
 }
 

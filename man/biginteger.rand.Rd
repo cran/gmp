@@ -20,15 +20,13 @@ urand.bigz(nb=1,size=200, seed = 0)
   \item{seed}{Bigz: random seed initialisation}
 }
 
-
 \value{
   A biginteger of class bigz.
 }
-\references{mpz\_urandomb from Gnu MP Library see http://swox.com/gmp}
-
+\references{
+  \samp{mpz\_urandomb} from the GMP Library, see \url{http://gmplib.org}
+}
 \author{Antoine Lucas}
-
-
 
 \examples{
 # Integers are differents
