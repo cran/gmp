@@ -60,7 +60,7 @@ void factor_using_division (mpz_t t, unsigned int limit,  bigvec & result)
   failures = 0;
   f = 7;
   ai = 0;
-  while (mpz_cmp_ui (t, 1) != 0)
+  while (mpz_cmp_ui (t, 1) != 0) // t != 1
     {
       mpz_tdiv_qr_ui (q, r, t, f);
       if (mpz_cmp_ui (r, 0) != 0)

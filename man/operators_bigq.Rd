@@ -7,6 +7,8 @@
 \alias{*.bigq}
 \alias{div.bigq}
 \alias{/.bigq}
+\alias{pow.bigq}
+\alias{^.bigq}
 \alias{abs.bigq}
 
 \title{Basic arithmetic operators for large rationals}
@@ -27,6 +29,8 @@ mul.bigq(e1, e2)
 div.bigq(e1, e2)
 \method{/}{bigq}(e1, e2)
 
+\method{^}{bigq}(e1, e2)
+
 \method{abs}{bigq}(x)
 }
 \arguments{
@@ -35,7 +39,8 @@ div.bigq(e1, e2)
 }
 \details{
   Operators can be use directly when the objects are of class \code{"\link{bigq}"}:
-  a + b, a * b, etc.
+  a + b, a * b, etc, and \code{a ^ n}, where \code{n} must be coercable
+  to a biginteger (\code{"\link{bigz}"}).
 }
 \value{
   A bigq class representing the result of the arithmetic operation.
@@ -48,6 +53,9 @@ div.bigq(e1, e2)
 \examples{
 ## 1/3 + 1 = 4/3 :
 as.bigq(1,3) + 1
+
+r <- as.bigq(12, 47)
+stopifnot(r ^ 3 == r*r*r)
 }
 \keyword{arith}
 

@@ -23,14 +23,19 @@ mul.bigq <- `*.bigq` <- function(e1, e2) .Call(bigrational_mul, e1, e2)
 
 "/.bigq" <- div.bigq <- function(e1, e2) .Call(bigrational_div, e1, e2)
 
-print.bigq <- function(x, quote = FALSE, ...)
+## note: Here, the 2nd argument must be big integer, not rational:
+"^.bigq" <- pow.bigq <- function(e1, e2) .Call(bigrational_pow, e1, as.bigz(e2))
+
+print.bigq <- function(x, quote = FALSE, initLine = TRUE, ...)
 {
   if((n <- length(x)) > 0) {
-    cat("Big Rational ('bigq') ")
-    kind <- if(isM <- !is.null(nr <- attr(x, "nrow")))
-      sprintf("%d x %d matrix", nr, n/nr)
-    else if(n > 1) sprintf("object of length %d", n) else ""
-    cat(kind,":\n", sep="")
+    if(initLine) {
+      cat("Big Rational ('bigq') ")
+      kind <- if(isM <- !is.null(nr <- attr(x, "nrow")))
+        sprintf("%d x %d matrix", nr, n/nr)
+      else if(n > 1) sprintf("object of length %d", n) else ""
+      cat(kind,":\n", sep="")
+    }
     print(as.character(x), quote = quote, ...)
   }
   else
@@ -46,6 +51,13 @@ as.bigq <- function(n, d=1)
 as.character.bigq <- function(x, b = 10L, ...)
 {
     .Call(bigrational_as_character, x, b)
+}
+
+formatN.bigq	<- function(x, ...) {
+    r <- as.character(x, ...)
+    if(any(iI <- is.whole.bigq(x)))
+	r[iI] <- paste0(r[iI],"/1")
+    r
 }
 
 as.double.bigq<- function(x,...) .Call(bigrational_as_numeric, x)
@@ -67,32 +79,25 @@ numerator <- function(x)
   as.bigq(value,denominator(x))
 
 
-as.bigz.bigq<- function(a,mod = NA)
+as.bigz.bigq <- function(a, mod = NA)
 {
-  as.bigz(numerator(a) %/% denominator(a),mod)
+  ## "FIXME":  considerably faster in C / C++
+  if(any(ina <- is.na.bigq(a))) {
+    r <- as.bigz(rep.int(NA, length(a)))
+    if(any(ii <- !ina)) {
+	a <- a[ii]
+	r[ii] <- as.bigz(numerator(a) %/% denominator(a), mod[ii])
+    }
+    attr(r,"nrow") <- attr(a, "nrow")
+    r
+  }
+  else # no NA's
+    as.bigz(numerator(a) %/% denominator(a), mod)
 }
 
+length.bigq<- function(x) .Call(bigrational_length, x)
+`length<-.bigq` <- function(x, value) .Call(bigrational_setlength, x, value)
 
-
-"[[.bigq"<- function(a,b=NA)
-{
-    .Call(bigrational_get_at, a, b)
-}
-
-"[[<-.bigq"<- function(dst, idx=NA, value)
-{
-    .Call(bigrational_set_at, dst, idx, value)
-}
-
-length.bigq<- function(x)
-{
-    .Call(bigrational_length, x)
-}
-
-"length<-.bigq"<- function(x, value)
-{
-    .Call(bigrational_setlength, x, value)
-}
 
 "<.bigq"  <- function(e1,e2) .Call(bigrational_lt,  e1, e2)
 ">.bigq"  <- function(e1,e2) .Call(bigrational_gt,  e1, e2)
@@ -102,8 +107,21 @@ length.bigq<- function(x)
 "!=.bigq" <- function(e1,e2) .Call(bigrational_neq, e1, e2)
 
 is.na.bigq <- function(x) .Call(bigrational_is_na, x)
+is.whole.bigq <- function(x) .Call(bigrational_is_int, x)
 is.finite.bigq <- function(x) !is.na.bigq(x) # otherwise all are finite
 is.infinite.bigq <- function(x) rep.int(FALSE, length(x))
+
+###  <bigz> o <bigq>  --- really dispatch on two arguments --> use S4
+if(FALSE) { ## not working really --- see also ./matrix-prods.R
+##                cannot use as.bigz() yet which is only defined in ./bigz.R
+setOldClass("bigz")#, prototype=as.bigz(integer()))
+setOldClass("bigq")#, prototype=as.bigq(integer()))
+
+setMethod("Ops", signature(e1 = "bigq", e2 = "bigz"),
+	  function(e1, e2) callGeneric(e1, as.bigq(e2)))
+setMethod("Ops", signature(e1 = "bigz", e2 = "bigq"),
+	  function(e1, e2) callGeneric(as.bigq(e1), e2))
+}
 
 ###------------------------- 'Math' S3 group ------------------------------
 
@@ -152,16 +170,26 @@ solve.bigq <- function(a,b,...)
   }
 
 
-
-"[.bigq"<- function(a,b=NULL,c=NULL)
+`[[.bigq`<- function(x, i=NA)
 {
-  .Call(matrix_get_at_q, a, b,c)
+    .Call(bigrational_get_at, x, i)
+}
+
+`[[<-.bigq` <- function(x, i=NA, value)
+{
+    .Call(bigrational_set_at, x, i, value)
 }
 
 
-"[<-.bigq"<- function(dst,idx=NULL,jdx=NULL,value)
+`[.bigq` <- function(x,i=NULL,j=NULL, drop=TRUE)
 {
-  .Call(matrix_set_at_q, dst, value,idx,jdx )
+  .Call(matrix_get_at_q, x, i,j)
+}
+
+
+`[<-.bigq` <- function(x,i=NULL,j=NULL,value)
+{
+  .Call(matrix_set_at_q, x, value,i,j )
 }
 
 

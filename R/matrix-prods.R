@@ -46,6 +46,7 @@ if(FALSE) {## a nice idea --- but not working:  setOldClass() is fine,
  `%*%` <- function(x,y) UseMethod("%*%")
 
  `%*%.default` <- function(x,y) {
+     ## dispatch on y (!)
      if(inherits(y, "bigz"))
          .Call(matrix_mul_z, x, y, 0L)
      else if(inherits(y, "bigq"))

@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2012-01-19 r58141)
+R version 2.15.0 Patched (2012-05-07 r59324) -- "Easter Beagle"
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -24,25 +24,21 @@ The following object(s) are masked from 'package:base':
 
     %*%, apply, crossprod, matrix, tcrossprod
 
-> ## for now -- later we want *.Rout.save file --> not these details
-> #sessionInfo()
-> #packageDescription("gmp")
 > 
 > ##
 > ##' @title Test a *binary* function
 > ##' @param FUN a function, such as add.bigq() ...
-> ##' @param out string determining output class; if "str", use characters, otherwise double
 > ##' @param x a list of "numbers"
+> ##' @param out string determining output class; if "str", use characters, otherwise double
 > ##' @return
 > ##' @author Antoine Lucas (& Martin Maechler)
 > ##' @examples test(as.bigq, 0)
-> test <- function(FUN, out = "str", unary = FALSE,
-+                  x = list(23,"25", 2.3, -4, as.integer(4), 0, as.bigz(34),
-+                  as.bigq(32,7), as.bigz(31,45),NULL,NA,as.integer(-3)))
+> test <- function(FUN, x, xlabs, out = "str", unary = FALSE)
 + {
-+   ##    x<- list(-5,0, as.bigq(1,4),0.5,5,"10",as.integer(100), as.bigz(1000), as.bigz(3,10),NULL,NA)
-+   xlabs <- sapply(x, format)
-+   stopifnot((n <- length(x)) >= 1)
++   if(missing(xlabs))
++     xlabs <- if(is.character(names(x))) names(x) else sapply(x, formatN)
++   stopifnot(is.function(FUN), is.list(x),
++ 	    (n <- length(x)) >= 1, length(xlabs) == n)
 +   if(out == "str") {
 +       sortie <- as.character
 +       res <- ""
@@ -53,7 +49,9 @@ The following object(s) are masked from 'package:base':
 +       error <- NA
 +   }
 +   nr <- if(unary) 1 else n
-+   res <- matrix(res, nr, n)
++ ## FIXME  res <- matrix(res, nr, n, dimnames = list(if(!unary) xlabs, xlabs))
++ ## for now
++   res <- matrix(res, nr, n, dimnames = list(NULL, xlabs))
 + 
 +   for(i in 1:nr)
 +     for(j in 1:n) {
@@ -64,38 +62,117 @@ The following object(s) are masked from 'package:base':
 +       else if(length(e) == 0)
 +         e <- numeric()
 + 
++       ## ## now, for some functions also compute the corresponding numeric values
++       ## d <- if(unary) try(FUN(as.numeric(x[[j]])),                    silent = TRUE) else
++       ##                try(FUN(as.numeric(x[[i]]),as.numeric(x[[j]])), silent = TRUE)
++ 
 +       res[i,j] <- sortie(e)[1]
 +     }
-+   res <- as.data.frame(res)
-+   ##    dimnames(res)[[1]]<- labels
-+   names(res) <- xlabs
-+   res
++   res ## for printing, the user may prefer as.data.frame(.)
 + }## end{test}
 > 
 > 
 > allfunctionid <- c("as.bigz","add.bigz","sub.bigz","mul.bigz",
 +                    "divq.bigz","div.bigz","mod.bigz","pow.bigz",
-+                    "inv.bigz","gcd.bigz","lcm.bigz",
-+                    "add.bigq","sub.bigq","div.bigq","as.bigq","gcdex",
++ #TODO              "inv.bigz", "gcd.bigz", "gcdex", "lcm.bigz",
++                    "inv.bigz", "gcd.bigz",          "lcm.bigz",
++ #TODO              "as.bigq",
++ #TODO              "add.bigq","sub.bigq","div.bigq",                   "mul.bigq", "^.bigq",
++                    "add.bigq","sub.bigq","div.bigq","as.bigq","gcdex", "mul.bigq", "^.bigq",
++                    "chooseZ",
 + 		   "max.bigq","max.bigz","min.bigq","min.bigz")
 > unaryfunctionid <- c("log.bigz","log2.bigz","log10.bigz","c.bigz",
-+                      "isprime","nextprime",
-+                    "sizeinbase","fibnum","fibnum2","lucnum","lucnum2",
++                      "isprime","nextprime", "factorialZ",
++                      "sizeinbase","fibnum","fibnum2","lucnum","lucnum2",
 +                      "factorize","abs")
+> numericFunName <- function(gmpName) {
++   if(gmpName != (r <- sub("[ZQ]$","", gmpName)) &&
++      r!="as" && existsFunction(r)) # e.g. chooseZ
++     return(r)
++   if(gmpName != (r <- sub("\\.big[zq]$","", gmpName)) &&
++      r!="as" && r!="sub" && existsFunction(r))
++     return(r)
++   ttt <- c("add" = "+",
++            "sub" = "-",
++            "mul" = "*",
++            "pow" = "^",
++            "div" = "/",
++            "divq" = "%/%",
++            "mod" = "%%")
++   if(!is.na(t.r <- ttt[r]))
++     t.r[[1L]]
++   else ## return argument
++     gmpName
++ }
+> 
 > 
 > options(width = 125)
 > 
+> sapply(allfunctionid,   numericFunName)
+   as.bigz   add.bigz   sub.bigz   mul.bigz  divq.bigz   div.bigz   mod.bigz   pow.bigz   inv.bigz   gcd.bigz   lcm.bigz 
+ "as.bigz"        "+"        "-"        "*"      "%/%"        "/"       "%%"        "^" "inv.bigz"      "gcd"      "lcm" 
+  add.bigq   sub.bigq   div.bigq    as.bigq      gcdex   mul.bigq     ^.bigq    chooseZ   max.bigq   max.bigz   min.bigq 
+       "+"        "-"        "/"  "as.bigq"    "gcdex"        "*"        "^"   "choose"      "max"      "max"      "min" 
+  min.bigz 
+     "min" 
+> sapply(unaryfunctionid, numericFunName)
+    log.bigz    log2.bigz   log10.bigz       c.bigz      isprime    nextprime   factorialZ   sizeinbase       fibnum 
+       "log"       "log2"      "log10"          "c"    "isprime"  "nextprime"  "factorial" "sizeinbase"     "fibnum" 
+     fibnum2       lucnum      lucnum2    factorize          abs 
+   "fibnum2"     "lucnum"    "lucnum2"  "factorize"        "abs" 
+> 
+> 
+> ex <- expression(23, "25", 2.3, -4, 4L, 0, as.bigz(34),
++                  as.bigq(32,7), as.bigz(31,45), NULL,NA, -3L)## TODO:  as.bigz(3)^700
+> x <- lapply(ex, eval)
+> ## Those "numbers" in x for which arithmetic should also work in double precision:
+> ## not modulo-arithmetic, not larger than double.prec
+> useN <- sapply(x, function(.) is.null(.) || is.na(.) ||
++                (is.finite(as.numeric(.)) && (!inherits(., "bigz") || is.null(modulus(.)))))
+> ## names(x) <- sapply(ex, format)
+> ## shorter & easier:
+> names(x) <- sapply(x, formatN)
+> str(x)
+List of 12
+ $ 23.       : num 23
+ $ 25        : chr "25"
+ $ 2.3       : num 2.3
+ $ -4.       : num -4
+ $ 4L        : int 4
+ $ 0.        : num 0
+ $ 34_Z      :Class 'bigz'  raw [1:16] 01 00 00 00 ...
+ $ 32/7      :Class 'bigq'  atomic [1:16] 01 00 00 00 ...
+  .. ..- attr(*, "denominator")= raw [1:16] 01 00 00 00 ...
+ $ (31 %% 45):Class 'bigz'  atomic [1:16] 01 00 00 00 ...
+  .. ..- attr(*, "mod")=Class 'bigz'  raw [1:16] 01 00 00 00 ...
+ $ NULL      : NULL
+ $ NA        : logi NA
+ $ -3L       : int -3
+> x. <- x[useN]
+> nx <- lapply(x., as.numeric)
 > gmp.NS <- asNamespace("gmp")# also get namespace *hidden* functions, i.e. methods:
 > for(fid in allfunctionid)
 +   {
-+     cat ("------------------------------------------\n", fid, "\n\n", sep="")
-+     FUN <- get(fid, envir=gmp.NS, mode="function")
-+     print(res <- test(FUN))
++     ##cat ("------------------------------------------\n", fid, "\n\n", sep="")
++     cat ("------------------------------------------\n", fid," ", sep="")
++     FUN <- get(fid, envir = gmp.NS, mode="function")
++     rc   <- test(FUN, x )
++     res  <- test(FUN, x. , out = "numeric")
++     if((nfid <- numericFunName(fid)) != fid || existsFunction(nfid, where=baseenv())) {
++       FUN <- get(nfid, envir = gmp.NS, mode="function")
++       if(nfid != fid) cat("-> num.fn.:", nfid)
++       cat("\n-> all.equal(target = res, current = F(<numeric x>)):\n")
++       nres <- test(FUN, nx, out = "numeric")
++       print(all.equal(res, nres))
++     } else cat("\n\n")
++     print(as.data.frame(rc)); cat("\n")
++     ##    ^^^^^^^^^^^^^ (for now, to diminuish difference to last version )
 +   }
 ------------------------------------------
-as.bigz
-
-           23         25      2.3        -4        4     0         34       32/7 (31 %% 45) NULL   NA        -3
+as.bigz 
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 40 in current 31 in target"
+          23.         25      2.3       -4.       4L    0.       34_Z       32/7 (31 %% 45) NULL   NA       -3L
 1   (0 %% 23) (23 %% 25) (1 %% 2) (3 %% -4) (3 %% 4) error (23 %% 34) (23 %% 32) (23 %% 31)   23   23 (2 %% -3)
 2   (2 %% 23)  (0 %% 25) (1 %% 2) (1 %% -4) (1 %% 4) error (25 %% 34) (25 %% 32) (25 %% 31)   25   25 (1 %% -3)
 3   (2 %% 23)  (2 %% 25) (0 %% 2) (2 %% -4) (2 %% 4) error  (2 %% 34)  (2 %% 32)  (2 %% 31)    2    2 (2 %% -3)
@@ -108,10 +185,12 @@ as.bigz
 10       <NA>       <NA>     <NA>      <NA>     <NA>  <NA>       <NA>       <NA>       <NA> <NA> <NA>      <NA>
 11         NA         NA       NA        NA       NA error         NA         NA         NA   NA   NA        NA
 12 (20 %% 23) (22 %% 25) (1 %% 2) (1 %% -4) (1 %% 4) error (31 %% 34) (29 %% 32) (28 %% 31)   -3   -3 (0 %% -3)
-------------------------------------------
-add.bigz
 
-          23         25        2.3         -4          4          0         34       32/7 (31 %% 45) NULL   NA         -3
+------------------------------------------
+add.bigz -> num.fn.: +
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "Mean relative difference: 0.529696"
+         23.         25        2.3        -4.         4L         0.       34_Z       32/7 (31 %% 45) NULL   NA        -3L
 1         46         48         25         19         27         23         57         55  (9 %% 45) <NA>   NA         20
 2         48         50         27         21         29         25         59         57 (11 %% 45) <NA>   NA         22
 3         25         27          4         -2          6          2         36         34 (33 %% 45) <NA>   NA         -1
@@ -124,10 +203,12 @@ add.bigz
 10      <NA>       <NA>       <NA>       <NA>       <NA>       <NA>       <NA>       <NA>       <NA> <NA> <NA>       <NA>
 11        NA         NA         NA         NA         NA         NA         NA         NA         NA <NA>   NA         NA
 12        20         22         -1         -7          1         -3         31         29 (28 %% 45) <NA>   NA         -6
-------------------------------------------
-sub.bigz
 
-          23        25        2.3         -4          4          0         34       32/7 (31 %% 45)       NULL   NA
+------------------------------------------
+sub.bigz -> num.fn.: -
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 40 in current 31 in target"
+         23.        25        2.3        -4.         4L         0.       34_Z       32/7 (31 %% 45)       NULL   NA
 1          0        -2         21         27         19         23        -11         -9 (37 %% 45)        -23   NA
 2          2         0         23         29         21         25         -9         -7 (39 %% 45)        -25   NA
 3        -21       -23          0          6         -2          2        -32        -30 (16 %% 45)         -2   NA
@@ -140,7 +221,7 @@ sub.bigz
 10      <NA>      <NA>       <NA>       <NA>       <NA>       <NA>       <NA>       <NA>       <NA>       <NA> <NA>
 11        NA        NA         NA         NA         NA         NA         NA         NA         NA         NA   NA
 12       -26       -28         -5          1         -7         -3        -37        -35 (11 %% 45)          3   NA
-           -3
+          -3L
 1          26
 2          28
 3           5
@@ -153,10 +234,12 @@ sub.bigz
 10       <NA>
 11         NA
 12          0
-------------------------------------------
-mul.bigz
 
-           23         25        2.3         -4          4         0         34      32/7 (31 %% 45) NULL   NA         -3
+------------------------------------------
+mul.bigz -> num.fn.: *
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "Mean relative difference: 0.8380853"
+          23.         25        2.3        -4.         4L        0.       34_Z      32/7 (31 %% 45) NULL   NA        -3L
 1         529        575         46        -92         92         0        782       736 (38 %% 45) <NA>   NA        -69
 2         575        625         50       -100        100         0        850       800 (10 %% 45) <NA>   NA        -75
 3          46         50          4         -8          8         0         68        64 (17 %% 45) <NA>   NA         -6
@@ -169,10 +252,12 @@ mul.bigz
 10       <NA>       <NA>       <NA>       <NA>       <NA>      <NA>       <NA>      <NA>       <NA> <NA> <NA>       <NA>
 11         NA         NA         NA         NA         NA        NA         NA        NA         NA <NA>   NA         NA
 12        -69        -75         -6         12        -12         0       -102       -96 (42 %% 45) <NA>   NA          9
-------------------------------------------
-divq.bigz
 
-          23        25        2.3         -4         4     0        34      32/7 (31 %% 45) NULL   NA         -3
+------------------------------------------
+divq.bigz -> num.fn.: %/%
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 41 in current 49 in target"
+         23.        25        2.3        -4.        4L    0.      34_Z      32/7 (31 %% 45) NULL   NA        -3L
 1          1         0         11         -5         5 error         0         0  (0 %% 45) <NA>   NA         -7
 2          1         1         12         -6         6 error         0         0  (0 %% 45) <NA>   NA         -8
 3          0         0          1          0         0 error         0         0  (0 %% 45) <NA>   NA          0
@@ -185,10 +270,12 @@ divq.bigz
 10      <NA>      <NA>       <NA>       <NA>      <NA>  <NA>      <NA>      <NA>       <NA> <NA> <NA>       <NA>
 11        NA        NA         NA         NA        NA    NA        NA        NA         NA <NA>   NA         NA
 12         0         0         -1          0         0 error         0         0  (0 %% 45) <NA>   NA          1
-------------------------------------------
-div.bigz
 
-                                   23                               25                                 2.3
+------------------------------------------
+div.bigz -> num.fn.: /
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 41 in current 49 in target"
+                                  23.                               25                                 2.3
 1                                   1                            23/25  25895697857380352/2589569785738035
 2                               25/23                                1    5629499534213120/517913957147607
 3  2589569785738035/25895697857380352 517913957147607/5629499534213120                                   1
@@ -201,7 +288,7 @@ div.bigz
 10                               <NA>                             <NA>                                <NA>
 11                                 NA                               NA                                  NA
 12                              -3/23                            -3/25   -1125899906842624/863189928579345
-                                   -4                                 4     0                                 34
+                                  -4.                                4L    0.                               34_Z
 1                               -23/4                              23/4 error                              23/34
 2                               -25/4                              25/4 error                              25/34
 3  -2589569785738035/4503599627370496 2589569785738035/4503599627370496 error 2589569785738035/38280596832649216
@@ -214,7 +301,7 @@ div.bigz
 10                               <NA>                              <NA>  <NA>                               <NA>
 11                                 NA                                NA    NA                                 NA
 12                                3/4                              -3/4 error                              -3/34
-                                  32/7 (31 %% 45) NULL   NA                                -3
+                                  32/7 (31 %% 45) NULL   NA                               -3L
 1                               161/32  (0 %% 45) <NA>   NA                             -23/3
 2                               175/32  (0 %% 45) <NA>   NA                             -25/3
 3  18126988500166245/36028797018963968  (0 %% 45) <NA>   NA -863189928579345/1125899906842624
@@ -227,10 +314,12 @@ div.bigz
 10                                <NA>       <NA> <NA> <NA>                              <NA>
 11                                  NA         NA <NA>   NA                                NA
 12                              -21/32  (0 %% 45) <NA>   NA                                 1
-------------------------------------------
-mod.bigz
 
-          23        25      2.3        -4        4     0         34       32/7 (31 %% 45) NULL   NA        -3
+------------------------------------------
+mod.bigz -> num.fn.: %%
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "Mean relative difference: 1.02235"
+         23.        25      2.3       -4.       4L    0.       34_Z       32/7 (31 %% 45) NULL   NA       -3L
 1          0        23        1         3        3 error         23         23 (23 %% 31) <NA>   NA         2
 2          2         0        1         1        1 error         25         25 (25 %% 31) <NA>   NA         1
 3          2         2        0         2        2 error          2          2  (2 %% 31) <NA>   NA         2
@@ -243,52 +332,69 @@ mod.bigz
 10      <NA>      <NA>     <NA>      <NA>     <NA>  <NA>       <NA>       <NA>       <NA> <NA> <NA>      <NA>
 11        NA        NA       NA        NA       NA    NA         NA         NA         NA <NA>   NA        NA
 12        20        22        1         1        1 error         31         29 (28 %% 31) <NA>   NA         0
-------------------------------------------
-pow.bigz
 
-                                     23                                      25        2.3         -4          4         0
-1      20880467999847912034355032910567     11045767571919545466173812409689943        529      error     279841         1
-2     142108547152020037174224853515625     88817841970012523233890533447265625        625      error     390625         1
-3                               8388608                                33554432          4      error         16         1
-4                       -70368744177664                       -1125899906842624         16      error        256         1
-5                        70368744177664                        1125899906842624         16      error        256         1
-6                                     0                                       0          0      error          0         1
-7  167500108222301408246337399112597504 193630125104980427932766033374162714624       1156      error    1336336         1
-8   41538374868278621028243970633760768  42535295865117307932921825928971026432       1024      error    1048576         1
-9                            (16 %% 45)                              (31 %% 45) (16 %% 45) (16 %% 45) (31 %% 45) (1 %% 45)
-10                                 <NA>                                    <NA>       <NA>       <NA>       <NA>      <NA>
-11                                   NA                                      NA         NA         NA         NA        NA
-12                         -94143178827                           -847288609443          9      error         81         1
-                                                      34                                               32/7 (31 %% 45) NULL
-1        19895113660064588580108197261066338165074766609       37608910510519071039902074217516707306379521 (32 %% 45) <NA>
-2       338813178901720135627329000271856784820556640625      542101086242752217003726400434970855712890625 (25 %% 45) <NA>
-3                                            17179869184                                         4294967296 (38 %% 45) <NA>
-4                                  295147905179352825856                               18446744073709551616 (41 %% 45) <NA>
-5                                  295147905179352825856                               18446744073709551616  (4 %% 45) <NA>
-6                                                      0                                                  0  (0 %% 45) <NA>
-7  11756638905368616011414050501310355554617941909569536 10170102859315411774579628461341138023025901305856 (34 %% 45) <NA>
-8   1496577676626844588240573268701473812127674924007424  1461501637330902918203684832716283019655932542976 (23 %% 45) <NA>
-9                                             (31 %% 45)                                         (16 %% 45) (31 %% 45) <NA>
-10                                                  <NA>                                               <NA>       <NA> <NA>
-11                                                    NA                                                 NA         NA <NA>
-12                                     16677181699666569                                   1853020188851841 (18 %% 45) <NA>
-     NA        -3
-1    NA     error
-2    NA     error
-3    NA     error
-4    NA     error
-5    NA     error
-6    NA     error
-7    NA     error
-8    NA     error
-9    NA (1 %% 45)
-10 <NA>      <NA>
-11   NA        NA
-12   NA     error
 ------------------------------------------
-inv.bigz
+pow.bigz -> num.fn.: ^
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 43 in current 41 in target"
+                                    23.                                      25        2.3
+1      20880467999847912034355032910567     11045767571919545466173812409689943        529
+2     142108547152020037174224853515625     88817841970012523233890533447265625        625
+3                               8388608                                33554432          4
+4                       -70368744177664                       -1125899906842624         16
+5                        70368744177664                        1125899906842624         16
+6                                     0                                       0          0
+7  167500108222301408246337399112597504 193630125104980427932766033374162714624       1156
+8   41538374868278621028243970633760768  42535295865117307932921825928971026432       1024
+9                            (16 %% 45)                              (31 %% 45) (16 %% 45)
+10                                 <NA>                                    <NA>       <NA>
+11                                   NA                                      NA         NA
+12                         -94143178827                           -847288609443          9
+                                                                                                                            -4.
+1                                                                                                                      1/279841
+2                                                                                                                      1/390625
+3  1606938044258990275541962092341162602522202993782792835301376/44968714924347995877535679665554839525511318324676467468500625
+4                                                                                                                         1/256
+5                                                                                                                         1/256
+6                                                                                                                         error
+7                                                                                                                     1/1336336
+8                                                                                                                  2401/1048576
+9                                                                                                                      1/923521
+10                                                                                                                         <NA>
+11                                                                                                                           NA
+12                                                                                                                         1/81
+           4L   0.                                                  34_Z                                               32/7
+1      279841    1       19895113660064588580108197261066338165074766609       37608910510519071039902074217516707306379521
+2      390625    1      338813178901720135627329000271856784820556640625      542101086242752217003726400434970855712890625
+3          16    1                                           17179869184                                         4294967296
+4         256    1                                 295147905179352825856                               18446744073709551616
+5         256    1                                 295147905179352825856                               18446744073709551616
+6           0    1                                                     0                                                  0
+7     1336336    1 11756638905368616011414050501310355554617941909569536 10170102859315411774579628461341138023025901305856
+8     1048576    1  1496577676626844588240573268701473812127674924007424  1461501637330902918203684832716283019655932542976
+9  (31 %% 45)    1                                            (31 %% 45)                                         (16 %% 45)
+10       <NA> <NA>                                                  <NA>                                               <NA>
+11         NA    1                                                    NA                                                 NA
+12         81    1                                     16677181699666569                                   1853020188851841
+   (31 %% 45) NULL   NA                                                                                            -3L
+1  (32 %% 45) <NA>   NA                                                                                        1/12167
+2  (25 %% 45) <NA>   NA                                                                                        1/15625
+3  (38 %% 45) <NA>   NA 1427247692705959881058285969449495136382746624/17365322677153409849313160265892197722207192875
+4  (41 %% 45) <NA>   NA                                                                                          -1/64
+5   (4 %% 45) <NA>   NA                                                                                           1/64
+6   (0 %% 45) <NA>   NA                                                                                          error
+7  (34 %% 45) <NA>   NA                                                                                        1/39304
+8  (23 %% 45) <NA>   NA                                                                                      343/32768
+9  (31 %% 45) <NA>   NA                                                                                        1/29791
+10       <NA> <NA> <NA>                                                                                           <NA>
+11         NA <NA>   NA                                                                                             NA
+12 (18 %% 45) <NA>   NA                                                                                          -1/27
 
-          23         25       2.3        -4         4     0         34       32/7 (31 %% 45) NULL   NA        -3
+------------------------------------------
+inv.bigz 
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "Mean relative difference: 0.6133333"
+         23.         25       2.3       -4.        4L    0.       34_Z       32/7 (31 %% 45) NULL   NA       -3L
 1      error         12         1         3         3 error          3          7 (27 %% 45) <NA>   NA         2
 2         12      error         1         1         1 error         15          9  (5 %% 45) <NA>   NA         1
 3         12         13     error     error     error error      error      error (16 %% 45) <NA>   NA         2
@@ -301,10 +407,12 @@ inv.bigz
 10      <NA>       <NA>      <NA>      <NA>      <NA>  <NA>       <NA>       <NA>       <NA> <NA> <NA>      <NA>
 11        NA         NA        NA        NA        NA    NA         NA         NA         NA <NA>   NA        NA
 12        15          8         1         1         1 error         11         21 (10 %% 45) <NA>   NA     error
-------------------------------------------
-gcd.bigz
 
-          23        25       2.3        -4         4          0        34      32/7 (31 %% 45) NULL   NA        -3
+------------------------------------------
+gcd.bigz -> num.fn.: gcd
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "Mean relative difference: 0.875"
+         23.        25       2.3       -4.        4L         0.      34_Z      32/7 (31 %% 45) NULL   NA       -3L
 1         23         1         1         1         1         23         1         1  (1 %% 45) <NA>   NA         1
 2          1        25         1         1         1         25         1         1  (1 %% 45) <NA>   NA         1
 3          1         1         2         2         2          2         2         2  (1 %% 45) <NA>   NA         1
@@ -317,10 +425,12 @@ gcd.bigz
 10      <NA>      <NA>      <NA>      <NA>      <NA>       <NA>      <NA>      <NA>       <NA> <NA> <NA>      <NA>
 11        NA        NA        NA        NA        NA         NA        NA        NA         NA <NA>   NA        NA
 12         1         1         1         1         1          3         1         1  (1 %% 45) <NA>   NA         3
-------------------------------------------
-lcm.bigz
 
-           23         25        2.3         -4          4         0         34      32/7 (31 %% 45) NULL   NA        -3
+------------------------------------------
+lcm.bigz -> num.fn.: lcm
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 121 in current 40 in target"
+          23.         25        2.3        -4.         4L        0.       34_Z      32/7 (31 %% 45) NULL   NA       -3L
 1          23        575         46         92         92         0        782       736 (38 %% 45) <NA>   NA        69
 2         575         25         50        100        100         0        850       800 (10 %% 45) <NA>   NA        75
 3          46         50          2          4          4         0         34        32 (17 %% 45) <NA>   NA         6
@@ -333,10 +443,12 @@ lcm.bigz
 10       <NA>       <NA>       <NA>       <NA>       <NA>      <NA>       <NA>      <NA>       <NA> <NA> <NA>      <NA>
 11         NA         NA         NA         NA         NA        NA         NA        NA         NA <NA>   NA        NA
 12         69         75          6         12         12         0        102        96  (3 %% 45) <NA>   NA         3
-------------------------------------------
-add.bigq
 
-                                   23                                 25                                2.3
+------------------------------------------
+add.bigq -> num.fn.: +
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] TRUE
+                                  23.                                 25                                2.3
 1                                  46                                 48 28485267643118387/1125899906842624
 2                                  48                                 50 30737067456803635/1125899906842624
 3  28485267643118387/1125899906842624 30737067456803635/1125899906842624   2589569785738035/562949953421312
@@ -349,7 +461,7 @@ add.bigq
 10                               <NA>                               <NA>                               <NA>
 11                                 NA                                 NA                                 NA
 12                                 20                                 22  -788129934789837/1125899906842624
-                                   -4                                 4                                 0
+                                  -4.                                4L                                0.
 1                                  19                                27                                23
 2                                  21                                29                                25
 3  -1914029841632461/1125899906842624 7093169413108531/1125899906842624 2589569785738035/1125899906842624
@@ -362,7 +474,7 @@ add.bigq
 10                               <NA>                              <NA>                              <NA>
 11                                 NA                                NA                                NA
 12                                 -7                                 1                                -3
-                                   34                               32/7                         (31 %% 45) NULL   NA
+                                 34_Z                               32/7                         (31 %% 45) NULL   NA
 1                                  57                              193/7                                 54 <NA>   NA
 2                                  59                              207/7                                 56 <NA>   NA
 3  40870166618387251/1125899906842624 54155785519130213/7881299347898368 37492466897859379/1125899906842624 <NA>   NA
@@ -375,7 +487,7 @@ add.bigq
 10                               <NA>                               <NA>                               <NA> <NA> <NA>
 11                                 NA                                 NA                                 NA <NA>   NA
 12                                 31                               11/7                                 28 <NA>   NA
-                                  -3
+                                 -3L
 1                                 20
 2                                 22
 3  -788129934789837/1125899906842624
@@ -388,10 +500,12 @@ add.bigq
 10                              <NA>
 11                                NA
 12                                -6
-------------------------------------------
-sub.bigq
 
-                                    23                                  25                                2.3
+------------------------------------------
+sub.bigq -> num.fn.: -
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 40 in current 31 in target"
+                                   23.                                  25                                2.3
 1                                    0                                  -2 23306128071642317/1125899906842624
 2                                    2                                   0 25557927885327565/1125899906842624
 3  -23306128071642317/1125899906842624 -25557927885327565/1125899906842624                                  0
@@ -404,7 +518,7 @@ sub.bigq
 10                                <NA>                                <NA>                               <NA>
 11                                  NA                                  NA                                 NA
 12                                 -26                                 -28 -5967269506265907/1125899906842624
-                                  -4                                  4                                 0
+                                 -4.                                 4L                                0.
 1                                 27                                 19                                23
 2                                 29                                 21                                25
 3  7093169413108531/1125899906842624 -1914029841632461/1125899906842624 2589569785738035/1125899906842624
@@ -417,7 +531,7 @@ sub.bigq
 10                              <NA>                               <NA>                              <NA>
 11                                NA                                 NA                                NA
 12                                 1                                 -7                                -3
-                                    34                                32/7                          (31 %% 45)
+                                  34_Z                                32/7                          (31 %% 45)
 1                                  -11                               129/7                                  -8
 2                                   -9                               143/7                                  -6
 3  -35691027046911181/1125899906842624 -17901808518797723/7881299347898368 -32313327326383309/1125899906842624
@@ -430,7 +544,7 @@ sub.bigq
 10                                <NA>                                <NA>                                <NA>
 11                                  NA                                  NA                                  NA
 12                                 -37                               -53/7                                 -34
-                                 NULL   NA                                -3
+                                 NULL   NA                               -3L
 1                                 -23   NA                                26
 2                                 -25   NA                                28
 3  -2589569785738035/1125899906842624   NA 5967269506265907/1125899906842624
@@ -443,10 +557,12 @@ sub.bigq
 10                               <NA> <NA>                              <NA>
 11                                 NA   NA                                NA
 12                                  3   NA                                 0
-------------------------------------------
-div.bigq
 
-                                   23                               25                                 2.3
+------------------------------------------
+div.bigq -> num.fn.: /
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 41 in current 49 in target"
+                                  23.                               25                                 2.3
 1                                   1                            23/25  25895697857380352/2589569785738035
 2                               25/23                                1    5629499534213120/517913957147607
 3  2589569785738035/25895697857380352 517913957147607/5629499534213120                                   1
@@ -459,7 +575,7 @@ div.bigq
 10                               <NA>                             <NA>                                <NA>
 11                                 NA                               NA                                  NA
 12                              -3/23                            -3/25   -1125899906842624/863189928579345
-                                   -4                                 4     0                                 34
+                                  -4.                                4L    0.                               34_Z
 1                               -23/4                              23/4 error                              23/34
 2                               -25/4                              25/4 error                              25/34
 3  -2589569785738035/4503599627370496 2589569785738035/4503599627370496 error 2589569785738035/38280596832649216
@@ -472,7 +588,7 @@ div.bigq
 10                               <NA>                              <NA>  <NA>                               <NA>
 11                                 NA                                NA    NA                                 NA
 12                                3/4                              -3/4 error                              -3/34
-                                  32/7                         (31 %% 45) NULL   NA                                -3
+                                  32/7                         (31 %% 45) NULL   NA                               -3L
 1                               161/32                              23/31 <NA>   NA                             -23/3
 2                               175/32                              25/31 <NA>   NA                             -25/3
 3  18126988500166245/36028797018963968 2589569785738035/34902897112121344 <NA>   NA -863189928579345/1125899906842624
@@ -485,10 +601,12 @@ div.bigq
 10                                <NA>                               <NA> <NA> <NA>                              <NA>
 11                                  NA                                 NA <NA>   NA                                NA
 12                              -21/32                              -3/31 <NA>   NA                                 1
-------------------------------------------
-as.bigq
 
-                                   23                               25                                 2.3
+------------------------------------------
+as.bigq 
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] TRUE
+                                  23.                               25                                 2.3
 1                                   1                            23/25  25895697857380352/2589569785738035
 2                               25/23                                1    5629499534213120/517913957147607
 3  2589569785738035/25895697857380352 517913957147607/5629499534213120                                   1
@@ -501,7 +619,7 @@ as.bigq
 10                               <NA>                             <NA>                                <NA>
 11                                 NA                               NA                                  NA
 12                              -3/23                            -3/25   -1125899906842624/863189928579345
-                                   -4                                 4     0                                 34
+                                  -4.                                4L    0.                               34_Z
 1                               -23/4                              23/4 error                              23/34
 2                               -25/4                              25/4 error                              25/34
 3  -2589569785738035/4503599627370496 2589569785738035/4503599627370496 error 2589569785738035/38280596832649216
@@ -514,7 +632,7 @@ as.bigq
 10                               <NA>                              <NA>  <NA>                               <NA>
 11                                 NA                                NA    NA                                 NA
 12                                3/4                              -3/4 error                              -3/34
-                                  32/7                         (31 %% 45) NULL   NA                                -3
+                                  32/7                         (31 %% 45) NULL   NA                               -3L
 1                               161/32                              23/31 <NA>   NA                             -23/3
 2                               175/32                              25/31 <NA>   NA                             -25/3
 3  18126988500166245/36028797018963968 2589569785738035/34902897112121344 <NA>   NA -863189928579345/1125899906842624
@@ -527,10 +645,12 @@ as.bigq
 10                                <NA>                               <NA> <NA> <NA>                              <NA>
 11                                  NA                                 NA <NA>   NA                                NA
 12                              -21/32                              -3/31 <NA>   NA                                 1
-------------------------------------------
-gcdex
 
-     23   25  2.3   -4    4    0   34 32/7 (31 %% 45) NULL   NA   -3
+------------------------------------------
+gcdex 
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "Mean relative difference: 0.875"
+    23.   25  2.3  -4.   4L   0. 34_Z 32/7 (31 %% 45) NULL   NA  -3L
 1    23    1    1    1    1   23    1    1          1 <NA>   23    1
 2     1   25    1    1    1   25    1    1          1 <NA>   25    1
 3     1    1    2    2    2    2    2    2          1 <NA>    2    1
@@ -543,39 +663,253 @@ gcdex
 10 <NA> <NA> <NA> <NA> <NA> <NA> <NA> <NA>       <NA> <NA> <NA> <NA>
 11   23   25    2    4    4    0   34   32         31 <NA>    0    3
 12    1    1    1    1    1    3    1    1          1 <NA>    3    3
-------------------------------------------
-max.bigq
 
-   23 25                               2.3                                -4    4                                 0 34 32/7
-1  23 25                                23                                23   23                                23 34   23
-2  25 25                                25                                25   25                                25 34   25
-3  23 25 2589569785738035/1125899906842624 2589569785738035/1125899906842624    4 2589569785738035/1125899906842624 34 32/7
-4  23 25 2589569785738035/1125899906842624                                -4    4                                 0 34 32/7
-5  23 25                                 4                                 4    4                                 4 34 32/7
-6  23 25 2589569785738035/1125899906842624                                 0    4                                 0 34 32/7
-7  34 34                                34                                34   34                                34 34   34
-8  23 25                              32/7                              32/7 32/7                              32/7 34 32/7
-9  31 31                                31                                31   31                                31 34   31
-10 23 25 2589569785738035/1125899906842624                                -4    4                                 0 34 32/7
-11 23 25 2589569785738035/1125899906842624                                -4    4                                 0 34 32/7
-12 23 25 2589569785738035/1125899906842624                                -3    4                                 0 34 32/7
-   (31 %% 45)                              NULL   NA                                -3
-1          31                                23 <NA>                                23
-2          31                                25 <NA>                                25
-3          31 2589569785738035/1125899906842624 <NA> 2589569785738035/1125899906842624
-4          31                                -4 <NA>                                -3
-5          31                                 4 <NA>                                 4
-6          31                                 0 <NA>                                 0
-7          34                                34 <NA>                                34
-8          31                              32/7 <NA>                              32/7
-9          31                                31 <NA>                                31
-10         31                              <NA>   NA                                -3
-11         31                                NA <NA>                                -3
-12         31                                -3 <NA>                                -3
 ------------------------------------------
-max.bigz
+mul.bigq -> num.fn.: *
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] TRUE
+                                  23.                                 25
+1                                 529                                575
+2                                 575                                625
+3  59560105071974805/1125899906842624 64739244643450875/1125899906842624
+4                                 -92                               -100
+5                                  92                                100
+6                                   0                                  0
+7                                 782                                850
+8                               736/7                              800/7
+9                                 713                                775
+10                               <NA>                               <NA>
+11                                 NA                                 NA
+12                                -69                                -75
+                                                               2.3                               -4.
+1                               59560105071974805/1125899906842624                               -92
+2                               64739244643450875/1125899906842624                              -100
+3  6705871675207332498089645661225/1267650600228229401496703205376 -2589569785738035/281474976710656
+4                                -2589569785738035/281474976710656                                16
+5                                 2589569785738035/281474976710656                               -16
+6                                                                0                                 0
+7                                44022686357546595/562949953421312                              -136
+8                                 2589569785738035/246290604621824                            -128/7
+9                               80276663357879085/1125899906842624                              -124
+10                                                            <NA>                              <NA>
+11                                                              NA                                NA
+12                              -7768709357214105/1125899906842624                                12
+                                 4L   0.                              34_Z                             32/7
+1                                92    0                               782                            736/7
+2                               100    0                               850                            800/7
+3  2589569785738035/281474976710656    0 44022686357546595/562949953421312 2589569785738035/246290604621824
+4                               -16    0                              -136                           -128/7
+5                                16    0                               136                            128/7
+6                                 0    0                                 0                                0
+7                               136    0                              1156                           1088/7
+8                             128/7    0                            1088/7                          1024/49
+9                               124    0                              1054                            992/7
+10                             <NA> <NA>                              <NA>                             <NA>
+11                               NA   NA                                NA                               NA
+12                              -12    0                              -102                            -96/7
+                           (31 %% 45) NULL   NA                                -3L
+1                                 713 <NA>   NA                                -69
+2                                 775 <NA>   NA                                -75
+3  80276663357879085/1125899906842624 <NA>   NA -7768709357214105/1125899906842624
+4                                -124 <NA>   NA                                 12
+5                                 124 <NA>   NA                                -12
+6                                   0 <NA>   NA                                  0
+7                                1054 <NA>   NA                               -102
+8                               992/7 <NA>   NA                              -96/7
+9                                 961 <NA>   NA                                -93
+10                               <NA> <NA> <NA>                               <NA>
+11                                 NA <NA>   NA                                 NA
+12                                -93 <NA>   NA                                  9
 
-           23         25        2.3         -4          4          0         34       32/7 (31 %% 45)       NULL   NA
+------------------------------------------
+^.bigq -> num.fn.: ^
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 43 in current 41 in target"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               23.
+1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 20880467999847912034355032910567
+2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                142108547152020037174224853515625
+3  3193267066726519048024192216637055127345435527507969872464125269470059286635690056577798125781909527810376124991657578351679738651102730620756661966927725302014424563645174067521149296951817172162659710933905232201861139535639770451240923886107589858621996997021980283938508630500856543753576433647630287667125834181740141064461894579190528392791748046875/15293081873211767368008098429801431702283953435860199762548849392729924449022989580446715984539492948078961126718377261636114752088759037662583404222552656421516118242870155513277445799253988599903013203035456980522029444518708424647262033039075005711224960492468690967906200650878912999528261427142481809365636558292208635816169529602354261786624
+4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  -70368744177664
+5                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   70368744177664
+6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                0
+7                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             167500108222301408246337399112597504
+8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         41538374868278621028243970633760768/27368747340080916343
+9                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              20013311644049280264138724244295391
+10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <NA>
+11                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              NA
+12                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    -94143178827
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             25
+1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           11045767571919545466173812409689943
+2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           88817841970012523233890533447265625
+3  21413639174133767093505199715038044466889478084427543014054373353606799973999555952463354291023438787520381906929026918045391637112947382715526121906606283112604854466945907623131972373435188891715298513556332721312474275624288596793752238253786597460093767539962333897980041388322455011164388818122854663154832902275480961648169795509698874173270150359260851124999167621135711669921875/19386284415916351754079089178450564925773557736103804419411555585271880141782314140372424277909703897018770899538474171965166118458515899084769015397275464167677107284570523250425575952346592304246424549348074591181601727656179068362270484463196732647218460003493653290976614849694549301017494559084845337731890794268139677171965009511882361078407710175469865837534369361690624
+4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             -1125899906842624
+5                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              1125899906842624
+6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             0
+7                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       193630125104980427932766033374162714624
+8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 42535295865117307932921825928971026432/1341068619663964900807
+9                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        19232792489931358333837313998767870751
+10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         <NA>
+11                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           NA
+12                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                -847288609443
+                                                               2.3
+1                                                              529
+2                                                              625
+3  6705871675207332498089645661225/1267650600228229401496703205376
+4                                                               16
+5                                                               16
+6                                                                0
+7                                                             1156
+8                                                          1024/49
+9                                                              961
+10                                                            <NA>
+11                                                              NA
+12                                                               9
+                                                                                                                            -4.
+1                                                                                                                      1/279841
+2                                                                                                                      1/390625
+3  1606938044258990275541962092341162602522202993782792835301376/44968714924347995877535679665554839525511318324676467468500625
+4                                                                                                                         1/256
+5                                                                                                                         1/256
+6                                                                                                                         error
+7                                                                                                                     1/1336336
+8                                                                                                                  2401/1048576
+9                                                                                                                      1/923521
+10                                                                                                                         <NA>
+11                                                                                                                           NA
+12                                                                                                                         1/81
+                                                                                                                             4L
+1                                                                                                                        279841
+2                                                                                                                        390625
+3  44968714924347995877535679665554839525511318324676467468500625/1606938044258990275541962092341162602522202993782792835301376
+4                                                                                                                           256
+5                                                                                                                           256
+6                                                                                                                             0
+7                                                                                                                       1336336
+8                                                                                                                  1048576/2401
+9                                                                                                                        923521
+10                                                                                                                         <NA>
+11                                                                                                                           NA
+12                                                                                                                           81
+     0.
+1     1
+2     1
+3     1
+4     1
+5     1
+6     1
+7     1
+8     1
+9     1
+10 <NA>
+11    1
+12    1
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             34_Z
+1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 19895113660064588580108197261066338165074766609
+2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                338813178901720135627329000271856784820556640625
+3  112134448995806412223041531252325689689434241773129463856194924775065849993758927138248448857451881852778079174438072439871541372725357277611100220662048533548249623049759821537528960265127944408702031659222970104299168038907323334285583711071763179197558648442268059107299162467637345454729356013444236833673458037376330404465353413816666461156176812757297147723235699476344863071169788486411354939505382833362638884485793706579289250006900870855295005402423945646154983524016500090061373872294270927668549120426177978515625/56362808934785782620655415167470525914030964411108314940402423418609289689068355355971379591897745173403010078263747529856646401949852539644969848434700186501722593132609102394906926373262117075563330306831364144677433787178189964179613588058505555939250641616528896329618001580624087604790707070002646363767810376024580461947390375276158858357529962546338406854636102805723631292609311399696875316557143945391102311532165688506692261634047197324706752950818927815472385992693228752306187618995383028460736741376
+4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           295147905179352825856
+5                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           295147905179352825856
+6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               0
+7                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           11756638905368616011414050501310355554617941909569536
+8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              1496577676626844588240573268701473812127674924007424/54116956037952111668959660849
+9                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             508507766528375922442969666478706045897328683433921
+10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <NA>
+11                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             NA
+12                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              16677181699666569
+                                                                                                                           32/7
+1                                                                                                                        279841
+2                                                                                                                        390625
+3  44968714924347995877535679665554839525511318324676467468500625/1606938044258990275541962092341162602522202993782792835301376
+4                                                                                                                           256
+5                                                                                                                           256
+6                                                                                                                             0
+7                                                                                                                       1336336
+8                                                                                                                  1048576/2401
+9                                                                                                                        923521
+10                                                                                                                         <NA>
+11                                                                                                                           NA
+12                                                                                                                           81
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           (31 %% 45)
+1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         1635170022196481349560959748587682926364327
+2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        21684043449710088680149056017398834228515625
+3  6457377791392006557478029861340380899980883396368749497071832981130275005352780281695929173658945727227744211636413193439375434941648200428740338769083266862010019025750071845902931188020684290332892454276403765729426560499995092449502754877647053541693992616699747606257147008431498447928301034336091380849646794283682340353822227453060517405971707864776112424801887309632528462559345195432215569765847613620879506822246726376929203559303019591376134041431359946727752685546875/39490558802674197931296630473167898425951735774342167779076915840045177103840103639762289034974757677685944586746069070444337839780576597196302139193602451889442215352428547682644493564603293690705437378762962043823674914535908951809415366608478338498524211467752254302281291452934019947098835582448203700148125189885486562395000537277444234446120215967349161881024795172481378405277942805379045378986156134350730656132398629069223417026989801256665165993399365402624
+4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                -4611686018427387904
+5                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 4611686018427387904
+6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0
+7                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    299120672332806228664106719451209941853702979584
+8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         45671926166590716193865151022383844364247891968/157775382034845806615042743
+9                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     17069174130723235958610643029059314756044734431
+10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               <NA>
+11                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 NA
+12                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   -617673396283947
+   NULL   NA                                                                                            -3L
+1  <NA>   NA                                                                                        1/12167
+2  <NA>   NA                                                                                        1/15625
+3  <NA>   NA 1427247692705959881058285969449495136382746624/17365322677153409849313160265892197722207192875
+4  <NA>   NA                                                                                          -1/64
+5  <NA>   NA                                                                                           1/64
+6  <NA>   NA                                                                                          error
+7  <NA>   NA                                                                                        1/39304
+8  <NA>   NA                                                                                      343/32768
+9  <NA>   NA                                                                                        1/29791
+10 <NA> <NA>                                                                                           <NA>
+11 <NA>   NA                                                                                             NA
+12 <NA>   NA                                                                                          -1/27
+
+------------------------------------------
+chooseZ -> num.fn.: choose
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 40 in current 21 in target"
+         23.       25  2.3  -4.    4L   0. 34_Z 32/7 (31 %% 45) NULL   NA  -3L
+1          1        0  253    0  8855    1   23   23         23 <NA>    0    0
+2        300        1  300    0 12650    1   25   25         25 <NA>    0    0
+3          0        0    1    0     0    1    2    2          2 <NA>    0    0
+4      -2600    -3276   10    0    35    1   -4   -4         -4 <NA>    0    0
+5          0        0    6    0     1    1    4    4          4 <NA>    0    0
+6          0        0    0    0     0    1    0    0          0 <NA>    0    0
+7  286097760 52451256  561    0 46376    1   34   34         34 <NA>    0    0
+8   28048800  3365856  496    0 35960    1   32   32         32 <NA>    0    0
+9    7888725   736281  465    0 31465    1   31   31         31 <NA>    0    0
+10      <NA>     <NA> <NA> <NA>  <NA> <NA> <NA> <NA>       <NA> <NA> <NA> <NA>
+11         0        0    0    0     0    1    0    0          0 <NA>    0    0
+12      -300     -351    6    0    15    1   -3   -3         -3 <NA>    0    0
+
+------------------------------------------
+max.bigq -> num.fn.: max
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 21 in current 13 in target"
+   23. 25                               2.3                               -4.   4L                                0. 34_Z
+1   23 25                                23                                23   23                                23   34
+2   25 25                                25                                25   25                                25   34
+3   23 25 2589569785738035/1125899906842624 2589569785738035/1125899906842624    4 2589569785738035/1125899906842624   34
+4   23 25 2589569785738035/1125899906842624                                -4    4                                 0   34
+5   23 25                                 4                                 4    4                                 4   34
+6   23 25 2589569785738035/1125899906842624                                 0    4                                 0   34
+7   34 34                                34                                34   34                                34   34
+8   23 25                              32/7                              32/7 32/7                              32/7   34
+9   31 31                                31                                31   31                                31   34
+10  23 25 2589569785738035/1125899906842624                                -4    4                                 0   34
+11  23 25 2589569785738035/1125899906842624                                -4    4                                 0   34
+12  23 25 2589569785738035/1125899906842624                                -3    4                                 0   34
+   32/7 (31 %% 45)                              NULL   NA                               -3L
+1    23         31                                23 <NA>                                23
+2    25         31                                25 <NA>                                25
+3  32/7         31 2589569785738035/1125899906842624 <NA> 2589569785738035/1125899906842624
+4  32/7         31                                -4 <NA>                                -3
+5  32/7         31                                 4 <NA>                                 4
+6  32/7         31                                 0 <NA>                                 0
+7    34         34                                34 <NA>                                34
+8  32/7         31                              32/7 <NA>                              32/7
+9    31         31                                31 <NA>                                31
+10 32/7         31                              <NA>   NA                                -3
+11 32/7         31                                NA <NA>                                -3
+12 32/7         31                                -3 <NA>                                -3
+
+------------------------------------------
+max.bigz -> num.fn.: max
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 21 in current 13 in target"
+          23.         25        2.3        -4.         4L         0.       34_Z       32/7 (31 %% 45)       NULL   NA
 1          23         25         23         23         23         23         34         32         31         23 <NA>
 2          25         25         25         25         25         25         34         32         31         25 <NA>
 3          23         25          2          2          4          2         34         32         31          2 <NA>
@@ -588,7 +922,7 @@ max.bigz
 10         23         25          2         -4          4          0         34         32 (31 %% 45)       <NA>   NA
 11         23         25          2         -4          4          0         34         32         31         NA <NA>
 12         23         25          2         -3          4          0         34         32         31         -3 <NA>
-           -3
+          -3L
 1          23
 2          25
 3           2
@@ -601,23 +935,25 @@ max.bigz
 10         -3
 11         -3
 12         -3
-------------------------------------------
-min.bigq
 
-                                  23                                25                               2.3 -4
-1                                 23                                23 2589569785738035/1125899906842624 -4
-2                                 23                                25 2589569785738035/1125899906842624 -4
-3  2589569785738035/1125899906842624 2589569785738035/1125899906842624 2589569785738035/1125899906842624 -4
-4                                 -4                                -4                                -4 -4
-5                                  4                                 4 2589569785738035/1125899906842624 -4
-6                                  0                                 0                                 0 -4
-7                                 23                                25 2589569785738035/1125899906842624 -4
-8                               32/7                              32/7 2589569785738035/1125899906842624 -4
-9                                 23                                25 2589569785738035/1125899906842624 -4
-10                                23                                25 2589569785738035/1125899906842624 -4
-11                                23                                25 2589569785738035/1125899906842624 -4
-12                                -3                                -3                                -3 -4
-                                   4  0                                34                              32/7
+------------------------------------------
+min.bigq -> num.fn.: min
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 21 in current 13 in target"
+                                 23.                                25                               2.3 -4.
+1                                 23                                23 2589569785738035/1125899906842624  -4
+2                                 23                                25 2589569785738035/1125899906842624  -4
+3  2589569785738035/1125899906842624 2589569785738035/1125899906842624 2589569785738035/1125899906842624  -4
+4                                 -4                                -4                                -4  -4
+5                                  4                                 4 2589569785738035/1125899906842624  -4
+6                                  0                                 0                                 0  -4
+7                                 23                                25 2589569785738035/1125899906842624  -4
+8                               32/7                              32/7 2589569785738035/1125899906842624  -4
+9                                 23                                25 2589569785738035/1125899906842624  -4
+10                                23                                25 2589569785738035/1125899906842624  -4
+11                                23                                25 2589569785738035/1125899906842624  -4
+12                                -3                                -3                                -3  -4
+                                  4L 0.                              34_Z                              32/7
 1                                  4  0                                23                              32/7
 2                                  4  0                                25                              32/7
 3  2589569785738035/1125899906842624  0 2589569785738035/1125899906842624 2589569785738035/1125899906842624
@@ -630,23 +966,25 @@ min.bigq
 10                                 4  0                                34                              32/7
 11                                 4  0                                34                              32/7
 12                                -3 -3                                -3                                -3
-                          (31 %% 45)                              NULL   NA -3
-1                                 23                                23 <NA> -3
-2                                 25                                25 <NA> -3
-3  2589569785738035/1125899906842624 2589569785738035/1125899906842624 <NA> -3
-4                                 -4                                -4 <NA> -4
-5                                  4                                 4 <NA> -3
-6                                  0                                 0 <NA> -3
-7                                 31                                34 <NA> -3
-8                               32/7                              32/7 <NA> -3
-9                                 31                                31 <NA> -3
-10                                31                              <NA>   NA -3
-11                                31                                NA <NA> -3
-12                                -3                                -3 <NA> -3
-------------------------------------------
-min.bigz
+                          (31 %% 45)                              NULL   NA -3L
+1                                 23                                23 <NA>  -3
+2                                 25                                25 <NA>  -3
+3  2589569785738035/1125899906842624 2589569785738035/1125899906842624 <NA>  -3
+4                                 -4                                -4 <NA>  -4
+5                                  4                                 4 <NA>  -3
+6                                  0                                 0 <NA>  -3
+7                                 31                                34 <NA>  -3
+8                               32/7                              32/7 <NA>  -3
+9                                 31                                31 <NA>  -3
+10                                31                              <NA>   NA  -3
+11                                31                                NA <NA>  -3
+12                                -3                                -3 <NA>  -3
 
-           23         25       2.3         -4         4         0         34       32/7 (31 %% 45)       NULL   NA
+------------------------------------------
+min.bigz -> num.fn.: min
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "'is.NA' value mismatch: 21 in current 13 in target"
+          23.         25       2.3        -4.        4L        0.       34_Z       32/7 (31 %% 45)       NULL   NA
 1          23         23         2         -4         4         0         23         23         23         23 <NA>
 2          23         25         2         -4         4         0         25         25         25         25 <NA>
 3           2          2         2         -4         2         0          2          2          2          2 <NA>
@@ -659,7 +997,7 @@ min.bigz
 10         23         25         2         -4         4         0         34         32 (31 %% 45)       <NA>   NA
 11         23         25         2         -4         4         0         34         32         31         NA <NA>
 12         -3         -3        -3         -4        -3        -3         -3         -3         -3         -3 <NA>
-           -3
+          -3L
 1          -3
 2          -3
 3          -3
@@ -672,6 +1010,8 @@ min.bigz
 10         -3
 11         -3
 12         -3
+
+There were 22 warnings (use warnings() to see them)
 > 
 > ##==============================================================================
 > 
@@ -679,77 +1019,82 @@ min.bigz
 +   {
 +     cat ("------------------------------------------\n", fid, "\n\n", sep="")
 +     FUN <- get(fid, envir = gmp.NS, mode="function")
-+     print(res <- test(FUN, unary=TRUE))
++     print(as.data.frame(test(FUN, x, unary=TRUE)))
 +   }
 ------------------------------------------
 log.bigz
 
-                23              25               2.3  -4                4    0               34             32/7
+               23.              25               2.3 -4.               4L   0.             34_Z             32/7
 1 3.13549421592915 3.2188758248682 0.693147180559945 NaN 1.38629436111989 -Inf 3.52636052461616 3.46573590279973
-        (31 %% 45) NULL   NA  -3
+        (31 %% 45) NULL   NA -3L
 1 3.43398720448515 <NA> -Inf NaN
 ------------------------------------------
 log2.bigz
 
-                23               25 2.3  -4 4    0               34 32/7       (31 %% 45) NULL   NA  -3
-1 4.52356195605701 4.64385618977472   1 NaN 2 -Inf 5.08746284125034    5 4.95419631038687 <NA> -Inf NaN
+               23.               25 2.3 -4. 4L   0.             34_Z 32/7       (31 %% 45) NULL   NA -3L
+1 4.52356195605701 4.64385618977472   1 NaN  2 -Inf 5.08746284125034    5 4.95419631038687 <NA> -Inf NaN
 ------------------------------------------
 log10.bigz
 
-                23               25               2.3  -4                 4    0               34             32/7
+               23.               25               2.3 -4.                4L   0.             34_Z             32/7
 1 1.36172783601759 1.39794000867204 0.301029995663981 NaN 0.602059991327962 -Inf 1.53147891704225 1.50514997831991
-        (31 %% 45) NULL   NA  -3
+        (31 %% 45) NULL   NA -3L
 1 1.49136169383427 <NA> -Inf NaN
 ------------------------------------------
 c.bigz
 
-  23 25 2.3 -4 4 0 34 32/7 (31 %% 45) NULL NA -3
-1 23 25   2 -4 4 0 34   32 (31 %% 45) <NA> NA -3
+  23. 25 2.3 -4. 4L 0. 34_Z 32/7 (31 %% 45) NULL NA -3L
+1  23 25   2  -4  4  0   34   32 (31 %% 45) <NA> NA  -3
 ------------------------------------------
 isprime
 
-  23 25 2.3 -4 4 0 34 32/7 (31 %% 45) NULL NA -3
-1  2  0   2  0 0 0  0    0          2 <NA>  0  2
+  23. 25 2.3 -4. 4L 0. 34_Z 32/7 (31 %% 45) NULL NA -3L
+1   2  0   2   0  0  0    0    0          2 <NA>  0   2
 ------------------------------------------
 nextprime
 
-  23 25 2.3 -4 4 0 34 32/7 (31 %% 45) NULL NA -3
-1 29 29   3  2 5 2 37   37         37 <NA>  2  2
+  23. 25 2.3 -4. 4L 0. 34_Z 32/7 (31 %% 45) NULL NA -3L
+1  29 29   3   2  5  2   37   37         37 <NA>  2   2
+------------------------------------------
+factorialZ
+
+                      23.                         25 2.3 -4. 4L 0. 34_Z 32/7 (31 %% 45) NULL NA -3L
+1 25852016738884976640000 15511210043330985984000000   2   0 24  1    1    1          1 <NA>  0   0
 ------------------------------------------
 sizeinbase
 
-  23 25 2.3 -4 4 0 34 32/7 (31 %% 45) NULL NA -3
-1  2  2   1  1 1 1  2    2          2 <NA>  1  1
+  23. 25 2.3 -4. 4L 0. 34_Z 32/7 (31 %% 45) NULL NA -3L
+1   2  2   1   1  1  1    2    2          2 <NA>  1   1
 ------------------------------------------
 fibnum
 
-     23    25 2.3    -4 4 0 34 32/7 (31 %% 45) NULL    NA    -3
-1 28657 75025   1 error 3 0  1    1          1 <NA> error error
+    23.    25 2.3   -4. 4L 0. 34_Z 32/7 (31 %% 45) NULL    NA   -3L
+1 28657 75025   1 error  3  0    1    1          1 <NA> error error
 ------------------------------------------
 fibnum2
 
-     23    25 2.3    -4 4 0 34 32/7 (31 %% 45)  NULL    NA    -3
-1 17711 46368   1 error 2 1  0    0          0 error error error
+    23.    25 2.3   -4. 4L 0. 34_Z 32/7 (31 %% 45)  NULL    NA   -3L
+1 17711 46368   1 error  2  1    0    0          0 error error error
 ------------------------------------------
 lucnum
 
-     23     25 2.3    -4 4 0 34 32/7 (31 %% 45) NULL    NA    -3
-1 64079 167761   3 error 7 2  1    1          1 <NA> error error
+    23.     25 2.3   -4. 4L 0. 34_Z 32/7 (31 %% 45) NULL    NA   -3L
+1 64079 167761   3 error  7  2    1    1          1 <NA> error error
 ------------------------------------------
 lucnum2
 
-     23     25 2.3    -4 4  0 34 32/7 (31 %% 45)  NULL    NA    -3
-1 39603 103682   1 error 4 -1  2    2          2 error error error
+    23.     25 2.3   -4. 4L 0. 34_Z 32/7 (31 %% 45)  NULL    NA   -3L
+1 39603 103682   1 error  4 -1    2    2          2 error error error
 ------------------------------------------
 factorize
 
-  23 25 2.3 -4 4     0 34 32/7 (31 %% 45) NULL    NA -3
-1 23  5   2 -1 2 error  2    2         31 <NA> error -1
+  23. 25 2.3 -4. 4L    0. 34_Z 32/7 (31 %% 45) NULL    NA -3L
+1  23  5   2  -1  2 error    2    2         31 <NA> error  -1
 ------------------------------------------
 abs
 
-  23    25 2.3 -4 4 0 34 32/7 (31 %% 45)  NULL   NA -3
-1 23 error 2.3  4 4 0 34 32/7 (31 %% 45) error <NA>  3
+  23.    25 2.3 -4. 4L 0. 34_Z 32/7 (31 %% 45)  NULL   NA -3L
+1  23 error 2.3   4  4  0   34 32/7 (31 %% 45) error <NA>   3
 > 
 > ##==============================================================================
 > 
@@ -785,7 +1130,6 @@ Big Integer ('bigz') 3 x 3 matrix:
 [2,] 2    4    6   
 [3,] 3    6    9   
 > ymc %*% t(ymc)
-Big Integer ('bigz') 3 x 3 matrix:
      [,1]     [,2]     [,3]    
 [1,] (1 %% 4) (2 %% 4) (3 %% 4)
 [2,] (2 %% 4) (1 %% 4) (0 %% 4)
@@ -823,7 +1167,6 @@ Big Rational ('bigq') 4 x 4 matrix:
 [3,] 0    0    1/3  0   
 [4,] 0    0    0    1/4 
 > solve(Dmr)
-Big Integer ('bigz') 4 x 4 matrix:
      [,1]     [,2]     [,3]     [,4]    
 [1,] (1 %% 7) (0 %% 7) (0 %% 7) (0 %% 7)
 [2,] (0 %% 7) (4 %% 7) (0 %% 7) (0 %% 7)
@@ -834,15 +1177,16 @@ Error in solve.bigz(Dmc) : argument has no inverse
 > try(solve(Dm)) # Error: System is singular
 Error in solve.bigz(Dm) : System is singular
 > 
-> (D.D <- try(D %*% t(Dm)))# now [>= Jan.2012] works too
+> (D.D <- D %*% t(Dm))# now [>= Jan.2012] works too
 Big Integer ('bigz') 4 x 4 matrix:
      [,1] [,2] [,3] [,4]
 [1,] 1    0    0    0   
 [2,] 0    0    0    0   
 [3,] 0    0    3    0   
 [4,] 0    0    0    4   
+> stopifnot(identical(D.D, tcrossprod(D,Dm)))
 > 
 > 
 > proc.time()
    user  system elapsed 
-  2.840   0.230   3.051 
+  1.184   0.067   1.307 

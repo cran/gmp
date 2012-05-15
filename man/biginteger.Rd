@@ -1,20 +1,24 @@
 \name{bigz}
+\title{Large Sized Integer Values}
 \alias{bigz}
 \alias{as.bigz}
 \alias{as.character.bigz}
 \alias{as.double.bigz}
 \alias{print.bigz}
 \alias{is.na.bigz}
-\title{Large Sized Integer Values}
+% Experimental: these two are C symbols, potentially for other packages:
+% Hence not yet documented at all (FIXME)
+\alias{biginteger_as}
+\alias{biginteger_as_character}
 \description{
   Class \code{"bigz"} encodes arbitrarily large integers (via GMP)
 }
 \usage{
 as.bigz(a, mod = NA)
-\S3method{as.character}{bigz}(x, b = 10, ...)
-% \S3method{as.double}{bigz}(x,...)
+\S3method{as.character}{bigz}(x, b = 10, \dots)
+% \S3method{as.double}{bigz}(x,\dots)
 \S3method{is.na}{bigz}(x)
-\S3method{print}{bigz}(x, quote=FALSE, ...)
+\S3method{print}{bigz}(x, quote=FALSE, initLine = is.null(modulus(x)), \dots)
 }
 \arguments{
   \item{a}{either \code{\link{integer}}, \code{\link{numeric}} (i.e.,
@@ -25,11 +29,15 @@ as.bigz(a, mod = NA)
     Formatting errors are signalled as with \code{\link{stop}}.}
   \item{b}{base: from 2 to 36}
   \item{x}{numeric value}
-  \item{...}{additional arguments passed to methods}
+  \item{\dots}{additional arguments passed to methods}
   \item{mod}{an integer, numeric, string or bigz of the internal modulus, see below.}
   \item{quote}{(for printing:) logical indicating if the numbers
     should be quoted (as characters are);  the default used to be
     \code{TRUE} (implicitly) till 2011.}
+  \item{initLine}{(for printing:) logical indicating if an
+    \bold{init}ial line (with the class and length or dimension) should
+    be printed.  The default prints it for those cases where the class
+    is not easily discernable from the print output.}
 }
 \value{
   An \R object of (S3) class \code{"bigz"}, representing the argument \code{x}.

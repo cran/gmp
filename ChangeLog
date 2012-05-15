@@ -1,5 +1,26 @@
+2012-05-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/bigrational.cc (^): Q^n  and Z^n now also work for negative
+	'n' and with NA's.
+
+	* R/bigq.R (as.bigz.bigq): as.bigz(as.bigq(NA)) now works
+
+2012-05-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/bigrationalR.cc (bigrational_pow, mpqz_pow):
+	* src/bigrational.cc (operator^): add   <bigq> ^ n   functionality.
+	* TODO: (one less :-)
+
+2012-05-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.5-2
+
+	* src/bigintegerR.cc (bigI_choose, bigI_factorial): now vectorized.
+	* man/factorialZ.Rd: updated, including examples
+
 2012-01-20 Antoine Lucas
-	* update gmp-test
+
+	* tests/gmp-test.R: update
 
 2012-01-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 

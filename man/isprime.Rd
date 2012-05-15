@@ -2,23 +2,26 @@
 \alias{isprime}
 \title{Determine if number is (very probably) prime}
 \description{
-  Determine whether the number is prime or not. 2: number is prime,
-  1, number is probably prime (without beeing certain), 0 number is
-  composite.
+  Determine whether the number \eqn{n} is prime or not, with
+  \emph{three} possible answers:
+  \describe{
+    \item{2:}{\eqn{n} is prime,}
+    \item{1:}{\eqn{n} is probably prime (without beeing certain),}
+    \item{0:}{\eqn{n} is composite.}
+  }
 }
 \usage{
 isprime(n, reps = 40)  % we feel better with 40 :)
 }
 \arguments{
-  \item{n}{integer number, to be tested}
-  \item{reps}{integer number of repeats}
+  \item{n}{integer number, to be tested.}
+  \item{reps}{integer number of primality testing repeats.}
 }
 \details{
   This function does some trial divisions, then some Miller-Rabin
   probabilistic primary tests.  \code{reps} controls how many such tests are
-  done, 5 to 10 is a resonable number.  More will reduce the chances
+  done, 5 to 10 is already a resonable number.  More will reduce the chances
   of a composite being returned as \dQuote{probably prime}.
-
 }
 \value{
   \item{0}{\eqn{n} is not prime}
@@ -29,7 +32,13 @@ isprime(n, reps = 40)  % we feel better with 40 :)
 
 \author{Antoine Lucas}
 
-\seealso{\code{\link{nextprime}}
+\seealso{
+  \code{\link{nextprime}}, \code{\link{factorize}}.
+
+  Note that for \dQuote{small} \eqn{n}, which means something like
+  \eqn{n < 10'000'000}, non-probabilistic methods (such as
+  \code{\link{factorize}()}) are fast enough. For example,
+  \code{\link[sfsmisc]{primes}} in package \pkg{sfsmisc}.
 }
 \examples{
 isprime(210)

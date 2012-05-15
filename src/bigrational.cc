@@ -127,6 +127,21 @@ bigrational operator/(const bigrational& lhs, const bigrational& rhs)
   return bigrationalR::create_bigrational(lhs, rhs, mpq_div, false);
 }
 
+/**
+ * \brief Return  a ^ b
+ */
+bigrational operator^(const bigrational& lhs, const biginteger& rhs)
+{
+  // if (base == 1  or  exp == 0)  return 1
+  if((!lhs.isNA() && !mpq_cmp_si(lhs.getValueTemp(), 1,1)) ||
+     (!rhs.isNA() && !mpz_cmp_si(rhs.getValueTemp(), 0)))
+    return bigrational(1);
+  if (lhs.isNA() || rhs.isNA())
+    return bigrational();
+
+  return bigrationalR::create_bigrational_z(lhs, rhs, bigrationalR::mpqz_pow);
+}
+
 //
 bool operator!=(const bigrational& lhs, const bigrational& rhs)
 {

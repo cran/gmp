@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04
- *  \date Last modified: $Id: bigintegerR.cc,v 1.29 2012-01-12 17:46:59 mmaechler Exp $
+ *  \date Last modified: $Id: bigintegerR.cc,v 1.32 2012-05-07 21:17:40 mmaechler Exp $
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
@@ -15,6 +15,9 @@
 #include "Rgmp.h"
 
 #include "bigintegerR.h"
+// only for  <bigz> ^ -|n| :
+#include "bigrationalR.h"
+
 #include "matrix.h"
 
 #include <vector>
@@ -190,9 +193,6 @@ namespace bigintegerR
   {
     bigvec va = bigintegerR::create_bignum(a);
     bigvec vb = bigintegerR::create_bignum(b), result;
-    // MM: I think, 0 length vector operations should work too!
-    // if (va.value.empty() || vb.value.empty())
-    //   error(_("argument must not be an empty list"));
     int size = (va.value.empty() || vb.value.empty()) ? 0 : max(va.value.size(), vb.value.size());
     result.value.reserve(size);
     for (int i = 0; i < size; ++i)
@@ -208,9 +208,6 @@ namespace bigintegerR
   {
     bigvec va = bigintegerR::create_bignum(a);
     bigvec vb = bigintegerR::create_bignum(b), result;
-    // MM: I think, 0 length vector operations should work too!
-    // if (va.value.empty() || vb.value.empty())
-    //   error(_("argument must not be an empty list"));
     int size = (va.value.empty() || vb.value.empty()) ? 0 : max(va.value.size(), vb.value.size());
     //	int sizemod = max(va.modulus.size(), vb.modulus.size());
     SEXP ans = PROTECT(Rf_allocVector(LGLSXP, size));
@@ -269,11 +266,29 @@ SEXP biginteger_sub (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_oper
 SEXP biginteger_mul (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator*);}
 SEXP biginteger_div (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator/);}
 SEXP biginteger_mod (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator%);}
-SEXP biginteger_pow (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,pow);}
+SEXP biginteger_pow (SEXP a, SEXP b) {
+  // if any b < 0 , the result must be (non-integer) bigrational
+  bool use_rat = FALSE;
+  bigvec vb = bigintegerR::create_bignum(b);
+  for (unsigned int i = 0; i < vb.value.size(); ++i) {
+    if(mpz_sgn(vb.value[i].getValueTemp()) < 0) {
+      use_rat = TRUE;
+      break;
+    }
+  }
+  if (use_rat) { // a ^ b  with some b negative --> rational result
+    // 1)  a := as.bigq(a, 1)
+    SEXP aq = bigrational_as(a, Rf_ScalarInteger(1));
+    // 2)  result =  <bigq a> ^ b:
+    return bigrational_pow(aq, b);
+  } else
+    return bigintegerR::biginteger_binary_operation(a,b, pow); // -> pow() in ./bigmod.cc
+}
 SEXP biginteger_inv (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,inv);}
 SEXP biginteger_gcd (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,gcd);}
 SEXP biginteger_lcm (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,lcm);}
 SEXP biginteger_as (SEXP a, SEXP mod){return bigintegerR::biginteger_binary_operation(a,mod,set_modulus);}
+//								set_modulus :  -> ./bigmod.cc
 
 SEXP biginteger_lt  (SEXP a, SEXP b) {return bigintegerR::biginteger_logical_binary_operation(a,b,bigintegerR::lt);}
 SEXP biginteger_gt  (SEXP a, SEXP b) {return bigintegerR::biginteger_logical_binary_operation(a,b,bigintegerR::gt);}
@@ -315,7 +330,7 @@ SEXP biginteger_as_numeric(SEXP a)
   SEXP ans = PROTECT(Rf_allocVector(REALSXP,v.size()));
   double *r = REAL(ans);
   for (unsigned int i = 0; i < v.size(); ++i)
-    r[i] = v.value[i].as_double();
+    r[i] = v.value[i].isNA() ? NA_REAL : v.value[i].as_double();
   UNPROTECT(1);
   return ans;
 }
@@ -328,18 +343,12 @@ SEXP biginteger_as_integer(SEXP a)
   for (unsigned int i = 0; i < v.size(); ++i) {
     if(v.value[i].isNA()) {
       r[i] = NA_INTEGER;
-      break;
     }
-    // TODO? -- ideally would use
-    // a[i] = v.value[i].as_long();
-    // as_long == mpz_get_si() is not good enough: needs mpz_fits_slong_p()
-    // Using double is not bad: we know that an integer always should fit
-    double ri = v.value[i].as_double();
-    if(fabs(ri) <= INT_MAX)
-      r[i] = static_cast<int>(ri);
-    else {
+    else if(!mpz_fits_slong_p(v.value[i].getValueTemp())) {
       Rf_warning("NAs introduced by coercion from big integer");
       r[i] = NA_INTEGER;
+    } else {
+      r[i] = mpz_get_si(v.value[i].getValueTemp());
     }
   }
   UNPROTECT(1);
@@ -745,21 +754,18 @@ SEXP biginteger_sizeinbase(SEXP x, SEXP base)
 
 
 /** @brief bigI_factorial returns n!
- *  @param n non-negative integer
+ *  @param n non-negative integer vector
  */
 SEXP bigI_factorial(SEXP n)
 {
   bigvec result;
-  if(Length(n) > 0) {
-    int nn = INTEGER(AS_INTEGER(n))[0];
-    unsigned long int num = nn;
-    if(nn < 0 || nn == NA_INTEGER)
-      error(_("argument must be non-negative"));
-    mpz_t val;
-    mpz_init(val);
-    mpz_t_sentry val_s(val);
-    mpz_fac_ui(val, num);
-    result.push_back(bigmod(val));
+  int *nn = INTEGER(AS_INTEGER(n)), size = Length(n);
+  result.value.resize(size);
+  for (int i = 0; i < size; ++i) {
+    result.value[i].NA(false);
+    if(nn[i] != NA_INTEGER && nn[i] >= 0) {
+      mpz_fac_ui(result.value[i].getValue(), (unsigned long int)nn[i]);
+    }
   }
   return bigintegerR::create_SEXP(result);
 } // bigI_factorial
@@ -770,28 +776,23 @@ SEXP bigI_factorial(SEXP n)
  */
 SEXP bigI_choose(SEXP n, SEXP k)
 {
-  bigvec result;
-  if(Length(k) > 0 && Length(n) > 0) {
-    int kk = INTEGER(AS_INTEGER(k))[0];
-    unsigned long int k_ = kk;
-    if(kk < 0 || kk == NA_INTEGER)
-      error(_("argument 'k' must be non-negative"));
+  bigvec result, n_ = bigintegerR::create_bignum(n);
+  int *kk = INTEGER(AS_INTEGER(k)), n_k = Length(k);
+  int size = (n_.value.empty() || n_k == 0) ? 0 :
+    // else:  max(n_.value.size(), n_k)
+    (((int)n_.value.size() <= n_k) ? n_k : n_.value.size());
 
-    mpz_t val;
-    mpz_init(val);
-    mpz_t_sentry val_s(val);
-
-    if(TYPEOF(n) == RAWSXP) { // assume this is an R "bigz"
-      bigvec va = bigintegerR::create_vector(n);
-      mpz_bin_ui(val, va.value[0].getValueTemp(), k_);
-      //              -------------------------- former "bigz" translated to mpz_t
+  result.value.resize(size);
+  for (int i = 0; i < size; ++i) {
+    result.value[i].NA(false);
+    int ik_i = kk[i % n_k];
+    // check if k in range:
+    if(ik_i != NA_INTEGER && ik_i >= 0) {
+      unsigned long int k_i = (unsigned long int)ik_i;
+      /* void mpz_bin_ui (mpz_t ROP, mpz_t N, unsigned long int K) */
+      mpz_bin_ui(result.value[i].getValue(),
+		 n_.value[i % n_.value.size()].getValueTemp(), k_i);
     }
-    else {
-      unsigned long int n_ = INTEGER(AS_INTEGER(n))[0];
-      mpz_bin_uiui(val, n_, k_);
-    }
-
-    result.push_back(bigmod(val));
   }
   return bigintegerR::create_SEXP(result);
 }

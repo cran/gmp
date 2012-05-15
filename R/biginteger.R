@@ -1,3 +1,8 @@
+## Auxiliaries:
+if(getRversion() < "2.15")
+    paste0 <- function(...) paste(..., sep = '')
+
+
 #----------------------------------------------------------
 #
 #  Author        : Immanuel Scholz (immanuel.scholz@gmx.de)
@@ -8,7 +13,6 @@
 #  Licence       : GPL
 #
 #----------------------------------------------------------
-
 
 "+.bigz" <- add.bigz <- function(e1, e2) .Call(biginteger_add, e1, e2)
 
@@ -53,14 +57,16 @@ lcm.default <- function(a,b)
   as.integer(lcm.bigz(a,b))
 lcm.bigz <- function(a,b) .Call(biginteger_lcm,a,b)
 
-print.bigz <- function(x, quote = FALSE, ...)
+print.bigz <- function(x, quote = FALSE, initLine = is.null(modulus(x)), ...)
 {
   if((n <- length(x)) > 0) {
-    cat("Big Integer ('bigz') ")
-    kind <- if(isM <- !is.null(nr <- attr(x, "nrow")))
-      sprintf("%d x %d matrix", nr, n/nr)
-    else if(n > 1) sprintf("object of length %d", n) else ""
-    cat(kind,":\n", sep="")
+    if(initLine) {
+      cat("Big Integer ('bigz') ")
+      kind <- if(isM <- !is.null(nr <- attr(x, "nrow")))
+        sprintf("%d x %d matrix", nr, n/nr)
+      else if(n > 1) sprintf("object of length %d", n) else ""
+      cat(kind,":\n", sep="")
+    }
     print(as.character(x), quote = quote, ...)
   }
   else
@@ -81,6 +87,25 @@ as.character.bigz <- function(x, b = 10L, ...)
 {
     .Call(biginteger_as_character, x, b)
 }
+
+##' format() Numbers such as to distinguish  bigz, integer, double, mpfr, etc
+formatN <- function(x, ...) UseMethod("formatN")
+formatN.integer <- function(x, ...) paste0(as.character(x, ...), "L")
+formatN.bigz    <- function(x, ...) {
+    r <- as.character(x, ...)
+    if(any(noMod <- is.null(modulus(x))))
+	r[noMod] <- paste0(r[noMod],"_Z")
+    r
+}
+formatN.double	<- function(x, ...) {
+    r <- vapply(x, format, "", ...)
+    if(any(intLike <- !grepl("[^-0-9]",r)))
+	r[intLike] <- paste0(r[intLike],".")
+    r
+}
+##' Default Method: Use the standard format() --- e.g. for complex
+formatN.default <- function(x, ...) format(x, ...)
+
 
 as.double.bigz  <- function(x,...) .Call(biginteger_as_numeric, x)
 as.integer.bigz <- function(x,...) .Call(biginteger_as_integer, x)
@@ -109,8 +134,25 @@ powm <- function(x,y, n) .Call(biginteger_powm, x,y,n)
 "==.bigz" <- function(e1, e2) .Call(biginteger_eq, e1, e2)
 "!=.bigz" <- function(e1, e2) .Call(biginteger_neq, e1, e2)
 
+is.whole <- function(x) UseMethod("is.whole")
+is.whole.default <- function(x) {
+    n <- length(x)
+    if(is.atomic(x)) {
+        if(is.integer(x) || is.logical(x))
+            return(rep.int(TRUE, n))
+        if(is.numeric(x))
+            return(x == floor(x))
+        if(is.complex(x))
+            return(x == round(x))
+    }
+    ## else:
+    logical(n) ## == rep.int(FALSE, length(x))
+}
+
+
 is.na.bigz <- function(x) .Call(biginteger_is_na, x)
 is.finite.bigz <- function(x) !is.na.bigz(x) # otherwise all are finite
+is.whole.bigz <- function(x) rep.int(TRUE, length(x))
 is.infinite.bigz <- function(x) rep.int(FALSE, length(x))
 
 frexpZ <- function(x) .Call(bigI_frexp, x)
@@ -263,25 +305,32 @@ solve.bigz <- function(a, b,...)
   }
 
 
-"[[.bigz" <- function(x, i=NA)
+`[[.bigz` <- function(x, i=NA) .Call(biginteger_get_at, x, i)
+
+`[[<-.bigz` <- function(x, i=NA, value)
+    .Call(biginteger_set_at, x, i, value)
+
+`[.bigz` <- function(x, i=NULL, j=NULL, drop=TRUE)
 {
-    .Call(biginteger_get_at, x, i)
+  mdrop <- missing(drop)
+  Narg <- nargs() - (!mdrop)
+  has.j <- !missing(j)
+  if(isM <- !is.null(nr <- attr(x, "nrow"))) { ## matrix
+    ## FIXME  x[i,] vs. x[,j] vs. x[i]
+    .Call(matrix_get_at_z, x, i,j)
+  } else { ## non-matrix
+    if(has.j) stop("invalid vector subsetting")
+    ## ugly "workaround"
+    r <- .Call(matrix_get_at_z, x, i, NULL)
+    attr(r,"nrow") <- NULL
+    r
+  }
+
 }
 
-"[[<-.bigz"<- function(dst, idx=NA, value)
+`[<-.bigz` <- function(x, i=NULL, j=NULL, value)
 {
-    .Call(biginteger_set_at, dst, idx, value)
-}
-
-
-"[.bigz"<- function(x, i=NULL, j=NULL)
-{
-  .Call(matrix_get_at_z, x, i,j)
-}
-
-"[<-.bigz"<- function(dst,idx=NULL,jdx=NULL,value)
-{
-  .Call(matrix_set_at_z, dst, value,idx,jdx )
+  .Call(matrix_set_at_z, x, value, i,j)
 }
 
 

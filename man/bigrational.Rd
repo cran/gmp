@@ -20,7 +20,7 @@ as.bigq(n, d = 1)
 \S3method{as.double}{bigq}(x,...)
 as.bigz.bigq(a, mod=NA)
 \S3method{is.na}{bigq}(x)
-\S3method{print}{bigq}(x, quote=FALSE, ...)
+\S3method{print}{bigq}(x, quote=FALSE, initLine = TRUE, ...)
 denominator(x)
 numerator(x)
 }
@@ -39,6 +39,13 @@ numerator(x)
   \item{quote}{(for printing:) logical indicating if the numbers
     should be quoted (as characters are);  the default used to be
     \code{TRUE} (implicitly) till 2011.}
+  \item{initLine}{(for printing:) logical indicating if an
+    \bold{init}ial line (with the class and length or dimension) should
+    be printed. % not yet smart default .. The default prints it for
+    % those cases where the class is not easily discernable from the
+    % print output.
+  }
+
 }
 \value{
   An \R object of (S3) class \code{"bigq"} representing the parameter value.
@@ -65,6 +72,10 @@ x + y
 
 # You can even try multiplication, division...
 x * y / 13
+
+# and, since May 2012,
+x ^ 20
+stopifnot(x ^ 20 == as.bigz(7)^20 / 2^20)
 
 # convert to string, double
 as.character(x)

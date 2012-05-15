@@ -27,7 +27,7 @@ typedef bool (*biginteger_logical_binary_fn)(const biginteger&, const biginteger
 #endif
 
 /**
- * \brief set of function usefull for manipulation of SEXP and bigvec
+ * \brief set of function useful for manipulation of SEXP and bigvec
  */
 namespace bigintegerR{
 

@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 12/12/04
- *  \date Last modified: $Id: bigrationalR.cc,v 1.18 2012-01-08 01:11:29 mmaechler Exp $
+ *  \date Last modified: $Id: bigrationalR.cc,v 1.20 2012-05-07 21:17:40 mmaechler Exp $
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
@@ -154,8 +154,8 @@ namespace bigrationalR
 	  }
 	else
 	  {
-	    //  *num = mpq_numref(v.value[i].getValueTemp());
-	    //*den = mpq_denref(v.value[i].getValueTemp());
+	    // *num = mpq_numref(v.value[i].getValueTemp());
+	    // *den = mpq_denref(v.value[i].getValueTemp());
 	    mpq_get_num(num,v.value[i].getValueTemp());
 	    mpq_get_den(den,v.value[i].getValueTemp());
 
@@ -204,6 +204,18 @@ namespace bigrationalR
     // MM: I think, 0 length vector operations should work too!
     // if (va.value.empty() || vb.value.empty())
     //   error(_("argument must not be an empty list"));
+    int size = (va.value.empty() || vb.value.empty()) ? 0 : max(va.size(), vb.size());
+    result.value.reserve(size);
+    for (int i = 0; i < size; ++i)
+      result.push_back(f(va.value[i%va.size()], vb.value[i%vb.size()]));
+    result.nrow = matrixz::checkDims(va.nrow,vb.nrow) ;
+    return bigrationalR::create_SEXP(result);
+  }
+
+  SEXP bigrational_bigz_binary_operation(SEXP a, SEXP b, bigrational_bigz_binary_fn f)
+  {
+    bigvec_q va = bigrationalR::create_bignum(a), result;
+    bigvec vb = bigintegerR::create_bignum(b);
     int size = (va.value.empty() || vb.value.empty()) ? 0 : max(va.size(), vb.size());
     result.value.reserve(size);
     for (int i = 0; i < size; ++i)
@@ -274,7 +286,8 @@ namespace bigrationalR
 
 
   // Create a bigrational from a binary combination of two other bigrationals
-  bigrational create_bigrational(const bigrational& lhs, const bigrational& rhs, gmpq_binary f,  bool zeroRhsAllowed ) {
+  bigrational create_bigrational(const bigrational& lhs, const bigrational& rhs,
+				 gmpq_binary f,  bool zeroRhsAllowed ) {
     if (lhs.isNA() || rhs.isNA())
       return bigrational();
 
@@ -293,10 +306,60 @@ namespace bigrationalR
     return bigrational(val);
   }
 
+  // Create a bigrational from a binary combination of  (bigrational , biginteger)
+  bigrational create_bigrational_z(const bigrational& lhs, const biginteger& rhs,
+				   gmp_qz_binary f, bool zeroRhsAllowed)
+  {
+    if (lhs.isNA() || rhs.isNA())
+      return bigrational();
+    if (!zeroRhsAllowed && ( mpz_sgn(rhs.getValueTemp()) == 0))
+      error(_("division by zero"));
+
+    mpq_t val; mpq_init(val); mpq_t_sentry val_s(val);
+
+    f(val,lhs.getValueTemp(),rhs.getValueTemp());
+    /* Simplify numerator and denominator and return */
+    mpq_canonicalize(val);
+    return bigrational(val);
+  }
+
+  //  x ^ y  (for biginteger y):
+  void mpqz_pow(mpq_t result, const mpq_t x, const mpz_t y)
+  {
+    if(!mpz_fits_slong_p(y))
+      error(_("exponent 'y' too large in 'x^y'"));
+
+    mpz_t num, den; mpz_init(num); mpz_init(den);
+    mpz_t_sentry val_n(num); mpz_t_sentry val_d(den);
+    int yi = mpz_get_si(y);
+    bool neg =(yi < 0);
+    // *num = mpq_numref(x);
+    // *den = mpq_denref(y);
+    mpq_get_num(num, x);
+    mpq_get_den(den, x);
+    if(neg) {
+	if(mpz_sgn(num) == 0)
+	    error(_("0 ^ <negative> is a division by zero"));
+	yi = -yi;
+    }
+    mpz_pow_ui(num, num, yi); // num := num ^ |y|
+    mpz_pow_ui(den, den, yi); // den := den ^ |y|
+
+    if(neg) { // Q^{-n} = 1 / Q^|n| --> result := den / num = as.bigq(den, num) :
+	mpz_set(mpq_numref(result), den);
+	mpz_set(mpq_denref(result), num);
+    } else {
+	// result := num / den = as.bigq(num, den) :
+	mpz_set(mpq_numref(result), num);
+	mpz_set(mpq_denref(result), den);
+    }
+    /* Simplify numerator and denominator */
+    mpq_canonicalize(result);
+  }
+
 
 }
-
-/* End of namespace bigrationalR*/
+// End of namespace bigrationalR ----------------------------------------------
 
 
 
@@ -304,7 +367,10 @@ SEXP bigrational_add (SEXP a, SEXP b) {return bigrationalR::bigrational_binary_o
 SEXP bigrational_sub (SEXP a, SEXP b) {return bigrationalR::bigrational_binary_operation(a,b,operator-);}
 SEXP bigrational_mul (SEXP a, SEXP b) {return bigrationalR::bigrational_binary_operation(a,b,operator*);}
 SEXP bigrational_div (SEXP a, SEXP b) {return bigrationalR::bigrational_binary_operation(a,b,operator/);}
-SEXP bigrational_as (SEXP n, SEXP d) {return bigrationalR::bigrational_binary_operation(n,d,set_denominator);}
+SEXP bigrational_pow (SEXP a, SEXP b) {
+    return bigrationalR::bigrational_bigz_binary_operation(a,b,operator^); //-> mpqz_pow() above
+}
+SEXP bigrational_as (SEXP n, SEXP d) {return bigrationalR::bigrational_binary_operation(n,d,set_denominator);} //-> mpq_div()
 
 SEXP bigrational_lt (SEXP a, SEXP b) {return bigrationalR::bigrational_logical_binary_operation(a,b,bigrationalR::lt);}
 SEXP bigrational_gt (SEXP a, SEXP b) {return bigrationalR::bigrational_logical_binary_operation(a,b,bigrationalR::gt);}
@@ -344,7 +410,7 @@ SEXP bigrational_as_numeric(SEXP a)
   SEXP ans = PROTECT(Rf_allocVector(REALSXP,v.size()));
   double *r = REAL(ans);
   for (unsigned int i = 0; i < v.size(); ++i)
-      r[i] = v.value[i].as_double();
+    r[i] = v.value[i].isNA() ? NA_REAL : v.value[i].as_double();
   UNPROTECT(1);
   return ans;
 }
@@ -516,6 +582,24 @@ SEXP bigrational_is_na(SEXP a)
   return ans;
 }
 
+
+SEXP bigrational_is_int(SEXP a)
+{
+  bigvec_q v = bigrationalR::create_bignum(a);
+  SEXP ans = PROTECT(Rf_allocVector(LGLSXP, v.size()));
+  int *a_ = LOGICAL(ans);
+  mpz_t z_tmp;
+  mpz_init(z_tmp);
+
+  for (unsigned int i = 0; i < v.size(); ++i) {
+    mpq_get_den(z_tmp,v.value[i].getValueTemp());
+    a_[i] = mpz_cmp_ui (z_tmp, 1) == 0; // <==> numerator == 1
+  }
+  mpz_clear(z_tmp);
+  UNPROTECT(1);
+  return ans;
+}
+
 SEXP bigrational_c(SEXP args)
 {
   //  if(TYPEOF( args ) != LISTSXP)
@@ -679,4 +763,52 @@ SEXP bigrational_prod(SEXP a)
   result.value[0].setValue(val);
   return(bigrationalR::create_SEXP(result));
 }
+
+/* ================================ UNUSED ============================*/
+// return x ^ y   x: "bigq"  y: "bigz" (or INTSXP, REALSXP -- TODO ?)
+SEXP bigrational_R_pow(SEXP x, SEXP y)
+{
+  bigvec_q result, vx = bigrationalR::create_bignum(x);
+  bigvec vy = bigintegerR::create_bignum(y);
+  int size = (vx.value.empty() || vy.value.empty()) ? 0 : max(vx.size(), vy.size());
+
+  mpq_t val; mpq_init(val); mpq_t_sentry val_s(val);
+  mpz_t num, den; mpz_init(num); mpz_init(den);
+  mpz_t_sentry val_n(num); mpz_t_sentry val_d(den);
+
+  result.value.resize(size);
+
+  for (int i = 0 ; i < size; i++) {
+    int i_x = i % vx.value.size(),
+        i_y = i % vy.value.size();
+
+    //fails: val.NA(false);
+    if(vx.value[i_x].isNA() ||
+       vy.value[i_y].isNA())
+	break;
+    // else -- res[i] :=  x[i] ^ y[i]  =  (num ^ y_i) / (den ^ y_i) ----
+
+    if(mpz_sgn(vy.value[i_y].getValueTemp()) < 0)
+	error(_("Negative powers not yet implemented [i = %d]"), i_y +1);
+    if (!mpz_fits_ulong_p(vy.value[i_y].getValueTemp()))
+	error(_("exponent too large for pow  [i = %d]"), i_y +1);
+    int y_i = mpz_get_ui(vy.value[i_y].getValueTemp());
+    // *num = mpq_numref(vx.value[i].getValueTemp());
+    // *den = mpq_denref(vx.value[i].getValueTemp());
+    mpq_get_num(num, vx.value[i_x].getValueTemp());
+    mpq_get_den(den, vx.value[i_x].getValueTemp());
+    mpz_pow_ui(num, num, y_i); // num := num ^ y_i
+    mpz_pow_ui(den, den, y_i); // den := den ^ y_i
+
+    // val := as.bigq(num, den) :
+    mpz_set(mpq_numref(val), num);
+    mpz_set(mpq_denref(val), den);
+    /* Simplify numerator and denominator */
+    mpq_canonicalize(val);
+
+    result.value[i].setValue(val);
+  }
+
+  return bigrationalR::create_SEXP(result);
+} // ..._pow()
 

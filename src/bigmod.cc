@@ -2,6 +2,13 @@
 
 #include "bigmod.h"
 
+#define DEBUG_bigmod
+#undef DEBUG_bigmod
+#ifdef DEBUG_bigmod
+#include <R_ext/Print.h>
+#endif
+
+
 std::string bigmod::str(int b) const
 {
   if (value.isNA())
@@ -84,7 +91,7 @@ bigmod operator%(const bigmod& lhs, const bigmod& rhs)
   if (lhs.value.isNA() || rhs.value.isNA())
     return bigmod();
   if (mpz_sgn(rhs.value.getValueTemp()) == 0)
-    error(_("division by zero"));
+    error(_("division by zero"));// FIXME -- rather return NA or NaN
   biginteger mod;
   if (!lhs.modulus.isNA() || !rhs.modulus.isNA())
     mod = rhs.value;
@@ -100,19 +107,31 @@ bigmod operator%(const bigmod& lhs, const bigmod& rhs)
 
 bigmod pow(const bigmod& base, const bigmod& exp)
 {
+#ifdef DEBUG_bigmod
+  // Debug
+  if(!mpz_cmp_si(base.value.getValueTemp(), 1))
+    Rprintf("bigmod pow(1, exp=%d)\n", mpz_get_si(exp.value.getValueTemp()));
+  else if(!mpz_cmp_si(exp.value.getValueTemp(), 0))
+    Rprintf("bigmod pow(base=%d, 0)\n", mpz_get_si(base.value.getValueTemp()));
+#endif
+
+  // if (base == 1  or  exp == 0)  return 1
+  if((!base.value.isNA() && !mpz_cmp_si(base.value.getValueTemp(), 1)) ||
+     (! exp.value.isNA() && !mpz_cmp_si( exp.value.getValueTemp(), 0)))
+    return bigmod(biginteger(1));
   if (base.value.isNA() || exp.value.isNA())
     return bigmod();
-  mpz_t val;
-  mpz_init(val);
-  mpz_t_sentry val_s(val);
+  mpz_t val; mpz_init(val); mpz_t_sentry val_s(val);
   biginteger mod = get_modulus(base, exp);
   if (mod.isNA())
   {
-    if(mpz_sgn(exp.value.getValueTemp() ) <0)
-      error(_("Negative values not allowed"));
+    if(mpz_sgn(exp.value.getValueTemp()) < 0) // b ^ -|e| =  1 / b^|e|  __TODO__
+      error(_("Negative powers for Z/nZ not yet implemented"));
     if (!mpz_fits_ulong_p(exp.value.getValueTemp()))
       error(_("exponent too large for pow"));
-    mpz_pow_ui(val, base.value.getValueTemp(), mpz_get_ui(exp.value.getValueTemp()));
+    // else :
+    mpz_pow_ui(val, base.value.getValueTemp(),
+	       mpz_get_ui(exp.value.getValueTemp()));
   }
   else if( mpz_sgn(mod.getValueTemp()) != 0)  // check modulus not null
     mpz_powm(val, base.value.getValueTemp(), exp.value.getValueTemp(), mod.getValueTemp());
@@ -139,7 +158,7 @@ bigmod inv(const bigmod& x, const bigmod& m)
 bigmod set_modulus(const bigmod& x, const bigmod& m)
 {
   if (!m.value.isNA() && mpz_sgn(m.value.getValueTemp()) == 0)
-    error(_("division by zero"));
+    error(_("modulus 0 is invalid"));
   //    if (!m.value.isNA() && mpz_cmp(x.value.getValueTemp(),m.value.getValueTemp())>=0) {
   if (!m.value.isNA() ) {
     bigmod t(x%m);
@@ -185,7 +204,7 @@ bigmod create_bigmod(const bigmod& lhs, const bigmod& rhs, gmp_binary f,
   if (lhs.value.isNA() || rhs.value.isNA())
     return bigmod();
   if (!zeroRhsAllowed && mpz_sgn(rhs.value.getValueTemp()) == 0)
-    error(_("division by zero"));
+    error(_("modulus 0 is invalid in RHS"));
   biginteger mod = get_modulus(lhs, rhs);
   mpz_t val;
   mpz_init(val);

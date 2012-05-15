@@ -44,21 +44,21 @@ class bigrational
 
  public:
   /**
-   * Construct a "NA" biginteger.
+   * Construct a "NA" bigrational.
    */
   bigrational() :
     value(),
     na(true) {mpq_init(value);}
 
   /**
-   * Construct a biginteger from a raw expression.
+   * Construct a bigrational from a raw expression.
    * in fact in raw: we will store an mpz_export of
-   * either numeraotr, or denominator
+   * either numerator, or denominator
    */
   bigrational(void* raw);
 
   /**
-   * Create a biginteger from a value. Remember to free the
+   * Create a bigrational from a value. Remember to free the
    * parameter's mpz_t if you allocated them by yourself -
    * biginteger will copy the value.
    */
@@ -82,7 +82,7 @@ class bigrational
     }
 
   /**
-   * Construct a biginteger from a long value.
+   * Construct a bigrational from a long value.
    */
   bigrational(int value_) :
     value(),
@@ -95,7 +95,7 @@ class bigrational
   }
 
   /**
-   * Construct a biginteger from a long value.
+   * Construct a bigrational from a long value.
    */
   bigrational(int num_, int den_) :
     value(),
@@ -107,7 +107,7 @@ class bigrational
       mpq_set_si(value, num_,den_);}
 
   /**
-   * Construct a biginteger from a double value.
+   * Construct a bigrational from a double value.
    */
   bigrational(double value_) :
     value(),
@@ -116,12 +116,12 @@ class bigrational
       mpq_init(value);
       if(R_FINITE( value_ ) )
 	mpq_set_d(value, value_);
-      else
+      else // FIXME: consider  "1/0" and "(-1)/0" for  +- Inf
 	na = true  ;
     }
 
   /**
-   * Construct a biginteger from a string value. it can be "4343" or "2322/4343"
+   * Construct a bigrational from a string value. it can be "4343" or "2322/4343"
    */
   bigrational(const std::string& value_) :
     value(),
@@ -157,12 +157,12 @@ class bigrational
   bigrational & operator= (const bigrational& rhs);
 
   /**
-   * Set the biginteger to state "NA".
+   * Set the bigrational to state "NA".
    */
   void setValue() {mpq_set_si(value, 0,1); na = true;}
 
   /**
-   * Set the biginteger to a specific value.
+   * Set the bigrational to a specific value.
    */
   void setValue(const mpq_t value_ ) {
     mpq_set(value, value_); na = false;
@@ -255,18 +255,18 @@ class bigrational
   int sgn() const {return mpq_sgn(value);}
 
   /**
-   *  Convert the biginteger into a standard string.
+   *  Convert the bigrational into a standard string.
    */
   std::string str(int b) const;
 
   /**
-   * \brief Convert the biginteger into a double value
+   * \brief Convert the bigrational into a double value
    * (you may loose precision)
    */
   double as_double() const {return mpq_get_d(value);}
 
   /**
-   * Convert the biginteger to a raw memory block. Obtain the size needed
+   * Convert the bigrational to a raw memory block. Obtain the size needed
    * from biginteger_raw_size() first and make sure, the buffer provided is
    * large enough to hold the data.
    *
@@ -341,6 +341,11 @@ bigrational operator*(const bigrational& rhs, const bigrational& lhs);
  *\brief  Divide two bigrationals.
  */
 bigrational operator/(const bigrational& rhs, const bigrational& lhs);
+
+/**
+ *\brief  x^y = pow(x,y) :  bigrational ^ biginteger
+ */
+bigrational operator^(const bigrational& rhs, const biginteger& lhs);
 
 
 /** \brief comparison operator

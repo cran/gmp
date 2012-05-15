@@ -3,7 +3,7 @@
  *
  *  \version 1
  *
- *  \date Created: 2005   
+ *  \date Created: 2005
  *  \date Last modified: Time-stamp: <2010-04-10 19:27:44 antoine>
  *
  *
@@ -14,8 +14,9 @@
 
 #include "bigvec_q.h"
 
-typedef bigrational (*bigrational_binary_fn)(const bigrational&, const bigrational&);
-typedef bool (*bigrational_logical_binary_fn)(const bigrational&, const bigrational&);
+typedef bigrational (*bigrational_binary_fn)     (const bigrational&, const bigrational&);
+typedef bigrational (*bigrational_bigz_binary_fn)(const bigrational&, const biginteger&);
+typedef bool     (*bigrational_logical_binary_fn)(const bigrational&, const bigrational&);
 
 extern "C"
 {
@@ -40,26 +41,31 @@ extern "C"
   SEXP bigrational_div(SEXP a, SEXP b);
 
   /**
-   * \brief Return Numerator of a 
+   * \brief Power  a ^ b
+   */
+  SEXP bigrational_pow(SEXP a, SEXP b);
+
+  /**
+   * \brief Return Numerator of a
    */
   SEXP bigrational_num(SEXP a);
 
   /**
-   * \brief Return Denominator of a 
+   * \brief Return Denominator of a
    */
   SEXP bigrational_den(SEXP a);
-   
+
   /**
    * \brief Return from vector a all elements specified in vector b
    */
   SEXP bigrational_get_at(SEXP a, SEXP b);
-    
+
   /**
-   * \brief Return a vector with the values from src specified by 
+   * \brief Return a vector with the values from src specified by
    * idx to sequentiell values from "value".
    */
   SEXP bigrational_set_at(SEXP src, SEXP idx, SEXP value);
-    
+
   /**
    * \brief Convert from one or 2 long value or a string or
    * bigz into bigrational.
@@ -93,30 +99,35 @@ extern "C"
   SEXP bigrational_is_na(SEXP a);
 
   /**
+   * \brief ans[i] :=  a[i] is integer valued, i.e., has denom == 1
+   */
+  SEXP bigrational_is_int(SEXP a);
+
+  /**
    * \brief Return whether a < b
    */
   SEXP bigrational_lt(SEXP a, SEXP b);
-    
+
   /**
    * \brief Return whether a > b
    */
   SEXP bigrational_gt(SEXP a, SEXP b);
-    
+
   /**
    * \brief Return whether a <= b
    */
   SEXP bigrational_lte(SEXP a, SEXP b);
-    
+
   /**
    * \brief Return whether a >= b
    */
   SEXP bigrational_gte(SEXP a, SEXP b);
-    
+
   /**
    * \brief Return whether a == b
    */
   SEXP bigrational_eq(SEXP a, SEXP b);
-    
+
   /**
    * \brief Return whether a != b
    */
@@ -128,7 +139,7 @@ extern "C"
   SEXP bigrational_c(SEXP args) ;
 
   /** \brief for function cbind
-   */ 
+   */
   SEXP bigrational_cbind(SEXP args) ;
   /**
    * \brief Create vector as n times x
@@ -165,7 +176,7 @@ extern "C"
 
 
 /**
- * \brief set of function usefull for manipulation of SEXP and bigvec_q
+ * \brief set of function useful for manipulation of SEXP and bigvec_q
  *
  */
 namespace bigrationalR{
@@ -175,14 +186,18 @@ namespace bigrationalR{
   bigvec_q create_bignum(SEXP param);
 
   SEXP create_SEXP(const bigvec_q & v);
-  
-  SEXP bigrational_binary_operation(SEXP a, SEXP b, bigrational_binary_fn f);
 
+  SEXP bigrational_binary_operation        (SEXP a, SEXP b, bigrational_binary_fn f);
+  SEXP bigrational_bigz_binary_operation   (SEXP a, SEXP b, bigrational_bigz_binary_fn f);
   SEXP bigrational_logical_binary_operation(SEXP a, SEXP b, bigrational_logical_binary_fn f);
 
   typedef void (*gmpq_binary)(mpq_t, const mpq_t, const mpq_t);
+  typedef void (*gmp_qz_binary)(mpq_t, const mpq_t, const mpz_t);
 
-  bigrational create_bigrational(const bigrational& lhs, const bigrational& rhs, gmpq_binary f,  bool zeroRhsAllowed = true);
+  bigrational create_bigrational(const bigrational& lhs, const bigrational& rhs, gmpq_binary f,
+				 bool zeroRhsAllowed = true);
+  bigrational create_bigrational_z(const bigrational& lhs, const biginteger& rhs, gmp_qz_binary f,
+				   bool zeroRhsAllowed = true);
 
   bool lt(const bigrational& lhs, const bigrational& rhs);
 
@@ -196,7 +211,8 @@ namespace bigrationalR{
 
   bool neq(const bigrational& lhs, const bigrational& rhs);
 
-
+  //  x ^ y  (for biginteger y):
+  void mpqz_pow(mpq_t result, const mpq_t x, const mpz_t y);
 }
 
 

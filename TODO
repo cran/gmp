@@ -1,10 +1,25 @@
 * Bug Fixes								-*-org-*-
 
-***  chooseZ() is *not* vectorized; neither factorialZ(), fibnum(), etc
 
-***  as.bigz(1:4) + as.bigq(7)  fails
+** Not working Arithmetic
+***  as.bigz(1:4) + as.bigq(7) fails
 
-***  <bigq> ^ 2  fails
+***  bigz  %% und %/%  fail with "division by zero"
+     whereas the numeric/integer version of these work fine, returning NA;
+     see matOuter() and eqA[] in tests/arith-ex.R
+***  bigq  %% and %/%  are not even defined (but are for 'numeric')!
+
+** Miscellaneous
+
+
+* Vectorization; other "desiderata"
+***  fibnum(), etc are not vectorized -- learn from chooseZ() !
+
+** allow  +/- Inf "bigq" ?? --  +Inf :=: 1/0   -Inf :=:  (-1)/0
+   This would allow the bigq (and bigz) arithmetic to be closer to the
+   other R arithmetic rules.
+   Currently we get "division by 0" instead... not really desirably in
+   quite some cases.
 
 
 * Matrix things
@@ -41,9 +56,13 @@
 
 *** provide binary-to-biginteger interface with bitwise operations (i.e., bit access to big integers)
 
+*** Create pochZ() for the Pochhammer symbol to complement  chooseZ()
+    the same as pochMpfr() in "Rmpfr" complements chooseMpfr()
+
 * Systematic Testing
 
 *** Arithmetic, Comparison, etc: ensure pairwise compatibility <bigz>, <bigq>, <numeric>
 
-*** tests/gmp-test.R: contains Antoine's previous test suite,
+*** tests/gmp-test.R: contains Antoine's previous test suite;
+    should add more tests about *correct* result.
 

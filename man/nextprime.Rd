@@ -1,34 +1,37 @@
 \name{nextprime}
 \alias{nextprime}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{Next prime number}
+\title{Next Prime Number}
 \description{
-Return next prime number geater than n
+  Return the next prime number, say \eqn{p}, with \eqn{p \ge n}{p >= n}.
 }
 \usage{
 nextprime(n)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{n}{Integer}
 }
 \details{
   This function uses probabilistic algorithm to identify
-  primes. For practical purposes, it's adequat, the chance
-  of a composit passing will be extremely small.
+  primes.  For practical purposes, it is adequate, the chance
+  of a composite passing will be extremely small.
 }
 \value{
-  A (probably) prime  number
+  A (probably) prime number
 }
 \references{The GNU MP Library, see \url{http://gmplib.org}}
 
 \author{Antoine Lucas}
 
-
-\seealso{\code{\link{isprime}}}
+\seealso{
+  \code{\link{isprime}} and its references and examples.
+}
 \examples{
 nextprime(14)
+## still very fast:
+(p <- nextprime(1e7))
+## to be really sure { isprime()  gives "probably prime" } :
+stopifnot(identical(p, factorize(p)))
 }
-\keyword{arith}% at least one, from doc/KEYWORDS
+\keyword{arith}
 
 

@@ -19,7 +19,7 @@ typedef void (*gmp_binary)(mpz_t, const mpz_t, const mpz_t);
 
 
 /**
- * \brief calss for bigmod values. Represent any integer in Z/nZ
+ * \brief class for bigmod values. Represent any integer in Z/nZ
  *
  * Represents two biginteger: a value and a modulus. These both are used
  * to operate arithmetic functions on it. If the modulus is NA, no modulus
@@ -34,15 +34,15 @@ class bigmod {
 
   /** \brief creator
    */
-  bigmod(const biginteger& value_ = biginteger(), 
-	 const biginteger& modulus_ = biginteger()) : 
+  bigmod(const biginteger& value_ = biginteger(),
+	 const biginteger& modulus_ = biginteger()) :
     value(value_),modulus(modulus_) {}
 
   /** \brief copy operator  */
   bigmod(const bigmod & rhs) :
     value(rhs.value),
     modulus(rhs.modulus){}
-    
+
   /**
    * \brief  Return as a human readible string
    */
@@ -108,7 +108,7 @@ bigmod operator/(const bigmod& rhs, const bigmod& lhs);
 /**
  * \brief Calculate the modulus (remainder) of two bigmods.
  *
- * The resulting bigmod will have set the intern modulus to 
+ * The resulting bigmod will have set the intern modulus to
  * the value of lhs, no matter what rhs.modulus or lhs.modulus
  * was before, except if rhs and lhs has both no modulus set,
  * in which case the resulting modulus will be unset too.
@@ -118,8 +118,8 @@ bigmod operator%(const bigmod& rhs, const bigmod& lhs);
 /**
  * \brief Return the power of "exp" to the base of "base" (return = base^exp).
  *
- * If both moduli are unset or unequal, this may EAT your memory alive, 
- * since then the infinite "pow" is used instead of the modulus "powm". 
+ * If both moduli are unset or unequal, this may EAT your memory alive,
+ * since then the infinite "pow" is used instead of the modulus "powm".
  * You  may not try to pow a value this way with an exponent that does
  * not fit into a long value.
  *
@@ -159,7 +159,7 @@ bigmod gcd(const bigmod& rhs, const bigmod& lhs);
 bigmod lcm(const bigmod& rhs, const bigmod& lhs);
 
 /**
- * \brief function used to make any binary operation between 
+ * \brief function used to make any binary operation between
  * two bigmod that return a bigmod (addition substraction... )
  */
 bigmod create_bigmod(const bigmod& lhs, const bigmod& rhs, gmp_binary f,
