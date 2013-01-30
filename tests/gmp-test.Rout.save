@@ -20,7 +20,7 @@ Type 'q()' to quit R.
 
 Attaching package: 'gmp'
 
-The following object(s) are masked from 'package:base':
+The following object is masked from 'package:base':
 
     %*%, apply, crossprod, matrix, tcrossprod
 

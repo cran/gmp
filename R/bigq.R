@@ -64,16 +64,28 @@ as.double.bigq<- function(x,...) .Call(bigrational_as_numeric, x)
 ## maybe sub-optimal, but at least "R-consistent" in warnings/errors...:
 as.integer.bigq<- function(x,...) as.integer(.Call(bigrational_as_numeric, x))
 
+.bigq2num <- function(x) {
+    r <- .Call(bigrational_as_numeric, x)
+    if(!is.null(d <- dim(x))) dim(r) <- d
+    r
+}
+setMethod("asNumeric", "bigq", .bigq2num)
 
-denominator <- function(x)
-  .Call(bigrational_den,x)
+
+denominator <- function(x) {
+  r <- .Call(bigrational_den,x)
+  if(!is.null(d <- dim(x))) dim(r) <- d
+  r
+}
 
 "denominator<-" <- function(x,value)
   as.bigq(numerator(x),value)
 
-
-numerator <- function(x)
-  .Call(bigrational_num,x)
+numerator <- function(x) {
+    r <- .Call(bigrational_num,x)
+    if(!is.null(d <- dim(x))) dim(r) <- d
+    r
+}
 
 "numerator<-" <- function(x,value)
   as.bigq(value,denominator(x))

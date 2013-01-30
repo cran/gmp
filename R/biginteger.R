@@ -2,6 +2,11 @@
 if(getRversion() < "2.15")
     paste0 <- function(...) paste(..., sep = '')
 
+setGeneric("asNumeric", function(x) {
+    if(is.numeric(x)) x else if(is.atomic(x)) {
+        storage.mode(x) <- "numeric"; x }
+    else as(x, "numeric")
+})
 
 #----------------------------------------------------------
 #
@@ -109,6 +114,14 @@ formatN.default <- function(x, ...) format(x, ...)
 
 as.double.bigz  <- function(x,...) .Call(biginteger_as_numeric, x)
 as.integer.bigz <- function(x,...) .Call(biginteger_as_integer, x)
+
+.bigz2num <- function(x) {
+    r <- .Call(biginteger_as_numeric, x)
+    if(!is.null(d <- dim(x))) dim(r) <- d
+    r
+}
+setMethod("asNumeric", "bigz", .bigz2num)
+
 
 length.bigz <- function(x) .Call(biginteger_length, x)
 

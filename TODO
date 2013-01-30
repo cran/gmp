@@ -31,8 +31,9 @@
 ***  also want different  M[1,] and M[1] for big[zq] matrices
 
 ***  as.matrix(as.bigq(1:4)),  as.matrix(as.bigz(1:4)) both fail:
-   MM: I'd want   as.matrix(<big* matrix>) to convert *back* to
-   double/integer matrix, as we have no other convenient way for that yet.
+**** Now have asNumeric() ... we can *well* reconsider the following:
+**** MM: I'd want   as.matrix(<big* matrix>) to convert *back* to
+double/integer matrix, as we have no other convenient way for that yet.
 
 ***  abs(.) or sign(<big..matrix>) {and probably many others!}
      return vector instead of matrix, i.e.., lose the "nrow" attribute.
@@ -46,9 +47,15 @@
    We could have an option() .. to suppress the initial line. Fine for
    bigq, but not for bigz
 
+*** frexpZ(z) is sufficient; want faster simpler sizeinbase()
+  i.e.  sizeinbase(x, base)  returning the number "digits" in base 'base'.
+  Notably  sizeinbase(z, 2)  would directly give frexpZ(z)$exp  (minus 1 ?),
+  and could be used in Rmpfr's getPrec() for  bigz -> mpfr conversion.
+
 ***  provide more functions for bigintegers, such as
    sort, order ...
 
+***  Bernoulli() {-> Rmpfr / copula } should return a  "bigq"
 *** more matrix and linear algebra computation functions (SVD, eigen values,
     determinant).
 

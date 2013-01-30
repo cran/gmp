@@ -197,6 +197,9 @@ S3method(solve,bigz)
 S3method(t,bigq)
 S3method(t,bigz)
 
+## S4 generic .. also imported in Rmpfr
+export(asNumeric)
+exportMethods(asNumeric)
 
 ## unfortunately, using S4 methods and setOldClass("bigz") is not enough
 ## exportMethods("%*%", "crossprod", "tcrossprod")#-> also exports generics, for R >= 2.15.0

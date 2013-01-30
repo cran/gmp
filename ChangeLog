@@ -1,3 +1,7 @@
+2013-02-03  Antoine Lucas + Martin Maechler
+	* man/sizeinbase.Rd updated
+	* new function asNumeric()
+	
 2012-05-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/bigrational.cc (^): Q^n  and Z^n now also work for negative

@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04
- *  \date Last modified: $Id: bigintegerR.cc,v 1.32 2012-05-07 21:17:40 mmaechler Exp $
+ *  \date Last modified: $Id: bigintegerR.cc,v 1.33 2012-07-07 09:41:29 mmaechler Exp $
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
@@ -1218,6 +1218,10 @@ SEXP biginteger_powm(SEXP x, SEXP y, SEXP n)
   return bigintegerR::create_SEXP(result);
 } // ..._powm()
 
+
+// TODO:  A version that only returns  'ex'  {i.e. the binary precision}
+// ----   GMP manual suggests that     size_t mpz_sizeinbase (mpz_t OP, int BASE)
+//        i.e.,  mpz_sizeinbase (OP, 2)  would give that
 
 // (d, ex) where  x = d * 2^ex, and  0.5 <= |d| < 1
 SEXP bigI_frexp(SEXP x)

@@ -3,7 +3,11 @@
 
 \title{Compute size of a bigz in a base}
 \description{
-  Return size (number of digits) written in base b.
+ Return an approximation to the number of
+ character the integer X would have printed in base b.  The
+ approximation is never too small. 
+
+ In case of powers of 2, function gives exact result.
 }
 \usage{
 sizeinbase(a, b=10)

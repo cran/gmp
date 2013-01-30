@@ -60,9 +60,8 @@ t.bigz <- function(x) .Call(bigint_transposeR, x)
 ##}
 
 
-.dimZQ <- function(x) {
-    n <- attr(x,"nrow")
-    c(n, length(x)/n)
+.dimZQ <- function(x) {# return NULL for non-array {as standard R}
+    if(is.null(n <- attr(x,"nrow"))) n else c(n, if(n) length(x)/n else 0L)
 }
 
 .dimsetZQ <- function(x,value)
@@ -72,14 +71,15 @@ t.bigz <- function(x) .Call(bigint_transposeR, x)
   x
 }
 .nrowZQ <- function(x) attr(x,"nrow")
-## MM: what about 0-row matrices --> ncol(.) gives NaN  ---> proof that we should store 'dim', not 'nrow'
-.ncolZQ <- function(x) length(x)/attr(x,"nrow")
+.ncolZQ <- function(x) if(is.null(n <- attr(x,"nrow"))) n else if(n) length(x)/n else 0L
 
 dim.bigz <- .dimZQ
 dim.bigq <- .dimZQ
 `dim<-.bigz` <- .dimsetZQ
 `dim<-.bigq` <- .dimsetZQ
 
+## not usable as S3, as long as  ncol(), nrow() are not S3 generic
+## FIXME? remove these ... ncol() / nrow() go via dim() anyway!
 nrow.bigz <- .nrowZQ
 nrow.bigq <- .nrowZQ
 ncol.bigz <- .ncolZQ

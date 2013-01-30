@@ -574,7 +574,7 @@ EOF
 
 else
   echo "$ac_t""no" 1>&6
-{ echo "configure: error: GNU MP not found, or not 4.1.4 or up, see http://swox.com.gmp" 1>&2; exit 1; }
+{ echo "configure: error: GNU MP not found, or not 4.1.4 or up, see http://gmplib.org" 1>&2; exit 1; }
 fi
 
 
