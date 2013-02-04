@@ -2,7 +2,7 @@
 if(getRversion() < "2.15")
     paste0 <- function(...) paste(..., sep = '')
 
-setGeneric("asNumeric", function(x) {
+setGeneric("asNumeric", useAsDefault = function(x) {
     if(is.numeric(x)) x else if(is.atomic(x)) {
         storage.mode(x) <- "numeric"; x }
     else as(x, "numeric")

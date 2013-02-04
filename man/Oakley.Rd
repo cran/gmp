@@ -2,7 +2,7 @@
 \alias{Oakley}
 \alias{Oakley1}
 \alias{Oakley2}
-\title{RFC 2409 Oakley Groups - Standardized Parameters for Diffie-Hellman Key Exchange}
+\title{RFC 2409 Oakley Groups - Parameters for Diffie-Hellman Key Exchange}
 \description{
   RFC 2409 standardizes global unique prime numbers and generators for
   the purpose of secure asymmetric key exchange on the Internet.
@@ -19,6 +19,8 @@ Oakley2
 \references{The Internet Key Exchange (RFC 2409), Nov. 1998}
 
 \examples{
+packageDescription("gmp") # {possibly useful for debugging}
+
 data(Oakley1)
 (M1 <- modulus(Oakley1))
 isprime(M1)# '1' : "probably prime"

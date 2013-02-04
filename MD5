@@ -1,9 +1,9 @@
 ce4a3668c9b84c4410d772c1c9799e3b *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-b8b98de42adba5e979392c4d8522915b *DESCRIPTION
+4a9d8a5520be4e2aeb08b48291fb64c5 *DESCRIPTION
 213bb431c50505410bdd88ab43ee2f58 *NAMESPACE
 d5b7cae90ea3d09107b11f8a93a00068 *R/Stirling-n-etc.R
-806e6cab10758a6f8bb802009f1239fa *R/biginteger.R
+0cee7450c5aff67f085078dca1f1e1b4 *R/biginteger.R
 3cfd29ec6c589c8c52d8d2c9155f0737 *R/bigq.R
 4f93a5bd2e13ca09e045ab5f3550177c *R/matrix-prods.R
 2c7495336543f717597dd04a6b6cb37e *R/matrixq.R
@@ -30,7 +30,7 @@ c451121b4c0164e72b43da5edde67dac *inst/doc/doxygen.png
 154321fbc762c42cb80f08347fac8171 *inst/doc/functions.html
 fb1d314245c83ae4ca85d145f0b13bdf *inst/doc/globals.html
 a744dfd76f01c846225f7832d47fbda3 *inst/doc/index.html
-b35ce838e65de2517d8d368ce37093cd *man/Oakley.Rd
+4903eba4dbd6eb0e283fd131a37b7512 *man/Oakley.Rd
 e51c494bb4f3b9dd17b1c71f119534c5 *man/Stirling.Rd
 1d6b1c2831e9097d412fc191be6c9a0e *man/add.biginteger.Rd
 c67bdf971595c0339917ebe3c37f101b *man/apply.Rd
