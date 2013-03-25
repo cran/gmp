@@ -1,6 +1,7 @@
 \name{bigq}
 \alias{bigq}
 \alias{as.bigq}
+\alias{is.bigq}
 \alias{as.character.bigq}
 \alias{as.double.bigq}
 \alias{print.bigq}
@@ -19,6 +20,7 @@ as.bigq(n, d = 1)
 \S3method{as.character}{bigq}(x, b=10,...)
 \S3method{as.double}{bigq}(x,...)
 as.bigz.bigq(a, mod=NA)
+is.bigq(x)
 \S3method{is.na}{bigq}(x)
 \S3method{print}{bigq}(x, quote=FALSE, initLine = TRUE, ...)
 denominator(x)
@@ -33,7 +35,7 @@ numerator(x)
     \code{n} stands for numerator, \code{d} for denominator}
   \item{a}{an element of class \code{"bigq"}}
   \item{mod}{optional modulus to convert into biginteger}
-  \item{x}{numeric value}
+  \item{x}{a \dQuote{rational number} (vector), of class \code{"bigq"}.}
   \item{b}{base: from 2 to 36}
   \item{...}{additional arguments passed to methods}
   \item{quote}{(for printing:) logical indicating if the numbers
@@ -75,7 +77,8 @@ x * y / 13
 
 # and, since May 2012,
 x ^ 20
-stopifnot(x ^ 20 == as.bigz(7)^20 / 2^20)
+stopifnot(is.bigq(x), is.bigq(x + y),
+	  x ^ 20 == as.bigz(7)^20 / 2^20)
 
 # convert to string, double
 as.character(x)
@@ -83,5 +86,3 @@ as.double(x)
 }
 
 \keyword{arith}
-%\keyword{bigz}
-

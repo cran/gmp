@@ -1,3 +1,6 @@
+is.bigz <- function(x) is.raw(x) && inherits(x, "bigz")
+is.bigq <- function(x) is.raw(x) && inherits(x, "bigq")
+
 ## Auxiliaries:
 if(getRversion() < "2.15")
     paste0 <- function(...) paste(..., sep = '')
@@ -261,8 +264,28 @@ c.bigz <- function(..., recursive = FALSE)
     .Call(biginteger_c, list(...))
 }
 
-rep.bigz <- function(x,times,...)
-    .Call(biginteger_rep, x, times)
+## This is practically identical to  grid :: rep.unit :
+rep.bigz <- function(x, times=1, length.out=NA, each=1, ...) {
+    ## if (length(x) == 0)
+    ##	   stop("invalid 'unit' object")
+    if(!missing(times) && missing(length.out) && missing(each))
+        .Call(biginteger_rep, x, times)
+    else {
+	## Determine an appropriate index, then call subsetting code
+	x[ rep(seq_along(x), times=times, length.out=length.out, each=each) ]
+    }
+}
+
+duplicated.bigz <- function(x, incomparables = FALSE, ...) {
+    x <- as.character(x) # lazy and inefficient --> TODO in C++
+    NextMethod("duplicated", x)
+}
+
+unique.bigz <- function(x, incomparables = FALSE, ...)
+    x[!duplicated(x, incomparables, ...)]
+
+all.equal.bigz <- function(target, current, ...)
+    if(all(target == current)) TRUE else "'target'(bigz) and 'current' differ"
 
 # Isprime, return:
 #   0 if not prime
@@ -304,10 +327,6 @@ lucnum  <- function(n) .Call(bigI_lucnum,  n)
 lucnum2 <- function(n) .Call(bigI_lucnum2, n)
 
 factorize <- function(n) .Call(factorR, as.bigz(n))
-
-## overload as.vector
-as.vector.bigz <- function(x,mode="any")
-  return(x)
 
 solve.bigz <- function(a, b,...)
   {

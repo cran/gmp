@@ -1,7 +1,28 @@
+2013-02-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/biginteger.R (duplicated.bigz, unique.bigz, all.equal.bigz):
+	new (cheap imp.).
+
+	* R/bigq.R (duplicated.bigq, unique.bigq, all.equal.bigq, mean.bigq):
+	new (cheap imp.)
+
+	* R/biginteger.R (rep.bigz): and
+	* R/bigq.R (rep.bigq): allow ('length.out' and 'each') arguments
+
+2013-02-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/bigrationalR.cc (bigrational_num): numerator(<NA>)
+
+	* R/matrixz.R (.dimsetZQ): dim(.) <- NULL  now works
+
+2013-02-04  Martin Maechler
+
+	* DESCRIPTION (Version): 0.5-4   (0.5-3 failed in R 2.14.2)
+
 2013-02-03  Antoine Lucas + Martin Maechler
 	* man/sizeinbase.Rd updated
 	* new function asNumeric()
-	
+
 2012-05-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* src/bigrational.cc (^): Q^n  and Z^n now also work for negative

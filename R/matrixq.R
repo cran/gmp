@@ -10,7 +10,7 @@ matrix.bigq <- function(data=NA,nrow=1, ncol=1, byrow=FALSE,
 
 
 as.matrix.bigq <- function(x, ...) {
-    if(is.matrix(x) || is.data.frame(x) || inherits(x, "bigq")) {
+    if(is.matrix(x) || is.data.frame(x) || length(dim(x)) == 2L) {
 	d <- dim(x)
 	n <- d[1L]
 	p <- d[2L]
@@ -22,8 +22,13 @@ as.matrix.bigq <- function(x, ...) {
 }
 
 as.vector.bigq <- function(x, mode="any") {
-    attr(x,"nrow") <- NULL
-    x
+    if(mode == "list") {
+	## "easy"; TODO: gmpToListQ()  withOUT matrix
+	.Call(gmpMatToListQ, matrix.bigq(x, nrow=length(x), ncol=1L), 1L)
+    } else if (mode == "any") {
+	attr(x,"nrow") <- NULL
+	x
+    } else as.vector(as.double(x), mode=mode)
 }
 
 

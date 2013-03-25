@@ -1,4 +1,5 @@
-\name{Extract}
+\name{extract}
+\title{Extract or Replace Parts of an Object}
 
 \alias{[.bigz}
 \alias{[<-.bigz}
@@ -12,25 +13,36 @@
 \alias{[<-.bigq}
 \alias{[[.bigq}
 \alias{[[<-.bigq}
+
 \alias{c.bigq}
 \alias{rep.bigq}
 \alias{length.bigq}
 \alias{length<-.bigq}
-\title{Extract or Replace Parts of an Object}
+
 \description{
   Operators acting on vectors, arrays and lists to extract or replace subsets.
 }
 \usage{
-\method{c}{bigz}(..., recursive = FALSE)
-\method{c}{bigq}(..., recursive = FALSE)
-\method{rep}{bigz}(x,times, ...)
-\method{rep}{bigq}(x,times, ...)
-}
+\method{[}{bigz}(x, i=NULL, j=NULL, drop = TRUE)
+\method{[}{bigq}(x, i=NULL, j=NULL, drop = TRUE)
 
+##_______ In the following, only the bigq method is mentioned: ______
+%%FIXME: R-Rd bug in "rendering" this  ( '[' is ok )
+%%FIXME \method{[<-}{bigq}(x, i=NULL, j=NULL, value)    ==> "the same", manually :
+%% x[i, j] <- value   | But this gives  ... WARNING .. Objects in \usage w/o \alias
+\method{c}{bigq}(\dots, recursive = FALSE)
+\method{rep}{bigq}(x, times=1, length.out=NA, each=1, \dots)
+}
 \arguments{
   \item{x}{\R object of class \code{"bigz"} or \code{"bigq"}, respectively.}
-  \item{...}{further arguments, notably for \code{c()}.}
-  \item{times}{integer}
+  \item{\dots}{further arguments, notably for \code{c()}.}
+  \item{i,j}{indices, see standard \R subsetting and subassignment.}
+  \item{drop}{logical, unused here.}
+%%FIXME \item{value}{\R object, typically of same \code{\link{class}} as
+%%FIXME   \code{x}, or also \code{\link{numeric}}.}
+  \item{times, length.out, each}{integer; typically only \emph{one} is
+    specified; for more see \code{\link{rep}} (standard \R, package \pkg{base}).
+  }
   \item{recursive}{unused here}
 }
 

@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 12/12/04
- *  \date Last modified: $Id: bigrationalR.cc,v 1.20 2012-05-07 21:17:40 mmaechler Exp $
+ *  \date Last modified: $Id: bigrationalR.cc,v 1.22 2013-03-25 10:57:04 mmaechler Exp $
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
@@ -32,6 +32,8 @@ namespace bigrationalR
    */
   bigvec_q create_vector(SEXP param) {
     switch (TYPEOF(param)) {
+    case NILSXP:
+	return bigvec_q(); // = bigq(0)
     case RAWSXP:
       {
 	// deserialise the vector. first int is the size.
@@ -79,8 +81,8 @@ namespace bigrationalR
       }
     default:
       {
-	/* vector of size 0 */
-	return bigvec_q();
+	// no longer: can be fatal later! /* vector of size 0 */ return bigvec_q();
+	error(_("only logical, numeric or character (atomic) vectors can be coerced to 'bigq'"));
       }
     }
   }
@@ -463,6 +465,13 @@ SEXP bigrational_set_at(SEXP src, SEXP idx, SEXP value)
   bigvec_q vvalue = bigrationalR::create_bignum(value);
   vector<int> vidx = bigintegerR::create_int(idx);
   int pos = 0;
+
+  if(vvalue.size() == 0) {
+      if(result.size() == 0)
+	  return bigrationalR::create_SEXP(result);
+      else
+	  error(_("replacement has length zero"));
+  }
   if (TYPEOF(idx) == LGLSXP) {
     for (i = 0; i < (int)result.size(); ++i)
       if (vidx[i%vidx.size()])
@@ -529,8 +538,10 @@ SEXP bigrational_num(SEXP a)
   result.resize(v.size());
 
   for (unsigned int i = 0; i < v.size(); ++i) {
-    mpq_get_num(z_tmp,v.value[i].getValueTemp());
-    result.value[i].setValue(z_tmp);
+    if(!v.value[i].isNA()) {
+      mpq_get_num(z_tmp,v.value[i].getValueTemp());
+      result.value[i].setValue(z_tmp);
+    } // else: uninitialized, i.e., NA
   }
   mpz_clear(z_tmp);
   return bigintegerR::create_SEXP(result);

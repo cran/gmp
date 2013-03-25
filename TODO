@@ -1,15 +1,61 @@
 * Bug Fixes								-*-org-*-
 
+** URGENT / BAD : Segfaults, Wrong Results, etc
 
-** Not working Arithmetic
-***  as.bigz(1:4) + as.bigq(7) fails
+** Not working  Arithmetic
 
-***  bigz  %% und %/%  fail with "division by zero"
+***  as.bigz(1:4) + as.bigq(7) fails, so does '*', '/', etc
+
+ --> use S4 setMethod() on *group* 'Arith' as in ~/R/Pkgs/Rmpfr/R/Arith.R
+  --> "done" in R/mixed-ops.R.~experi~
+ BUT tried and gave up  <bigz> o <bigq> for now:
+ To use S4 method, would need S4 (or setOldClass) class.
+ See  ~/R/MM/MISC/S4-dispatch-on-S3.R :
+ Also the setOldClass(.) only correctly dispatches when objects are created by
+ new("big*") ---> would need to do this not only in as.bigz(), as.bigq(),
+ but more importantly from C++ create_SEXP()
+    -->  create_SEXP(const bigvec& v)  in ~/R/Pkgs/gmp/src/bigintegerR.cc ,
+    where currently simply the class attribute is set
+
+
+
+***  bigz  %% and %/%  fail with "division by zero"
      whereas the numeric/integer version of these work fine, returning NA;
      see matOuter() and eqA[] in tests/arith-ex.R
 ***  bigq  %% and %/%  are not even defined (but are for 'numeric')!
 
+
 ** Miscellaneous
+
+* gmp <--> Rmpfr:
+
+*** Z <- as.bigz(1:7);  Z[1] <- mpfr(1, 20)  now gives an error {did segfault!};
+but later, *with* Rmpfr we should make Z into an 'mpfr'.
+This is completely analogous to
+ I <- 1:7    ;typeof(I) #  "integer"
+ I[1] <- 1.0 ;typeof(I) #  "double" (aka "numeric")
+ I[1] <- 1i  ;typeof(I) #  "complex"
+
+**** Want *in addition*:  "coercion" from mpfr() to bigz / bigq:
+
+   Solution: Work via GMP's  mpf_t:
+       A. mpfr --> mpf --> mpq  (exact for Q)       -- see below
+       B. mpfr      -->    mpz  (or round() for Z)  -- via  mpfr_get_z(mpz_t ROP, mpfr_t OP, mpfr_rnd_t RND)
+
+     for A) MPFR: int mpfr_get_f (mpf_t ROP, mpfr_t OP, mpfr_rnd_t RND)
+            GMP:  void mpq_set_f (mpq_t ROP, mpf_t OP): Set ROP to the value of OP... conversion is exact.
+
+   BTW: The other direction is via
+      int mpfr_set_z (mpfr_t ROP, mpz_t OP, mpfr_rnd_t RND)
+      int mpfr_set_q (mpfr_t ROP, mpq_t OP, mpfr_rnd_t RND)
+      int mpfr_set_f (mpfr_t ROP, mpf_t OP, mpfr_rnd_t RND)
+
+
+   NB:  also
+   2) provide corresponding  as(<mpfr>, "bigz") and as(<mpfr>, "bigq")
+   3) *and* (careful; these are in R pkg gmp; all the above is in Rmpfr):
+      enhance as.bigz()  and as.bigq() to  work for this case !
+
 
 
 * Vectorization; other "desiderata"
@@ -20,7 +66,14 @@
    other R arithmetic rules.
    Currently we get "division by 0" instead... not really desirably in
    quite some cases.
+*** 2013-03: Currently  as.bigz(Inf) now gives 2^8000 *very* arbitrarily;
+      this allows    <bigz>  <=  Inf   to give something better than  NA,
+    *but* does not work the same with <bigq>;
+    there, the   +- Inf :=  ( +-1 / 0 )   would seem more sensible.
+   However:  Clearly found that 'mpq' (GMP library) code does *not* work
+   with  "1/0" rational.
 
+   One possibility:  Using   +- <LARGE>/1  for "bigq", as   +- <LARGE> for "bigz"
 
 * Matrix things
 
@@ -28,12 +81,7 @@
 
 ***  x <- as.bigz(2:5); x[1] <- -1; x # --- is a matrix !!!!
 
-***  also want different  M[1,] and M[1] for big[zq] matrices
-
-***  as.matrix(as.bigq(1:4)),  as.matrix(as.bigz(1:4)) both fail:
-**** Now have asNumeric() ... we can *well* reconsider the following:
-**** MM: I'd want   as.matrix(<big* matrix>) to convert *back* to
-double/integer matrix, as we have no other convenient way for that yet.
+***  also want *different*  M[1,] and M[1] for big[zq] matrices
 
 ***  abs(.) or sign(<big..matrix>) {and probably many others!}
      return vector instead of matrix, i.e.., lose the "nrow" attribute.
@@ -52,10 +100,10 @@ double/integer matrix, as we have no other convenient way for that yet.
   Notably  sizeinbase(z, 2)  would directly give frexpZ(z)$exp  (minus 1 ?),
   and could be used in Rmpfr's getPrec() for  bigz -> mpfr conversion.
 
-***  provide more functions for bigintegers, such as
-   sort, order ...
+*** provide more functions for bigintegers & bigrationals, such as
+   sort, order, xtfrm, rank {-> quantile(), median() !};  mean() !! [-> bigq !]
 
-***  Bernoulli() {-> Rmpfr / copula } should return a  "bigq"
+*** Bernoulli() {-> Rmpfr / copula } should return a  "bigq"
 *** more matrix and linear algebra computation functions (SVD, eigen values,
     determinant).
 

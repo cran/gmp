@@ -25,7 +25,8 @@ asNumeric(x)
     \item{\code{signature(x = "bigq")}}{the method for big rationals.}
     \item{\code{signature(x = "bigq")}}{the method for big integers.}
   }
-  Note that package \pkg{Rmpfr} provides methods for its number-like objects.
+  Note that package \pkg{Rmpfr} provides methods for its own number-like objects.
+  % -->  ~/R/Pkgs/Rmpfr/man/asNumeric-methods.Rd
 }
 %% \details{
 %% %%  ~~ If necessary, more details than the description above ~~

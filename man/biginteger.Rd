@@ -2,6 +2,7 @@
 \title{Large Sized Integer Values}
 \alias{bigz}
 \alias{as.bigz}
+\alias{is.bigz}
 \alias{as.character.bigz}
 \alias{as.double.bigz}
 \alias{print.bigz}
@@ -17,6 +18,7 @@
 as.bigz(a, mod = NA)
 \S3method{as.character}{bigz}(x, b = 10, \dots)
 % \S3method{as.double}{bigz}(x,\dots)
+is.bigz(x)
 \S3method{is.na}{bigz}(x)
 \S3method{print}{bigz}(x, quote=FALSE, initLine = is.null(modulus(x)), \dots)
 }
@@ -28,7 +30,7 @@ as.bigz(a, mod = NA)
     binary, \code{0} for octal, or without a \code{0*} prefix for decimal values.
     Formatting errors are signalled as with \code{\link{stop}}.}
   \item{b}{base: from 2 to 36}
-  \item{x}{numeric value}
+  \item{x}{a \dQuote{big integer number} (vector), of class \code{"bigz"}.}
   \item{\dots}{additional arguments passed to methods}
   \item{mod}{an integer, numeric, string or bigz of the internal modulus, see below.}
   \item{quote}{(for printing:) logical indicating if the numbers
@@ -129,7 +131,7 @@ c <- x ^ e ; c ; Rev()
 # similar second way (makes more sense if you reuse e) to do it right
 modulus(e) <- n
 c2 <- x ^ e
-stopifnot(identical(c2, c)) ; Rev()
+stopifnot(identical(c2, c), is.bigz(c2)) ; Rev()
 
 # third way to do it right
 c3 <- x ^ as.bigz(e, n) ; stopifnot(identical(c3, c))
@@ -143,9 +145,6 @@ cc == c
 
 # Return result in hexa
 as.character(c, b=16)
-
 }
 
 \keyword{arith}
-
-

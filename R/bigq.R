@@ -123,6 +123,9 @@ is.whole.bigq <- function(x) .Call(bigrational_is_int, x)
 is.finite.bigq <- function(x) !is.na.bigq(x) # otherwise all are finite
 is.infinite.bigq <- function(x) rep.int(FALSE, length(x))
 
+if(FALSE) ## This does not work: is.atomic is primitive *NON*-generic:
+is.atomic.bigq <- function(x) FALSE # otherwise does return TRUE !
+
 ###  <bigz> o <bigq>  --- really dispatch on two arguments --> use S4
 if(FALSE) { ## not working really --- see also ./matrix-prods.R
 ##                cannot use as.bigz() yet which is only defined in ./bigz.R
@@ -171,7 +174,94 @@ c.bigq <- function(..., recursive = FALSE) {
     .Call(bigrational_c, list(...))
 }
 
-rep.bigq <- function(x,times,...) .Call(bigrational_rep,x,times)
+## This is practically identical to  grid :: rep.unit :
+rep.bigq <- function(x, times=1, length.out=NA, each=1, ...) {
+    ## if (length(x) == 0)
+    ##	   stop("invalid 'unit' object")
+    if(!missing(times) && missing(length.out) && missing(each))
+	.Call(bigrational_rep,x,times)
+    else {
+	## Determine an appropriate index, then call subsetting code
+	x[ rep(seq_along(x), times=times, length.out=length.out, each=each) ]
+    }
+}
+
+duplicated.bigq <- duplicated.bigz ## cheap (for now)
+
+## unique.bigq <- function(x, incomparables = FALSE, ...)
+##     x[!duplicated(x, incomparables=incomparables, ...)]
+unique.bigq <- unique.bigz
+
+##' mean() method needed for all.equal.bigq() below:
+mean.bigq <- function(x, trim = 0, na.rm = FALSE, ...) {
+    if(trim != 0) stop("'trim > 0' is not yet implemented for \"bigq\"")
+    if (na.rm) x <- x[!is.na(x)]
+    sum(x) / length(x)
+}
+
+## Almost:
+## all.equal.bigq <- all.equal.numeric
+## environment(all.equal.bigq) <- environment()# i.e. of 'gmp'  name space
+## but we copy-paste all.equal.numeric  {and slightly modify}:
+all.equal.bigq <-
+    function(target, current, tolerance = .Machine$double.eps ^ .5,
+             scale = NULL, check.attributes = FALSE, check.class=FALSE, ...)
+{
+    msg <- if(check.attributes)
+	attr.all.equal(target, current, tolerance=tolerance, scale=scale, ...)
+    if(check.class && data.class(target) != data.class(current)) {
+	msg <- c(msg, paste0("target is ", data.class(target), ", current is ",
+                             data.class(current)))
+	return(msg)
+    }
+
+    lt <- length(target)
+    lc <- length(current)
+    cplx <- FALSE
+    if(lt != lc) {
+	## *replace* the 'Lengths' msg[] from attr.all.equal():
+	if(!is.null(msg)) msg <- msg[- grep("\\bLengths\\b", msg)]
+	msg <- c(msg, paste0("bigq",
+                             ": lengths (", lt, ", ", lc, ") differ"))
+	return(msg)
+    }
+    ## remove atttributes (remember these are both numeric or complex vectors)
+    ## one place this is needed is to unclass Surv objects in the rpart test suite.
+    target <- as.vector(target)
+    current <- as.vector(current)
+    out <- is.na(target)
+    if(any(out != is.na(current))) {
+	msg <- c(msg, paste("'is.NA' value mismatch:", sum(is.na(current)),
+			    "in current", sum(out), "in target"))
+	return(msg)
+    }
+    out <- out | target == current
+    if(all(out)) { if (is.null(msg)) return(TRUE) else return(msg) }
+
+    target <- target[!out]
+    current <- current[!out]
+    if(is.integer(target) && is.integer(current)) target <- as.double(target)
+    xy <- mean((if(cplx) Mod else abs)(target - current))
+    what <-
+	if(is.null(scale)) {
+	    xn <- mean(abs(target))
+	    if(is.finite(xn) && xn > tolerance) {
+		xy <- xy/xn
+		"relative"
+	    } else "absolute"
+	} else {
+	    xy <- xy/scale
+	    "scaled"
+	}
+
+    if (cplx) what <- paste(what, "Mod") # PR#10575
+    if(is.na(xy) || xy > tolerance)
+        msg <- c(msg, paste("Mean", what, "difference:", format(xy)))
+
+    if(is.null(msg)) TRUE else msg
+}
+
+
 
 solve.bigq <- function(a,b,...)
   {

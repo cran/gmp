@@ -20,7 +20,8 @@ xx <- c(NaN, NA, -Inf, -123:-121, -1:2, 7:8, Inf)
 (x <- c(NA, xx[is.finite(xx)]))
 xI <- as.bigz(x)
 xQ <- as.bigq(xI)
-stopifnot(identical(xI, as.bigz(xQ)))
+stopifnot(identical(xI, as.bigz(xQ)),
+	  identical(numerator(xQ), xI)) # numerator( <NA> )
 
 stopifnot(isEQ(x, as.integer(x)), isEQ(x, xI), isEQ(x, xQ),
 	  identical(xQ, as.bigq(x)),
@@ -41,7 +42,8 @@ stopifnot(factorialZ(0:22) == factorial(0:22))
 
 ## This one does *NOT* distinguish  NA and NaN -- that's wanted here
 EQ1 <- function(x,y) {
-    (abs(x-y) <= 1e-13*(abs(x)+abs(y)) & !(nx <- is.na(x)) & !(ny <- is.na(y))) | (nx & ny)
+    (abs(x-y) <= 1e-13*(abs(x)+abs(y)) & !(nx <- is.na(x)) & !(ny <- is.na(y))) |
+        (nx & ny)
 }
 stopifnot(EQ1(x, xI))
 EQ <- function(x,y) mapply(EQ1, x, y, USE.NAMES=FALSE)

@@ -28,6 +28,7 @@ export(
        "gmpVersion",
        "inv.bigz", ## "inv",
        ## "is.na.bigq", "is.na.bigz",
+       "is.bigz", "is.bigq",
        "isprime", "is.whole",
        "lcm.bigz", "lcm.default",
        ## "length<-.bigq", "length.bigq", "length<-.bigz", "length.bigz",
@@ -107,6 +108,9 @@ S3method(min,bigz)
 S3method(rep,bigz)
 S3method(print,bigz)
 ##S3method(urand,bigz)
+S3method(duplicated,bigz)
+S3method(unique,bigz)
+S3method(all.equal,bigz)
 
 S3method("+",bigq)
 S3method("-",bigq)
@@ -139,6 +143,10 @@ S3method(max,bigq)
 S3method(min,bigq)
 S3method(rep,bigq)
 S3method(print,bigq)
+S3method(duplicated,bigq)
+S3method(unique,bigq)
+S3method(mean,bigq)
+S3method(all.equal,bigq)
 
 ## unfortunately, using S4 methods and setOldClass("bigz") is not enough
 S3method("%*%",default)
@@ -168,7 +176,7 @@ S3method(formatN,double)
 S3method(formatN,bigq)
 S3method(formatN,bigz)
 
-##----'Math'--------most give "non yet implemented":
+##----'Math'--------most give "not yet implemented":
 S3method(Math,bigq)
 S3method(Math,bigz)
 
@@ -203,6 +211,7 @@ exportMethods(asNumeric)
 
 ## unfortunately, using S4 methods and setOldClass("bigz") is not enough
 ## exportMethods("%*%", "crossprod", "tcrossprod")#-> also exports generics, for R >= 2.15.0
+
 
 
 ##importFrom(base,"%*%")

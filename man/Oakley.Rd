@@ -24,7 +24,7 @@ packageDescription("gmp") # {possibly useful for debugging}
 data(Oakley1)
 (M1 <- modulus(Oakley1))
 isprime(M1)# '1' : "probably prime"
-sizeinbase(M1)#  309 digits
+sizeinbase(M1)#  232 digits (was 309 in older version)
 }
 \keyword{data}
 

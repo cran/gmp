@@ -2,19 +2,17 @@
 
 #include "bigrationalR.h"
 
-// for something like x = A[indi, indj]
+// for something like x = A[indi, indj], but also simply  A[ind]
 SEXP matrix_get_at_q(SEXP A,SEXP INDI, SEXP INDJ)
 {
-
   bigvec_q mat = bigrationalR::create_bignum(A);
 
   return(bigrationalR::create_SEXP(extract_gmp_R::get_at( mat,INDI,INDJ)));
 }
 
-// for something like x = A[indi, indj], but also simply  a[ind]
+// for something like x = A[indi, indj], but also simply  A[ind]
 SEXP matrix_get_at_z(SEXP A,SEXP INDI, SEXP INDJ)
 {
-
   bigvec mat = bigintegerR::create_bignum(A);
   bigvec mat2 = extract_gmp_R::get_at( mat,INDI,INDJ);
 
@@ -59,13 +57,12 @@ SEXP matrix_get_at_z(SEXP A,SEXP INDI, SEXP INDJ)
 
 
 // for something like A[indi, indj] <- val
-SEXP matrix_set_at_z(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
+SEXP matrix_set_at_z(SEXP A, SEXP VAL, SEXP INDI, SEXP INDJ)
 {
-
   bigvec mat = bigintegerR::create_bignum(A);
 
-  if(TYPEOF(INDI) != LGLSXP )
-    {
+  if(TYPEOF(INDI) != LGLSXP ) {
+      if(!length(INDI)) return(A);
       std::vector<int> vidx = bigintegerR::create_int(INDI);
       for(std::vector<int>::const_iterator it = vidx.begin();
 	  it != vidx.end();
@@ -84,8 +81,8 @@ SEXP matrix_set_at_q(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
 {
   bigvec_q mat = bigrationalR::create_bignum(A);
 
-  if(TYPEOF(INDI) != LGLSXP )
-    {
+  if(TYPEOF(INDI) != LGLSXP ) {
+      if(!length(INDI)) return(A);
       std::vector<int> vidx = bigintegerR::create_int(INDI);
       for(std::vector<int>::const_iterator it = vidx.begin();
 	  it != vidx.end();

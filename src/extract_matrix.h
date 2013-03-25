@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 25/06/11
- *  \date Last modified: Time-stamp: <2008-02-27 21:04:52 antoine>
+ *  \date Modifications: see cvs log
  *
  *  \author A. Lucas
  *
@@ -74,10 +74,9 @@ namespace extract_gmp_R
     // case: vector
     if(A.nrow < 0)
       A.nrow = A.size();
-
-    // check that size is a multiple of row
-    if((A.size() / A.nrow) != static_cast<float>(A.size()) / static_cast<float>(A.nrow))
-      Rf_error("malformed matrix");
+    else // check that size is a multiple of row
+	if((A.size() / A.nrow) != static_cast<float>(A.size()) / static_cast<float>(A.nrow))
+	    Rf_error("malformed matrix");
 
     retour.resize(A.size() / A.nrow);
     for(i = 0; i < retour.size();  ++i)
@@ -118,18 +117,15 @@ namespace extract_gmp_R
   template <class T> T get_at (T & A, SEXP& INDI, SEXP& INDJ)
   {
 
-    // result = A[indii,indj]
+    // result = A[indi,indj]
     int oldnrow = A.nrow;
-
-    std::vector<int> indJ = bigintegerR::create_int(INDJ);
+    std::vector<int> indJ;
 
     typename std::vector<T*> matricetmp ;
     typename std::vector<T*> matricetmp2;
 
     toVecVec(A,matricetmp);
-    typename std::vector<T*> copyAdress( matricetmp);
-
-
+    typename std::vector<T*> copyAdress(matricetmp);
 
     // only pointers
     typename std::vector<T*> * matrice = &matricetmp;
@@ -150,10 +146,10 @@ namespace extract_gmp_R
 	return(retour);
       }
 
-    if(TYPEOF(INDJ) != NILSXP)
-      {
-      //LOCICAL
-      if (TYPEOF(INDJ) == LGLSXP)
+    if(TYPEOF(INDJ) != NILSXP) {
+      indJ = bigintegerR::create_int(INDJ);
+
+      if (TYPEOF(INDJ) == LGLSXP) // LOGICAL
 	{
 
 	  // for all columns
@@ -172,7 +168,8 @@ namespace extract_gmp_R
 	}
       else //INDJ: numbers
 	{
-	  std::remove(indJ.begin(), indJ.end(), 0) ; // remove all zeroes
+	  indJ.erase(std::remove(indJ.begin(), indJ.end(),0), indJ.end()); // remove all zeroes
+
 	  if (indJ.empty())
 	    {
 	      clearVec<T>(copyAdress);
@@ -219,10 +216,7 @@ namespace extract_gmp_R
 	  else
 	    // case: positive values: 1;5;7;7;9;10...
 	    {
-
-	      // note : we could have duplicate and indices are not
-	      // sorted
-
+	      // note : can have duplicates and indices are not sorted
 
 	      // allocate new matrix (all will be copied)
 	      // number of columns
@@ -231,14 +225,14 @@ namespace extract_gmp_R
 	      // for all [new] rows
 	      for( it=indJ.begin(); it != indJ.end(); it++)
 		{
-		  if (*it  < 0)
+		  if (*it < 0)
 		    Rf_error("only 0's may mix with negative subscripts");
-		  if( static_cast<unsigned int>(*it-1) < matrice->size() )
-		    {
+		  if( static_cast<unsigned int>(*it-1) < matrice->size() ) {
 		      //printf("on sort %s",(*matrice)[(*it)-1][0].str(10).c_str());
 		      matricework->push_back( (*matrice)[*it-1] );
-		    }
-
+		  } else {
+		      Rf_error("column subscript out of bounds");
+		  }
 		}
 
 	      // change addresses
@@ -248,7 +242,7 @@ namespace extract_gmp_R
 	    }//end of case: int+positive values
 
 	}
-      }
+      } // INDJ "exists"
 
     if(matrice->size()==0)
       {
@@ -261,11 +255,8 @@ namespace extract_gmp_R
     // --------------------------
     indJ.empty();
     std::vector<int> indI = bigintegerR::create_int(INDI);
-    if(TYPEOF(INDI) != NILSXP)
-      {
-      //LOCICAL
-      if (TYPEOF(INDI) == LGLSXP)
-	{
+    if(TYPEOF(INDI) != NILSXP) {
+	if (TYPEOF(INDI) == LGLSXP) { // LOGICAL
 	  // for all rows
 	  unsigned int delta = 0;
 	  for (i = 0; i < (*matrice)[0]->size(); ++i)
@@ -280,13 +271,13 @@ namespace extract_gmp_R
 		  --i; // i: new indice in modified matrix
 		  ++delta; // i+delta = old indices
 		}
-
 	    }
 
 	}
-      else //INDI: numbers
-	{
-	  std::remove(indI.begin(), indI.end(), 0) ; // remove all zeroes
+	else { // INDI : numbers
+	  // remove zeros:
+	  indI.erase(std::remove(indI.begin(), indI.end(),0), indI.end());
+
 	  if (indI.empty())
 	    {
 	      clearVec<T>(copyAdress);
@@ -336,16 +327,17 @@ namespace extract_gmp_R
 	  else
 	    // case: positive values: 1;5;7;7;9;10...
 	    {
-	      // delete too large values
+	      // delete too large values or give error iff  INDJ is non-NULL
 	      for(it = indI.begin(); it != indI.end(); ++it)
 		if(*it > static_cast<int>((*matrice)[0]->size()))
-		  {
-		    it = indI.erase(it);
-		    --it;
-		  }
+		    if(oldnrow < 0) { // vector case: out-of-bound --> NA
+			/* it = indI.erase(it); */
+			/* --it; */
+		    } else { // matrix case:
+			Rf_error("subscript out of bounds");
+		    }
 
-	      // note : we could have duplicate and indices are not
-	      // sorted
+	      // note : can have duplicates and indices are not sorted
 
 	      //newnrow = indI.size();
 
@@ -369,7 +361,7 @@ namespace extract_gmp_R
 	      // for all [new] rows
 	      for( i=0; i < indI.size(); ++i)
 		{
-		  if (indI[i]  < 0)
+		  if (indI[i] < 0)
 		    Rf_error("only 0's may mix with negative subscripts");
 		  if( static_cast<unsigned int>(indI[i]-1) < (*matrice)[0]->size() )
 		    {

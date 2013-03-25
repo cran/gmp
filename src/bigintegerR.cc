@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04
- *  \date Last modified: $Id: bigintegerR.cc,v 1.33 2012-07-07 09:41:29 mmaechler Exp $
+ *  \date Last modified: $Id: bigintegerR.cc,v 1.35 2013-03-25 10:57:04 mmaechler Exp $
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
@@ -36,6 +36,8 @@ namespace bigintegerR
   // \brief create a vector of bigvecs, all without a modulus.
   bigvec create_vector(const SEXP & param) {
     switch (TYPEOF(param)) {
+    case NILSXP:
+	return bigvec(); // = bigz(0)
     case RAWSXP:
       {
 	// deserialise the vector. first int is the size.
@@ -57,8 +59,31 @@ namespace bigintegerR
 	//bigvec v(d,d+LENGTH(param));
 	bigvec v;
 	v.value.resize(LENGTH(param));
-	for (int j = 0; j < LENGTH(param); ++j)
-	  v.value[j] = d[j];
+	for (int j = 0; j < LENGTH(param); ++j) {
+	    /// New:   numeric '+- Inf'  give  +- "Large" instead of NA
+	    double dj = d[j];
+	    if(R_FINITE(dj) || ISNAN(dj))
+		v.value[j] = dj;
+	    else { // dj is +- Inf : use LARGE ( =   +- 2 ^ 80000 -- arbitrarily )
+		mpz_t LARGE;
+		mpz_init(LARGE);
+		// FIXME: Keep 'LARGE' a static const; initialized only once
+		mpz_ui_pow_ui (LARGE, (unsigned long int) 2, (unsigned long int) 8000);
+		if(dj == R_PosInf)
+		    v.value[j] = LARGE;
+		else if(dj == R_NegInf) {
+		    mpz_t neg_L;
+		    mpz_init(neg_L);
+		    mpz_neg(neg_L, LARGE);
+		    v.value[j] = neg_L;
+		    mpz_clear(neg_L);
+		}
+		else// should never happen
+		    v.value[j] = dj;
+
+		mpz_clear(LARGE);
+	    }
+	}
 	return v;
       }
     case INTSXP:
@@ -87,7 +112,8 @@ namespace bigintegerR
 	return v;
       }
     default:
-      return bigvec();
+	// no longer: can be fatal later! return bigvec();
+	error(_("only logical, numeric or character (atomic) vectors can be coerced to 'bigz'"));
     }
   }
 
@@ -428,6 +454,12 @@ SEXP biginteger_set_at(SEXP src, SEXP idx, SEXP value)
   bigvec vvalue = bigintegerR::create_bignum(value);
   vector<int> vidx = bigintegerR::create_int(idx);
 
+  if(vvalue.size() == 0) {
+      if(result.size() == 0)
+	  return bigintegerR::create_SEXP(result);
+      else
+	  error(_("replacement has length zero"));
+  }
   //case: logicals
   if (TYPEOF(idx) == LGLSXP) {
     int pos = 0;
