@@ -1,7 +1,6 @@
 
-R version 2.15.0 Patched (2012-05-07 r59324) -- "Easter Beagle"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R version 3.0.1 Patched (2013-06-06 r62885) -- "Good Sport"
+Copyright (C) 2013 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -73,18 +72,16 @@ The following object is masked from 'package:base':
 > 
 > 
 > allfunctionid <- c("as.bigz","add.bigz","sub.bigz","mul.bigz",
-+                    "divq.bigz","div.bigz","mod.bigz","pow.bigz",
-+ #TODO              "inv.bigz", "gcd.bigz", "gcdex", "lcm.bigz",
-+                    "inv.bigz", "gcd.bigz",          "lcm.bigz",
-+ #TODO              "as.bigq",
-+ #TODO              "add.bigq","sub.bigq","div.bigq",                   "mul.bigq", "^.bigq",
-+                    "add.bigq","sub.bigq","div.bigq","as.bigq","gcdex", "mul.bigq", "^.bigq",
-+                    "chooseZ",
++ 		   "divq.bigz","div.bigz","mod.bigz","pow.bigz",
++ 		   "inv.bigz", "gcd.bigz", "gcdex", "lcm.bigz",
++ 		   "as.bigq",
++ 		   "add.bigq","sub.bigq","div.bigq", "mul.bigq", "^.bigq",
++ 		   "chooseZ",
 + 		   "max.bigq","max.bigz","min.bigq","min.bigz")
 > unaryfunctionid <- c("log.bigz","log2.bigz","log10.bigz","c.bigz",
-+                      "isprime","nextprime", "factorialZ",
-+                      "sizeinbase","fibnum","fibnum2","lucnum","lucnum2",
-+                      "factorize","abs")
++ 		     "isprime","nextprime", "factorialZ",
++ 		     "sizeinbase","fibnum","fibnum2","lucnum","lucnum2",
++ 		     "factorize","abs")
 > numericFunName <- function(gmpName) {
 +   if(gmpName != (r <- sub("[ZQ]$","", gmpName)) &&
 +      r!="as" && existsFunction(r)) # e.g. chooseZ
@@ -109,10 +106,10 @@ The following object is masked from 'package:base':
 > options(width = 125)
 > 
 > sapply(allfunctionid,   numericFunName)
-   as.bigz   add.bigz   sub.bigz   mul.bigz  divq.bigz   div.bigz   mod.bigz   pow.bigz   inv.bigz   gcd.bigz   lcm.bigz 
- "as.bigz"        "+"        "-"        "*"      "%/%"        "/"       "%%"        "^" "inv.bigz"      "gcd"      "lcm" 
-  add.bigq   sub.bigq   div.bigq    as.bigq      gcdex   mul.bigq     ^.bigq    chooseZ   max.bigq   max.bigz   min.bigq 
-       "+"        "-"        "/"  "as.bigq"    "gcdex"        "*"        "^"   "choose"      "max"      "max"      "min" 
+   as.bigz   add.bigz   sub.bigz   mul.bigz  divq.bigz   div.bigz   mod.bigz   pow.bigz   inv.bigz   gcd.bigz      gcdex 
+ "as.bigz"        "+"        "-"        "*"      "%/%"        "/"       "%%"        "^" "inv.bigz"      "gcd"    "gcdex" 
+  lcm.bigz    as.bigq   add.bigq   sub.bigq   div.bigq   mul.bigq     ^.bigq    chooseZ   max.bigq   max.bigz   min.bigq 
+     "lcm"  "as.bigq"        "+"        "-"        "/"        "*"        "^"   "choose"      "max"      "max"      "min" 
   min.bigz 
      "min" 
 > sapply(unaryfunctionid, numericFunName)
@@ -257,19 +254,19 @@ mul.bigz -> num.fn.: *
 divq.bigz -> num.fn.: %/%
 -> all.equal(target = res, current = F(<numeric x>)):
 [1] "'is.NA' value mismatch: 41 in current 49 in target"
-         23.        25        2.3        -4.        4L    0.      34_Z      32/7 (31 %% 45) NULL   NA        -3L
-1          1         0         11         -5         5 error         0         0  (0 %% 45) <NA>   NA         -7
-2          1         1         12         -6         6 error         0         0  (0 %% 45) <NA>   NA         -8
-3          0         0          1          0         0 error         0         0  (0 %% 45) <NA>   NA          0
-4          0         0         -2          1        -1 error         0         0  (0 %% 45) <NA>   NA          1
-5          0         0          2         -1         1 error         0         0  (0 %% 45) <NA>   NA         -1
-6          0         0          0          0         0 error         0         0  (0 %% 45) <NA>   NA          0
-7          1         1         17         -8         8 error         1         1  (1 %% 45) <NA>   NA        -11
-8          1         1         16         -8         8 error         0         1  (1 %% 45) <NA>   NA        -10
-9  (1 %% 45) (1 %% 45) (15 %% 45) (38 %% 45) (7 %% 45) error (0 %% 45) (0 %% 45)  (1 %% 45) <NA>   NA (35 %% 45)
-10      <NA>      <NA>       <NA>       <NA>      <NA>  <NA>      <NA>      <NA>       <NA> <NA> <NA>       <NA>
-11        NA        NA         NA         NA        NA    NA        NA        NA         NA <NA>   NA         NA
-12         0         0         -1          0         0 error         0         0  (0 %% 45) <NA>   NA          1
+         23.        25        2.3        -4.        4L   0.      34_Z      32/7 (31 %% 45) NULL   NA        -3L
+1          1         0         11         -5         5   NA         0         0  (0 %% 45) <NA>   NA         -7
+2          1         1         12         -6         6   NA         0         0  (0 %% 45) <NA>   NA         -8
+3          0         0          1          0         0   NA         0         0  (0 %% 45) <NA>   NA          0
+4          0         0         -2          1        -1   NA         0         0  (0 %% 45) <NA>   NA          1
+5          0         0          2         -1         1   NA         0         0  (0 %% 45) <NA>   NA         -1
+6          0         0          0          0         0   NA         0         0  (0 %% 45) <NA>   NA          0
+7          1         1         17         -8         8   NA         1         1  (1 %% 45) <NA>   NA        -11
+8          1         1         16         -8         8   NA         0         1  (1 %% 45) <NA>   NA        -10
+9  (1 %% 45) (1 %% 45) (15 %% 45) (38 %% 45) (7 %% 45)   NA (0 %% 45) (0 %% 45)  (1 %% 45) <NA>   NA (35 %% 45)
+10      <NA>      <NA>       <NA>       <NA>      <NA> <NA>      <NA>      <NA>       <NA> <NA> <NA>       <NA>
+11        NA        NA         NA         NA        NA   NA        NA        NA         NA <NA>   NA         NA
+12         0         0         -1          0         0   NA         0         0  (0 %% 45) <NA>   NA          1
 
 ------------------------------------------
 div.bigz -> num.fn.: /
@@ -284,7 +281,7 @@ div.bigz -> num.fn.: /
 6                                   0                                0                                   0
 7                               34/23                            34/25  38280596832649216/2589569785738035
 8                              32/161                           32/175 36028797018963968/18126988500166245
-9                           (1 %% 45)                        (1 %% 45)                          (15 %% 45)
+9                          (17 %% 45)                               NA                          (38 %% 45)
 10                               <NA>                             <NA>                                <NA>
 11                                 NA                               NA                                  NA
 12                              -3/23                            -3/25   -1125899906842624/863189928579345
@@ -297,41 +294,41 @@ div.bigz -> num.fn.: /
 6                                   0                                 0 error                                  0
 7                               -17/2                              17/2 error                                  1
 8                                -8/7                               8/7 error                             16/119
-9                          (38 %% 45)                         (7 %% 45) error                          (0 %% 45)
+9                          (26 %% 45)                        (19 %% 45)    NA                         (34 %% 45)
 10                               <NA>                              <NA>  <NA>                               <NA>
 11                                 NA                                NA    NA                                 NA
 12                                3/4                              -3/4 error                              -3/34
                                   32/7 (31 %% 45) NULL   NA                               -3L
-1                               161/32  (0 %% 45) <NA>   NA                             -23/3
-2                               175/32  (0 %% 45) <NA>   NA                             -25/3
-3  18126988500166245/36028797018963968  (0 %% 45) <NA>   NA -863189928579345/1125899906842624
-4                                 -7/8  (0 %% 45) <NA>   NA                               4/3
-5                                  7/8  (0 %% 45) <NA>   NA                              -4/3
+1                               161/32  (8 %% 45) <NA>   NA                             -23/3
+2                               175/32 (40 %% 45) <NA>   NA                             -25/3
+3  18126988500166245/36028797018963968 (32 %% 45) <NA>   NA -863189928579345/1125899906842624
+4                                 -7/8 (26 %% 45) <NA>   NA                               4/3
+5                                  7/8 (19 %% 45) <NA>   NA                              -4/3
 6                                    0  (0 %% 45) <NA>   NA                                 0
-7                               119/16  (1 %% 45) <NA>   NA                             -34/3
-8                                    1  (1 %% 45) <NA>   NA                            -32/21
-9                            (0 %% 45)  (1 %% 45) <NA>   NA                        (35 %% 45)
+7                               119/16  (4 %% 45) <NA>   NA                             -34/3
+8                                    1 (17 %% 45) <NA>   NA                            -32/21
+9                            (8 %% 45)  (1 %% 45) <NA>   NA                                NA
 10                                <NA>       <NA> <NA> <NA>                              <NA>
 11                                  NA         NA <NA>   NA                                NA
-12                              -21/32  (0 %% 45) <NA>   NA                                 1
+12                              -21/32 (42 %% 45) <NA>   NA                                 1
 
 ------------------------------------------
 mod.bigz -> num.fn.: %%
 -> all.equal(target = res, current = F(<numeric x>)):
 [1] "Mean relative difference: 1.02235"
-         23.        25      2.3       -4.       4L    0.       34_Z       32/7 (31 %% 45) NULL   NA       -3L
-1          0        23        1         3        3 error         23         23 (23 %% 31) <NA>   NA         2
-2          2         0        1         1        1 error         25         25 (25 %% 31) <NA>   NA         1
-3          2         2        0         2        2 error          2          2  (2 %% 31) <NA>   NA         2
-4         19        21        0         0        0 error         30         28 (27 %% 31) <NA>   NA         2
-5          4         4        0         0        0 error          4          4  (4 %% 31) <NA>   NA         1
-6          0         0        0         0        0 error          0          0  (0 %% 31) <NA>   NA         0
-7         11         9        0         2        2 error          0          2  (3 %% 31) <NA>   NA         1
-8          9         7        0         0        0 error         32          0  (1 %% 31) <NA>   NA         2
-9  (8 %% 23) (6 %% 25) (1 %% 2) (3 %% -4) (3 %% 4) error (31 %% 34) (31 %% 32)  (0 %% 31) <NA>   NA (1 %% -3)
-10      <NA>      <NA>     <NA>      <NA>     <NA>  <NA>       <NA>       <NA>       <NA> <NA> <NA>      <NA>
-11        NA        NA       NA        NA       NA    NA         NA         NA         NA <NA>   NA        NA
-12        20        22        1         1        1 error         31         29 (28 %% 31) <NA>   NA         0
+         23.        25      2.3       -4.       4L   0.       34_Z       32/7 (31 %% 45) NULL   NA       -3L
+1          0        23        1         3        3   NA         23         23 (23 %% 31) <NA>   NA         2
+2          2         0        1         1        1   NA         25         25 (25 %% 31) <NA>   NA         1
+3          2         2        0         2        2   NA          2          2  (2 %% 31) <NA>   NA         2
+4         19        21        0         0        0   NA         30         28 (27 %% 31) <NA>   NA         2
+5          4         4        0         0        0   NA          4          4  (4 %% 31) <NA>   NA         1
+6          0         0        0         0        0   NA          0          0  (0 %% 31) <NA>   NA         0
+7         11         9        0         2        2   NA          0          2  (3 %% 31) <NA>   NA         1
+8          9         7        0         0        0   NA         32          0  (1 %% 31) <NA>   NA         2
+9  (8 %% 23) (6 %% 25) (1 %% 2) (3 %% -4) (3 %% 4)   NA (31 %% 34) (31 %% 32)  (0 %% 31) <NA>   NA (1 %% -3)
+10      <NA>      <NA>     <NA>      <NA>     <NA> <NA>       <NA>       <NA>       <NA> <NA> <NA>      <NA>
+11        NA        NA       NA        NA       NA   NA         NA         NA         NA <NA>   NA        NA
+12        20        22        1         1        1   NA         31         29 (28 %% 31) <NA>   NA         0
 
 ------------------------------------------
 pow.bigz -> num.fn.: ^
@@ -359,54 +356,67 @@ pow.bigz -> num.fn.: ^
 6                                                                                                                         error
 7                                                                                                                     1/1336336
 8                                                                                                                  2401/1048576
-9                                                                                                                      1/923521
+9                                                                                                                    (16 %% 45)
 10                                                                                                                         <NA>
 11                                                                                                                           NA
 12                                                                                                                         1/81
-           4L   0.                                                  34_Z                                               32/7
-1      279841    1       19895113660064588580108197261066338165074766609       37608910510519071039902074217516707306379521
-2      390625    1      338813178901720135627329000271856784820556640625      542101086242752217003726400434970855712890625
-3          16    1                                           17179869184                                         4294967296
-4         256    1                                 295147905179352825856                               18446744073709551616
-5         256    1                                 295147905179352825856                               18446744073709551616
-6           0    1                                                     0                                                  0
-7     1336336    1 11756638905368616011414050501310355554617941909569536 10170102859315411774579628461341138023025901305856
-8     1048576    1  1496577676626844588240573268701473812127674924007424  1461501637330902918203684832716283019655932542976
-9  (31 %% 45)    1                                            (31 %% 45)                                         (16 %% 45)
-10       <NA> <NA>                                                  <NA>                                               <NA>
-11         NA    1                                                    NA                                                 NA
-12         81    1                                     16677181699666569                                   1853020188851841
-   (31 %% 45) NULL   NA                                                                                            -3L
-1  (32 %% 45) <NA>   NA                                                                                        1/12167
-2  (25 %% 45) <NA>   NA                                                                                        1/15625
-3  (38 %% 45) <NA>   NA 1427247692705959881058285969449495136382746624/17365322677153409849313160265892197722207192875
-4  (41 %% 45) <NA>   NA                                                                                          -1/64
-5   (4 %% 45) <NA>   NA                                                                                           1/64
-6   (0 %% 45) <NA>   NA                                                                                          error
-7  (34 %% 45) <NA>   NA                                                                                        1/39304
-8  (23 %% 45) <NA>   NA                                                                                      343/32768
-9  (31 %% 45) <NA>   NA                                                                                        1/29791
-10       <NA> <NA> <NA>                                                                                           <NA>
-11         NA <NA>   NA                                                                                             NA
-12 (18 %% 45) <NA>   NA                                                                                          -1/27
+           4L        0.                                                  34_Z
+1      279841         1       19895113660064588580108197261066338165074766609
+2      390625         1      338813178901720135627329000271856784820556640625
+3          16         1                                           17179869184
+4         256         1                                 295147905179352825856
+5         256         1                                 295147905179352825856
+6           0         1                                                     0
+7     1336336         1 11756638905368616011414050501310355554617941909569536
+8     1048576         1  1496577676626844588240573268701473812127674924007424
+9  (31 %% 45) (1 %% 45)                                            (31 %% 45)
+10       <NA>      <NA>                                                  <NA>
+11         NA         1                                                    NA
+12         81         1                                     16677181699666569
+                                                 32/7 (31 %% 45) NULL   NA
+1        37608910510519071039902074217516707306379521 (32 %% 45) <NA>   NA
+2       542101086242752217003726400434970855712890625 (25 %% 45) <NA>   NA
+3                                          4294967296 (38 %% 45) <NA>   NA
+4                                18446744073709551616 (41 %% 45) <NA>   NA
+5                                18446744073709551616  (4 %% 45) <NA>   NA
+6                                                   0  (0 %% 45) <NA>   NA
+7  10170102859315411774579628461341138023025901305856 (34 %% 45) <NA>   NA
+8   1461501637330902918203684832716283019655932542976 (23 %% 45) <NA>   NA
+9                                          (16 %% 45) (31 %% 45) <NA>   NA
+10                                               <NA>       <NA> <NA> <NA>
+11                                                 NA         NA <NA>   NA
+12                                   1853020188851841 (18 %% 45) <NA>   NA
+                                                                                              -3L
+1                                                                                         1/12167
+2                                                                                         1/15625
+3  1427247692705959881058285969449495136382746624/17365322677153409849313160265892197722207192875
+4                                                                                           -1/64
+5                                                                                            1/64
+6                                                                                           error
+7                                                                                         1/39304
+8                                                                                       343/32768
+9                                                                                       (1 %% 45)
+10                                                                                           <NA>
+11                                                                                             NA
+12                                                                                          -1/27
 
 ------------------------------------------
 inv.bigz 
 -> all.equal(target = res, current = F(<numeric x>)):
 [1] "Mean relative difference: 0.6133333"
-         23.         25       2.3       -4.        4L    0.       34_Z       32/7 (31 %% 45) NULL   NA       -3L
-1      error         12         1         3         3 error          3          7 (27 %% 45) <NA>   NA         2
-2         12      error         1         1         1 error         15          9  (5 %% 45) <NA>   NA         1
-3         12         13     error     error     error error      error      error (16 %% 45) <NA>   NA         2
-4         17          6     error     error     error error      error      error (23 %% 45) <NA>   NA         2
-5          6         19     error     error     error error      error      error  (8 %% 45) <NA>   NA         1
-6      error      error     error     error     error error      error      error      error <NA>   NA     error
-7         21         14     error     error     error error      error      error (21 %% 45) <NA>   NA         1
-8         18         18     error     error     error error      error      error  (1 %% 45) <NA>   NA         2
-9  (3 %% 45) (21 %% 45) (1 %% 45) (3 %% 45) (3 %% 45) error (11 %% 45) (31 %% 45)      error <NA>   NA (1 %% 45)
-10      <NA>       <NA>      <NA>      <NA>      <NA>  <NA>       <NA>       <NA>       <NA> <NA> <NA>      <NA>
-11        NA         NA        NA        NA        NA    NA         NA         NA         NA <NA>   NA        NA
-12        15          8         1         1         1 error         11         21 (10 %% 45) <NA>   NA     error
+         23.         25       2.3       -4.        4L   0.       34_Z       32/7 (31 %% 45) NULL   NA       -3L
+1         NA         12         1         3         3   NA          3          7 (27 %% 45) <NA>   NA         2
+2         12         NA         1         1         1   NA         15          9  (5 %% 45) <NA>   NA         1
+3         12         13        NA        NA        NA   NA         NA         NA (16 %% 45) <NA>   NA         2
+4         17          6        NA        NA        NA   NA         NA         NA (23 %% 45) <NA>   NA         2
+5          6         19        NA        NA        NA   NA         NA         NA  (8 %% 45) <NA>   NA         1
+6         NA         NA        NA        NA        NA   NA         NA         NA         NA <NA>   NA        NA
+7         21         14        NA        NA        NA   NA         NA         NA (21 %% 45) <NA>   NA         1
+8         18         18        NA        NA        NA   NA         NA         NA  (1 %% 45) <NA>   NA         2
+9  (3 %% 45) (21 %% 45) (1 %% 45) (3 %% 45) (3 %% 45)   NA (11 %% 45) (31 %% 45)         NA <NA>   NA (1 %% 45)
+10      <NA>       <NA>      <NA>      <NA>      <NA> <NA>       <NA>       <NA>       <NA> <NA> <NA>      <NA>
+11        NA         NA        NA        NA        NA   NA         NA         NA         NA <NA>   NA        NA
+12        15          8         1         1         1   NA         11         21 (10 %% 45) <NA>   NA        NA
 
 ------------------------------------------
 gcd.bigz -> num.fn.: gcd
@@ -427,6 +437,24 @@ gcd.bigz -> num.fn.: gcd
 12         1         1         1         1         1          3         1         1  (1 %% 45) <NA>   NA         3
 
 ------------------------------------------
+gcdex 
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] "Mean relative difference: 0.875"
+    23.   25  2.3  -4.   4L   0. 34_Z 32/7 (31 %% 45) NULL   NA  -3L
+1    23    1    1    1    1   23    1    1          1 <NA>   23    1
+2     1   25    1    1    1   25    1    1          1 <NA>   25    1
+3     1    1    2    2    2    2    2    2          1 <NA>    2    1
+4     1    1    2    4    4    4    2    4          1 <NA>    4    1
+5     1    1    2    4    4    4    2    4          1 <NA>    4    1
+6    23   25    2    4    4    0   34   32         31 <NA>    0    3
+7     1    1    2    2    2   34   34    2          1 <NA>   34    1
+8     1    1    2    4    4   32    2   32          1 <NA>   32    1
+9     1    1    1    1    1   31    1    1         31 <NA>   31    1
+10 <NA> <NA> <NA> <NA> <NA> <NA> <NA> <NA>       <NA> <NA> <NA> <NA>
+11   23   25    2    4    4    0   34   32         31 <NA>    0    3
+12    1    1    1    1    1    3    1    1          1 <NA>    3    3
+
+------------------------------------------
 lcm.bigz -> num.fn.: lcm
 -> all.equal(target = res, current = F(<numeric x>)):
 [1] "'is.NA' value mismatch: 121 in current 40 in target"
@@ -443,6 +471,50 @@ lcm.bigz -> num.fn.: lcm
 10       <NA>       <NA>       <NA>       <NA>       <NA>      <NA>       <NA>      <NA>       <NA> <NA> <NA>      <NA>
 11         NA         NA         NA         NA         NA        NA         NA        NA         NA <NA>   NA        NA
 12         69         75          6         12         12         0        102        96  (3 %% 45) <NA>   NA         3
+
+------------------------------------------
+as.bigq 
+-> all.equal(target = res, current = F(<numeric x>)):
+[1] TRUE
+                                  23.                               25                                 2.3
+1                                   1                            23/25  25895697857380352/2589569785738035
+2                               25/23                                1    5629499534213120/517913957147607
+3  2589569785738035/25895697857380352 517913957147607/5629499534213120                                   1
+4                               -4/23                            -4/25  -4503599627370496/2589569785738035
+5                                4/23                             4/25   4503599627370496/2589569785738035
+6                                   0                                0                                   0
+7                               34/23                            34/25  38280596832649216/2589569785738035
+8                              32/161                           32/175 36028797018963968/18126988500166245
+9                               31/23                            31/25  34902897112121344/2589569785738035
+10                               <NA>                             <NA>                                <NA>
+11                                 NA                               NA                                  NA
+12                              -3/23                            -3/25   -1125899906842624/863189928579345
+                                  -4.                                4L    0.                               34_Z
+1                               -23/4                              23/4 error                              23/34
+2                               -25/4                              25/4 error                              25/34
+3  -2589569785738035/4503599627370496 2589569785738035/4503599627370496 error 2589569785738035/38280596832649216
+4                                   1                                -1 error                              -2/17
+5                                  -1                                 1 error                               2/17
+6                                   0                                 0 error                                  0
+7                               -17/2                              17/2 error                                  1
+8                                -8/7                               8/7 error                             16/119
+9                               -31/4                              31/4 error                              31/34
+10                               <NA>                              <NA>  <NA>                               <NA>
+11                                 NA                                NA    NA                                 NA
+12                                3/4                              -3/4 error                              -3/34
+                                  32/7                         (31 %% 45) NULL   NA                               -3L
+1                               161/32                              23/31 <NA>   NA                             -23/3
+2                               175/32                              25/31 <NA>   NA                             -25/3
+3  18126988500166245/36028797018963968 2589569785738035/34902897112121344 <NA>   NA -863189928579345/1125899906842624
+4                                 -7/8                              -4/31 <NA>   NA                               4/3
+5                                  7/8                               4/31 <NA>   NA                              -4/3
+6                                    0                                  0 <NA>   NA                                 0
+7                               119/16                              34/31 <NA>   NA                             -34/3
+8                                    1                             32/217 <NA>   NA                            -32/21
+9                               217/32                                  1 <NA>   NA                             -31/3
+10                                <NA>                               <NA> <NA> <NA>                              <NA>
+11                                  NA                                 NA <NA>   NA                                NA
+12                              -21/32                              -3/31 <NA>   NA                                 1
 
 ------------------------------------------
 add.bigq -> num.fn.: +
@@ -601,68 +673,6 @@ div.bigq -> num.fn.: /
 10                                <NA>                               <NA> <NA> <NA>                              <NA>
 11                                  NA                                 NA <NA>   NA                                NA
 12                              -21/32                              -3/31 <NA>   NA                                 1
-
-------------------------------------------
-as.bigq 
--> all.equal(target = res, current = F(<numeric x>)):
-[1] TRUE
-                                  23.                               25                                 2.3
-1                                   1                            23/25  25895697857380352/2589569785738035
-2                               25/23                                1    5629499534213120/517913957147607
-3  2589569785738035/25895697857380352 517913957147607/5629499534213120                                   1
-4                               -4/23                            -4/25  -4503599627370496/2589569785738035
-5                                4/23                             4/25   4503599627370496/2589569785738035
-6                                   0                                0                                   0
-7                               34/23                            34/25  38280596832649216/2589569785738035
-8                              32/161                           32/175 36028797018963968/18126988500166245
-9                               31/23                            31/25  34902897112121344/2589569785738035
-10                               <NA>                             <NA>                                <NA>
-11                                 NA                               NA                                  NA
-12                              -3/23                            -3/25   -1125899906842624/863189928579345
-                                  -4.                                4L    0.                               34_Z
-1                               -23/4                              23/4 error                              23/34
-2                               -25/4                              25/4 error                              25/34
-3  -2589569785738035/4503599627370496 2589569785738035/4503599627370496 error 2589569785738035/38280596832649216
-4                                   1                                -1 error                              -2/17
-5                                  -1                                 1 error                               2/17
-6                                   0                                 0 error                                  0
-7                               -17/2                              17/2 error                                  1
-8                                -8/7                               8/7 error                             16/119
-9                               -31/4                              31/4 error                              31/34
-10                               <NA>                              <NA>  <NA>                               <NA>
-11                                 NA                                NA    NA                                 NA
-12                                3/4                              -3/4 error                              -3/34
-                                  32/7                         (31 %% 45) NULL   NA                               -3L
-1                               161/32                              23/31 <NA>   NA                             -23/3
-2                               175/32                              25/31 <NA>   NA                             -25/3
-3  18126988500166245/36028797018963968 2589569785738035/34902897112121344 <NA>   NA -863189928579345/1125899906842624
-4                                 -7/8                              -4/31 <NA>   NA                               4/3
-5                                  7/8                               4/31 <NA>   NA                              -4/3
-6                                    0                                  0 <NA>   NA                                 0
-7                               119/16                              34/31 <NA>   NA                             -34/3
-8                                    1                             32/217 <NA>   NA                            -32/21
-9                               217/32                                  1 <NA>   NA                             -31/3
-10                                <NA>                               <NA> <NA> <NA>                              <NA>
-11                                  NA                                 NA <NA>   NA                                NA
-12                              -21/32                              -3/31 <NA>   NA                                 1
-
-------------------------------------------
-gcdex 
--> all.equal(target = res, current = F(<numeric x>)):
-[1] "Mean relative difference: 0.875"
-    23.   25  2.3  -4.   4L   0. 34_Z 32/7 (31 %% 45) NULL   NA  -3L
-1    23    1    1    1    1   23    1    1          1 <NA>   23    1
-2     1   25    1    1    1   25    1    1          1 <NA>   25    1
-3     1    1    2    2    2    2    2    2          1 <NA>    2    1
-4     1    1    2    4    4    4    2    4          1 <NA>    4    1
-5     1    1    2    4    4    4    2    4          1 <NA>    4    1
-6    23   25    2    4    4    0   34   32         31 <NA>    0    3
-7     1    1    2    2    2   34   34    2          1 <NA>   34    1
-8     1    1    2    4    4   32    2   32          1 <NA>   32    1
-9     1    1    1    1    1   31    1    1         31 <NA>   31    1
-10 <NA> <NA> <NA> <NA> <NA> <NA> <NA> <NA>       <NA> <NA> <NA> <NA>
-11   23   25    2    4    4    0   34   32         31 <NA>    0    3
-12    1    1    1    1    1    3    1    1          1 <NA>    3    3
 
 ------------------------------------------
 mul.bigq -> num.fn.: *
@@ -1011,7 +1021,7 @@ min.bigz -> num.fn.: min
 11         -3
 12         -3
 
-There were 22 warnings (use warnings() to see them)
+There were 50 or more warnings (use warnings() to see the first 50)
 > 
 > ##==============================================================================
 > 
@@ -1173,7 +1183,9 @@ Big Rational ('bigq') 4 x 4 matrix:
 [3,] (0 %% 7) (0 %% 7) (5 %% 7) (0 %% 7)
 [4,] (0 %% 7) (0 %% 7) (0 %% 7) (2 %% 7)
 > try(solve(Dmc))# Error: argument has no inverse
-Error in solve.bigz(Dmc) : argument has no inverse
+Error in solve.bigz(Dmc) : System is singular
+In addition: Warning message:
+In solve.bigz(Dmc) : inv(x) returning NA as x has no inverse
 > try(solve(Dm)) # Error: System is singular
 Error in solve.bigz(Dm) : System is singular
 > 
@@ -1186,7 +1198,13 @@ Big Integer ('bigz') 4 x 4 matrix:
 [4,] 0    0    0    4   
 > stopifnot(identical(D.D, tcrossprod(D,Dm)))
 > 
+> ##
+> ## some specific tests
+> 
+> factorize("33162879029270137")
+Big Integer ('bigz') object of length 5:
+[1] 7      29     11867  75679  181903
 > 
 > proc.time()
    user  system elapsed 
-  1.184   0.067   1.307 
+  5.000   0.440   5.338 

@@ -28,6 +28,7 @@ static R_CallMethodDef CallEntries[] = {
   CALLDEF(biginteger_sub, 2),
   CALLDEF(biginteger_mul, 2),
   CALLDEF(biginteger_div, 2),
+  CALLDEF(biginteger_divq, 2),
   CALLDEF(biginteger_mod, 2),
   CALLDEF(biginteger_pow, 2),
   CALLDEF(biginteger_inv, 2),

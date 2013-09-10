@@ -140,6 +140,22 @@ void bigvec::push_back(const bigmod & number)
     }
 }
 
+/** 
+ * insert int value
+ */
+void bigvec::push_back(int value_p)
+{
+  value.push_back(biginteger(value_p));
+}
+
+/**
+ * Insert Big Integer value
+ */
+void bigvec::push_back(const __mpz_struct * value_p)
+{
+  value.push_back(biginteger(value_p));
+}
+
 
 // return size of value
 unsigned int bigvec::size() const
@@ -152,7 +168,7 @@ void bigvec::resize(unsigned int i)
 {
 
   value.resize(i);
-  if(i<modulus.size())
+  if(i < modulus.size())
       modulus.resize(i);
 }
 

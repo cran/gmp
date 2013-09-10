@@ -2,7 +2,7 @@
 \alias{nextprime}
 \title{Next Prime Number}
 \description{
-  Return the next prime number, say \eqn{p}, with \eqn{p \ge n}{p >= n}.
+  Return the next prime number, say \eqn{p}, with \eqn{p > n}{p > n}.
 }
 \usage{
 nextprime(n)

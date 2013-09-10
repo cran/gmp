@@ -99,6 +99,11 @@ bigmod operator-(const bigmod& rhs, const bigmod& lhs);
 bigmod operator*(const bigmod& rhs, const bigmod& lhs);
 
 /**
+ * \brief Divide two bigmods   a / b  :=  a * b^(-1)
+ */
+bigmod div_via_inv(const bigmod& a, const bigmod& b);
+
+/**
  * \brief Divide two bigmods.
  *
  * For modulus description, see operator+(bigmod, bigmod)

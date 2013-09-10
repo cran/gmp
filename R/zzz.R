@@ -5,3 +5,8 @@
 gmpVersion <- function()
     numeric_version(sub("^([0-9]+\\.[0-9]+\\.[0-9]+).*","\\1", .gmpVersion()))
 
+.onLoad <- function(libname, pkgname) {
+    options("gmp:warnModMismatch" = TRUE, ## see ../man/biginteger.Rd
+            "gmp:warnNoInv" = TRUE) ## ../man/add.biginteger.Rd | ../src/bigmod.cc
+}
+

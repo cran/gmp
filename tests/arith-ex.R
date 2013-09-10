@@ -107,6 +107,75 @@ stopifnot(M.powQ <- opEQ(`^`, x[x.po0], xQ[x.po0]))
 if(FALSE)# FIXME {z - q}
 M.poIQ <- opEQ(`^`,xI[x.po0], xQ[x.po0])
 
+## Modulo arithmetic
+i <- as.bigz(-5:10, 16); i <- i[i != 0]; i
+stopifnot(identical(as.integer(i), c(11:15, 1:10)))
+(Ii <- 1/i )## BUG: in all versions of gmp up to 0.5-5
+I2 <- i^(-1)## BUG: not considering (mod) // segmentation fault in gmp 0.5-1
+stopifnot(identical(Ii, I2),
+	  is.na(Ii[c(2, 4, 7, 9, 11, 13, 15)]),
+	  identical(Ii[c(1,3)], as.bigz(c(3,5), 16)))
+(Iz <- 1/(z <- as.bigz(1:12, 13)))
+stopifnot(identical(Iz, z^-1),
+	  Iz == c(1, 7, 9, 10, 8, 11, 2, 5, 3, 4, 6, 12),
+	  identical(modulus(Iz), as.bigz(13)))
+## The first two of course give fractions:
+(r1 <- as.bigz(3) / 1:12)
+r2 <- as.bigz(3) / as.bigz(1:12)
+stopifnot(identical(r1, r2))
+
+## Now, the new scheme :
+(iLR <- as.bigz(3, 13) / as.bigz(1:12, 13))
+ ## [1] (3 %% 13)  (8 %% 13)  (1 %% 13)  (4 %% 13)  (11 %% 13) (7 %% 13)
+ ## [7] (6 %% 13)  (2 %% 13)  (9 %% 13)  (12 %% 13) (5 %% 13)  (10 %% 13)
+iL  <- as.bigz(3, 13) / as.bigz(1:12)
+iLi <- as.bigz(3, 13) / 1:12
+iR  <- as.bigz(3)     / as.bigz(1:12, 13)
+iiR <-         3      / as.bigz(1:12, 13)
+stopifnot(identical(iL, iLi)
+          , identical(iR, iiR)
+          , identical(iR, iLR)
+          , identical(iL, iR)) ## failed until recently...
+
+## whereas these two always use  divq.bigz :
+(q <- as.bigz(3, 13) %/% as.bigz(1:12))
+## [1] (3 %% 13) (1 %% 13) (1 %% 13) (0 %% 13) (0 %% 13) (0 %% 13)
+## [7] (0 %% 13) (0 %% 13) (0 %% 13) (0 %% 13) (0 %% 13) (0 %% 13)
+stopifnot(identical(q, divq.bigz(as.bigz(3, 13), 1:12)),
+	  ##           ---------
+	  identical(q, 3 %/% as.bigz(1:12, 13)),
+	  q == c(3, 1, 1, rep(0,9)))
+s <- as.bigz(3, 13) / as.bigz(1:12, 17)
+## used to give
+## Big Integer ('bigz') object of length 12:
+##  [1] 3 1 1 0 0 0 0 0 0 0 0 0
+## but now, really just  `` drops the contradicting "mod" '' ==> uses rational:
+stopifnot(identical(s, r1))
+
+##----- Z^e (modulo m) ---------------
+z12 <- as.bigz(1:12,12)
+stopifnot(identical(z12^1, z12), z12^0 == 1,
+	  identical(z12^2, as.bigz(rep(c(1,4,9,4,1,0), 2), 12)),
+	  identical(z12^3,
+		    as.bigz(c(1,8,3:5,0,7:9,4,11,0), 12)),
+	  identical(z12^4, z12^2),
+	  identical(z12^5, z12^3),
+	  identical(z12^6, z12^2),
+	  identical(z12^6, (1:12) ^ as.bigz(6, 12))
+	  )
+
+for(E in 6:20) {
+    ir <- as.integer(r <- z12 ^ E)
+    stopifnot(identical(modulus(r), as.bigz(12)),
+	      0 <= ir, ir <= 11)
+}
+
+z17 <- as.bigz(1:16, 17)
+stopifnot(z17^0 == 1, identical(z17^1, z17), identical(z17^-1, iz <- 1/z17),
+	  identical(z17^-2, iz^2), (iz^2) * (sq <- z17^2) == 1,
+	  modulus(sq) == 17, unique(sq) == (1:8)^2 %% 17)
+
+
 
 ##--- Log()s -------------------------
 (ex <- c(outer(c(2,5,10), 10^(1:3))))# 20 .. 10'000

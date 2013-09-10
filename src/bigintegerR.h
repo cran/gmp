@@ -102,9 +102,10 @@ extern "C"
   SEXP biginteger_mul(SEXP a, SEXP b);
 
   /**
-   * \brief Quotient of a / b
+   * \brief Quotient of a / b   or  a %/% b
    */
-  SEXP biginteger_div(SEXP a, SEXP b);
+  SEXP biginteger_div (SEXP a, SEXP b);// integer division, possibly --> rational
+  SEXP biginteger_divq(SEXP a, SEXP b);// integer division
 
   /**
    * \brief Modulus of a % b

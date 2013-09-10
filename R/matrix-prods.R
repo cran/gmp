@@ -1,8 +1,10 @@
 if(FALSE) {## a nice idea --- but not working:  setOldClass() is fine,
-    ## but then dispatch only works if you create  new("bigz",...) objects
+    ## but then dispatch here only works if you create  new("bigz",...) objects
+    ## (though dispatch *does* work for asNumeric(.)  -- really just R bug ???
+    ## see also  'if(FALSE)'  in ./bigq.R
 
  ## NOTE: %*% is an S4, but *not* an S3 generic ==> Let's use S4 methods here
- setOldClass("bigz")
+
  setMethod("%*%", signature(x = "bigz", y = "bigz"),
            function(x,y) .Call(matrix_mul_z, x, y, FALSE, FALSE))
  setMethod("%*%", signature(x = "bigz", y = "ANY"),
@@ -22,7 +24,6 @@ if(FALSE) {## a nice idea --- but not working:  setOldClass() is fine,
  setMethod("tcrossprod", signature(x = "ANY", y = "bigz"),
            function(x,y) .NotYetImplemented())
 
- setOldClass("bigq")
  setMethod("%*%", signature(x = "bigq", y = "bigq"),
            function(x,y) .Call(matrix_mul_q, x, y, FALSE, FALSE))
  setMethod("%*%", signature(x = "bigq", y = "ANY"),

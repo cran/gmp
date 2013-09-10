@@ -1,3 +1,14 @@
+2013-09-10  Antoine Lucas.
+	* fix man page.
+
+2013-06-09  Antoine Lucas.
+        * fix factorize('33162879029270137')
+
+2013-06-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+	big changes related to  "a/b" and "b^(-1)";
+	also: now give [NA + warning()} rather than an error when
+	there is no inverse, a division to 0, or a modulus mismatch
+
 2013-02-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/biginteger.R (duplicated.bigz, unique.bigz, all.equal.bigz):

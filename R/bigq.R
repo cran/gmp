@@ -65,6 +65,7 @@ as.double.bigq<- function(x,...) .Call(bigrational_as_numeric, x)
 as.integer.bigq<- function(x,...) as.integer(.Call(bigrational_as_numeric, x))
 
 .bigq2num <- function(x) {
+    ## cat(".bigq2num():\n")
     r <- .Call(bigrational_as_numeric, x)
     if(!is.null(d <- dim(x))) dim(r) <- d
     r
@@ -128,9 +129,6 @@ is.atomic.bigq <- function(x) FALSE # otherwise does return TRUE !
 
 ###  <bigz> o <bigq>  --- really dispatch on two arguments --> use S4
 if(FALSE) { ## not working really --- see also ./matrix-prods.R
-##                cannot use as.bigz() yet which is only defined in ./bigz.R
-setOldClass("bigz")#, prototype=as.bigz(integer()))
-setOldClass("bigq")#, prototype=as.bigq(integer()))
 
 setMethod("Ops", signature(e1 = "bigq", e2 = "bigz"),
 	  function(e1, e2) callGeneric(e1, as.bigq(e2)))

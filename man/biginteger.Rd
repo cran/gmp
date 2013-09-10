@@ -42,7 +42,8 @@ is.bigz(x)
     is not easily discernable from the print output.}
 }
 \value{
-  An \R object of (S3) class \code{"bigz"}, representing the argument \code{x}.
+  An \R object of (S3) class \code{"bigz"}, representing the argument
+  (\code{x} or \code{a}).
 }
 \details{
   Bigz's are integers of arbitrary, but given length (means: only
@@ -57,15 +58,21 @@ is.bigz(x)
   Comparison are supported, i.e., \code{"=="}, \code{"!="},
   \code{"<"}, \code{"<="}, \code{">"}, and \code{">="}.
 
-  Objects of class \code{"bigz"} may have an attribute \code{mod}
-  which specifies a modulus that is applied after each arithmetic operation.
-  When the object has such a modulus \eqn{m}, all arithmetic is performed
-  \emph{\dQuote{modulo m}}, i.e.,
-\preformatted{
-      result <- mod.bigz(result, m)  ## == result \%\% m
+  Objects of class \code{"bigz"} may have a \dQuote{modulus}, accessible
+  via \code{\link{modulus}()}, currently as an attribute \code{mod}.
+  When the object has such a modulus \eqn{m}, arithmetic is performed
+  \emph{\dQuote{modulo m}}, mathematically \dQuote{within the
+    ring \eqn{Z/mZ}}.  For many operations, this means
+\preformatted{   result <- mod.bigz(result, m)  ## == result \%\% m
 }
-  is called after performing the arithmetic operation and the result will have the
-  attribute \code{mod} set accordingly.
+  is called after performing the arithmetic operation and the result
+  will have the attribute \code{mod} set accordingly.
+  This however does not apply, e.g., for \code{/}, where
+  \eqn{a / b := a b^{-1}}{a / b =  a b^(-1)} and
+  \eqn{b^{-1}}{b^(-1)} is the \emph{multiplicate inverse} of \eqn{b}
+  with respect to ring arithmetic, or \code{\link{NA}} with a warning
+  when the inverse does not exist.  The warning can be turned off via
+  \code{options("gmp:warnModMismatch" = FALSE)}% FIXME: show+check option()
 
   Powers of bigzs can only be performed, if either a modulus is going to
   be applied to the result bigz or if the exponent fits into an integer
@@ -81,8 +88,8 @@ is.bigz(x)
     modulus, except in case of \code{\link{mod.bigz}}, where the second operand's
     value is used.
     \item If only one of the operands has a modulus or both have a common (the
-    same), it is set and applied to the result, except in case of \code{mod.bigz},
-    where the second operand's value is used.
+    same), it is set and used for the arithmetic operations, except in
+    case of \code{mod.bigz}, where the second operand's value is used.
   }
 }
 

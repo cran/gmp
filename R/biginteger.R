@@ -34,17 +34,11 @@ setGeneric("asNumeric", useAsDefault = function(x) {
 
 "*.bigz" <- mul.bigz <- function(e1, e2) .Call(biginteger_mul, e1, e2)
 
-"%/%.bigz" <- divq.bigz <- function(e1, e2) .Call(biginteger_div, e1, e2)
+## divq : integer division
+"%/%.bigz" <- divq.bigz <- function(e1, e2) .Call(biginteger_divq, e1, e2)
 
-"/.bigz" <- div.bigz <- function(e1, e2)
-{
-  ismod <- ((inherits(e1, "bigz") && !is.null(modulus(e1))) ||
-            (inherits(e2, "bigz") && !is.null(modulus(e2))))
-  if(ismod)
-    .Call(biginteger_div, e1, e2)
-  else
-    .Call(bigrational_as, e1, e2)
-}
+## div : division of integers -> either rational or (mod) integer division
+"/.bigz" <- div.bigz <- function(e1, e2) .Call(biginteger_div, e1, e2)
 
 "%%.bigz" <- mod.bigz <- function(e1, e2) .Call(biginteger_mod,e1, e2)
 
@@ -90,11 +84,16 @@ as.bigz <- function(a, mod = NA)
   else
     .Call(biginteger_as, a, mod)
 }
-
-as.character.bigz <- function(x, b = 10L, ...)
-{
-    .Call(biginteger_as_character, x, b)
+## the .as*() functions are exported for Rmpfr
+.as.bigz <- function(a, mod = NA) {
+  if(inherits(a, "bigq")) as.bigz.bigq(a, mod) else .Call(biginteger_as, a, mod)
 }
+..as.bigz <- function(a, mod = NA) .Call(biginteger_as, a, mod)
+
+.as.char.bigz <-
+as.character.bigz <-
+    function(x, b = 10L, ...) .Call(biginteger_as_character, x, b)
+
 
 ##' format() Numbers such as to distinguish  bigz, integer, double, mpfr, etc
 formatN <- function(x, ...) UseMethod("formatN")

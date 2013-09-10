@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2005
- *  \date Last modified: Time-stamp: <2008-02-23 22:41:57 antoine>
+ *  \date Last modified: Time-stamp: <2013-06-08 22:27:37 antoine>
  *
  *
  *  \note Licence: GPL
@@ -66,6 +66,17 @@ class bigvec {
    * Or set by cell (as many modulus as value)
    */
   void push_back(const bigmod &i);
+
+  /** 
+   * insert int value
+   */
+  void push_back(int value_p);
+
+  /**
+   * Insert Big Integer value
+   */
+  //  void push_back(mpz_t & value_p);
+  void push_back(const __mpz_struct* value_p);
 
   /**
    * \brief return size of vector value

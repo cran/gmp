@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04
- *  \date Last modified: $Id: bigintegerR.cc,v 1.35 2013-03-25 10:57:04 mmaechler Exp $
+ *  \date Last modified: $Id: bigintegerR.cc,v 1.36 2013-06-07 15:16:57 mmaechler Exp $
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
@@ -290,25 +290,65 @@ SEXP R_gmp_get_version() {
 SEXP biginteger_add (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator+);}
 SEXP biginteger_sub (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator-);}
 SEXP biginteger_mul (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator*);}
-SEXP biginteger_div (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator/);}
+SEXP biginteger_divq(SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator/);}
 SEXP biginteger_mod (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator%);}
+
+SEXP biginteger_div (SEXP a, SEXP b) { // called from  "/.bigz" == div.bigz
+    bigvec A = bigintegerR::create_bignum(a),
+	B = bigintegerR::create_bignum(b);
+    // Note: a or b may be simple numbers (e.g. '1') => work with (A,B)
+    int len_m_a = A.modulus.size(),
+	len_m_b = B.modulus.size();
+    if(len_m_a == 0 && len_m_b == 0) // deal with important case quickly:
+	return bigrational_div(a, b);
+    else if(len_m_a == 0) { // and  len_m_b > 0:
+	// should work directly using b's "mod" --> compute  a * b^(-1)
+    }
+    else if(len_m_b == 0) { // and  len_m_a > 0:
+	// should use a's "mod" for b: div_via_inv() need's  b's modulus
+	B.modulus = A.modulus;
+	return bigintegerR::biginteger_binary_operation(a,
+							bigintegerR::create_SEXP(B),
+							div_via_inv);
+    }
+    else { // len_m_a > 0 and  len_m_b > 0:
+	bool same_mod = true;// are the two mods the "same" (after recycling)?
+	int m = (len_m_a < len_m_b) ? len_m_b : len_m_a; // = max(l..a, l..b)
+	for(int i = 0; i < m; i++)
+	    if(A.modulus[i % len_m_a] != B.modulus[i % len_m_b])  {
+		same_mod = false; break;
+	    }
+	if(same_mod) {
+	    // compute   a * b^(-1) ... should work w/o more
+	} else {
+	    // use *rational* a/b  (not considering 'mod' anymore):
+	    return bigrational_div(a, b);
+	}
+    }
+    return bigintegerR::biginteger_binary_operation(a,b, div_via_inv);
+}
+
 SEXP biginteger_pow (SEXP a, SEXP b) {
-  // if any b < 0 , the result must be (non-integer) bigrational
-  bool use_rat = FALSE;
-  bigvec vb = bigintegerR::create_bignum(b);
-  for (unsigned int i = 0; i < vb.value.size(); ++i) {
-    if(mpz_sgn(vb.value[i].getValueTemp()) < 0) {
-      use_rat = TRUE;
-      break;
+  bigvec v = bigintegerR::create_bignum(a),
+    exp = bigintegerR::create_bignum(b);
+  if(v.modulus.size() == 0) { /* has no modulus: now, if any b < 0 , the
+				 result must be (non-integer) bigrational */
+    bool use_rat = FALSE;
+    for (unsigned int i = 0; i < exp.value.size(); ++i) {
+      if(mpz_sgn(exp.value[i].getValueTemp()) < 0) {
+	use_rat = TRUE;
+	break;
+      }
+    }
+    if (use_rat) { // a ^ b  with some b negative --> rational result
+      // 1)  a := as.bigq(a, 1)
+      SEXP aq = bigrational_as(a, Rf_ScalarInteger(1));
+      // 2)  result =  <bigq a> ^ b:
+      return bigrational_pow(aq, b);
     }
   }
-  if (use_rat) { // a ^ b  with some b negative --> rational result
-    // 1)  a := as.bigq(a, 1)
-    SEXP aq = bigrational_as(a, Rf_ScalarInteger(1));
-    // 2)  result =  <bigq a> ^ b:
-    return bigrational_pow(aq, b);
-  } else
-    return bigintegerR::biginteger_binary_operation(a,b, pow); // -> pow() in ./bigmod.cc
+  // else, either, a has a modulus, or (no modulus *and*  exp >= 0) :
+  return bigintegerR::biginteger_binary_operation(a,b, pow); // -> pow() in ./bigmod.cc
 }
 SEXP biginteger_inv (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,inv);}
 SEXP biginteger_gcd (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,gcd);}
@@ -390,7 +430,8 @@ SEXP biginteger_get_at(SEXP a, SEXP i)
 
 }
 
-bigvec bigintegerR::biginteger_get_at_C(bigvec va,SEXP ind)
+// also called from  matrix_get_at_z(.)  in ./extract_matrix.cc :
+bigvec bigintegerR::biginteger_get_at_C(bigvec va, SEXP ind)
 {
   vector<int> v_ind = bigintegerR::create_int(ind);
   bigvec result;
@@ -448,8 +489,8 @@ bigvec bigintegerR::biginteger_get_at_C(bigvec va,SEXP ind)
 
 SEXP biginteger_set_at(SEXP src, SEXP idx, SEXP value)
 {
-
   // return = ( src[idx] <- value )
+
   bigvec result = bigintegerR::create_bignum(src);
   bigvec vvalue = bigintegerR::create_bignum(value);
   vector<int> vidx = bigintegerR::create_int(idx);
@@ -1035,12 +1076,9 @@ SEXP biginteger_min(SEXP a, SEXP narm)
 
 SEXP biginteger_cumsum(SEXP a)
 {
-  bigvec result;
-
-  bigvec va = bigintegerR::create_bignum(a);
+  bigvec result, va = bigintegerR::create_bignum(a);
 
   result.value.resize(va.value.size());
-
 
   mpz_t val;
   mpz_init(val);
@@ -1049,8 +1087,7 @@ SEXP biginteger_cumsum(SEXP a)
   bool hasmodulus = true;
 
   // first the modulus !
-  if(va.modulus.size()>1)
-    {
+  if(va.modulus.size() > 1) {
       biginteger modulus ;
       modulus.setValue(va.modulus[0].getValueTemp());
 
@@ -1061,20 +1098,13 @@ SEXP biginteger_cumsum(SEXP a)
 	    }
       }
       if(hasmodulus)
-	  result.modulus.push_back(modulus);
-
-    }
-  else
-    hasmodulus = false;
-
-  if(va.modulus.size() == 1)
-    {
+	result.modulus.push_back(modulus);
+  }
+  else if(va.modulus.size() == 1) {
       result.modulus.push_back(va.modulus[0]);
       hasmodulus = true;
-   }
-
-
-
+  }
+  else hasmodulus = false;
 
   for(unsigned int i = 0 ; i < va.size(); ++i)
     {
@@ -1094,20 +1124,15 @@ SEXP biginteger_cumsum(SEXP a)
     }
 
   return(bigintegerR::create_SEXP(result));
-
 }
 
 
 
 SEXP biginteger_sum(SEXP a)
 {
-
-  bigvec result;
-
-  bigvec va = bigintegerR::create_bignum(a);
+  bigvec result, va = bigintegerR::create_bignum(a);
 
   result.value.resize(1);
-
 
   mpz_t val;
   mpz_init(val);
@@ -1116,8 +1141,7 @@ SEXP biginteger_sum(SEXP a)
   bool hasmodulus = true;
 
   // first the modulus !
-  if(va.modulus.size()>1)
-    {
+  if(va.modulus.size() > 1) {
       biginteger modulus ;
       modulus.setValue(va.modulus[0].getValueTemp());
 
@@ -1129,16 +1153,14 @@ SEXP biginteger_sum(SEXP a)
       }
       if(hasmodulus)
 	result.modulus.push_back(modulus);
-
-    }
-  else
-    hasmodulus = false;
-
-  if(va.modulus.size() == 1)
-    {
+  }
+  else if(va.modulus.size() == 1) {
       result.modulus.push_back(va.modulus[0]);
       hasmodulus = true;
-   }
+  }
+  else
+      hasmodulus = false;
+
 
 
 
@@ -1155,14 +1177,12 @@ SEXP biginteger_sum(SEXP a)
 
 	if(hasmodulus)
 	  mpz_mod(val,val,va.modulus[0].getValueTemp() );
-
       }
     }
 
   result.value[0].setValue(val);
 
   return(bigintegerR::create_SEXP(result));
-
 }
 
 

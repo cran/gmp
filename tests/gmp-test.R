@@ -48,18 +48,16 @@ test <- function(FUN, x, xlabs, out = "str", unary = FALSE)
 
 
 allfunctionid <- c("as.bigz","add.bigz","sub.bigz","mul.bigz",
-                   "divq.bigz","div.bigz","mod.bigz","pow.bigz",
-#TODO              "inv.bigz", "gcd.bigz", "gcdex", "lcm.bigz",
-                   "inv.bigz", "gcd.bigz",          "lcm.bigz",
-#TODO              "as.bigq",
-#TODO              "add.bigq","sub.bigq","div.bigq",                   "mul.bigq", "^.bigq",
-                   "add.bigq","sub.bigq","div.bigq","as.bigq","gcdex", "mul.bigq", "^.bigq",
-                   "chooseZ",
+		   "divq.bigz","div.bigz","mod.bigz","pow.bigz",
+		   "inv.bigz", "gcd.bigz", "gcdex", "lcm.bigz",
+		   "as.bigq",
+		   "add.bigq","sub.bigq","div.bigq", "mul.bigq", "^.bigq",
+		   "chooseZ",
 		   "max.bigq","max.bigz","min.bigq","min.bigz")
 unaryfunctionid <- c("log.bigz","log2.bigz","log10.bigz","c.bigz",
-                     "isprime","nextprime", "factorialZ",
-                     "sizeinbase","fibnum","fibnum2","lucnum","lucnum2",
-                     "factorize","abs")
+		     "isprime","nextprime", "factorialZ",
+		     "sizeinbase","fibnum","fibnum2","lucnum","lucnum2",
+		     "factorize","abs")
 numericFunName <- function(gmpName) {
   if(gmpName != (r <- sub("[ZQ]$","", gmpName)) &&
      r!="as" && existsFunction(r)) # e.g. chooseZ
@@ -166,3 +164,7 @@ try(solve(Dm)) # Error: System is singular
 (D.D <- D %*% t(Dm))# now [>= Jan.2012] works too
 stopifnot(identical(D.D, tcrossprod(D,Dm)))
 
+##
+## some specific tests
+
+factorize("33162879029270137")

@@ -56,10 +56,8 @@ export(
        ## "t.bigq", "t.bigz",
        "urand.bigz")
 
-## C routines for other packages to .Call(..) .. hmm, convenient
-## but then also needs mention on a help page:
-export(biginteger_as,
-       biginteger_as_character)
+## For Rmpfr (and possibly similar packages)
+export(.as.bigz, ..as.bigz, .as.char.bigz)
 
 S3method(gcd,default)
 #S3method(lcm,default)

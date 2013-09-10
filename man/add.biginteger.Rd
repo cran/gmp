@@ -51,17 +51,34 @@ pow.bigz(e1, e2,...)## == e1 ^ e2
   \item{...}{Additional parameters}
 }
 \details{
-  For details about the internal modulus state, see the manpage of
-  \code{\link{bigz}}.
-
-  div or "/" return a rational number; divq or "\%/\%" return the
-  quotient of integer division.
-
   Operators can be used directly when objects are of class bigz:
   a + b, log(a), etc.
+
+  For details about the internal modulus state, \emph{and} the rules
+  applied for arithmetic operations on big integers with a modulus,
+  see the \code{\link{bigz}} help page.
+
+  \code{a / b}  \eqn{=}  \code{div(a,b)} returns a rational number
+  unless the operands have a (matching) modulus where
+  \code{a * b^-1} results.
+  \cr
+  \code{a \%/\% b} (or, equivalently, \code{divq(a,b)}) returns the
+  quotient of simple \emph{integer} division (with truncation towards zero),
+  possibly re-adding a modulus at the end (but \emph{not} using a
+  modulus like in \code{a / b}).
+
+  \code{r <- inv.bigz(a, m)}, the multiplicative inverse of
+  \code{a} modulo \eqn{m}, corresponds to \code{1/a} or \code{a ^-1}
+  from above \emph{when} \code{a} has modulus \code{m}.  Note that
+  \eqn{a} not always has an inverse modulo \eqn{m}, in which case
+  \code{r} will be \code{\link{NA}} with a warning that can be turned
+  off via \preformatted{options("gmp:warnNoInv" = FALSE)}.
 }
 \value{
-  A bigz class representing the result of the arithmetic operation.
+  Apart from \code{/} (or \code{div}), where rational numbers
+  (\code{\link{bigq}}) may result, these functions return an object of
+  class \code{"bigz"}, representing the result of the arithmetic
+  operation.
 }
 
 \references{The GNU MP Library, see \url{http://gmplib.org}}
@@ -90,6 +107,17 @@ a <- 1:10
 d <- as.bigz(7)
 a \%/\% d  # = divq(a, d)
 a \%\%  d  # = mod.bigz (a, d)
+
+(ii <- inv.bigz(1:10, 16))
+## with 5 warnings (one for each NA)
+op <- options("gmp:warnNoInv" = FALSE)
+i2 <- inv.bigz(1:10, 16) # no warnings
+(i3 <- 1 / as.bigz(1:10, 16))
+i4 <- as.bigz(1:10, 16) ^ -1
+stopifnot(identical(ii, i2),
+	  identical(as.bigz(i2, 16), i3),
+	  identical(i3, i4))
+options(op)# revert previous options' settings
 
 stopifnot(inv.bigz(7, 11) == 8,
           all(as.bigz(i.a, 11) * a == 1),
