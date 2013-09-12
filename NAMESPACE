@@ -58,6 +58,11 @@ export(
 
 ## For Rmpfr (and possibly similar packages)
 export(.as.bigz, ..as.bigz, .as.char.bigz)
+## C routines for other packages to .Call(..) .. hmm, convenient
+## but then also needs mention on a help page:
+## FIXME (2013-09-11): drop these after a while {when dependent packages
+## ----- all use the .as.* and ..as.* substitutes:
+export(biginteger_as, biginteger_as_character)
 
 S3method(gcd,default)
 #S3method(lcm,default)

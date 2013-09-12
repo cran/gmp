@@ -201,7 +201,7 @@ factor_using_pollard_rho (mpz_t n, unsigned long a, bigvec & factors)
 {
   mpz_t x, z, y, P;
   mpz_t t, t2;
-  unsigned long long k, l, i;
+  unsigned long  k, l, i;
 
   if (flag_verbose > 0)
     {

@@ -1,8 +1,8 @@
-756a1c9c64d884dd6047b4cf2cc0df59 *ChangeLog
+c220beb416529870a6b2e4a76a47b193 *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-be8a84ae69ef6074927911fe1c61e4b5 *DESCRIPTION
+428e7199726ad98e3764eaab68d6ac7f *DESCRIPTION
 bf1b2794bc731d5da18f4ce61e5dae5a *Done
-a7c51ad913b4f91ce1035af0130fdbab *NAMESPACE
+22ecdeefefa7376c309b3b877a173f2f *NAMESPACE
 3c1f7582c53e3690a71d21aa267dde14 *R/AllClasses-etc.R
 d5b7cae90ea3d09107b11f8a93a00068 *R/Stirling-n-etc.R
 dd13fb52e11ddb809f9a1a31b8a3ec7b *R/biginteger.R
@@ -85,7 +85,7 @@ ac265fd770384b99e8f5c62487ffd84e *src/bigvec_q.h
 b067faa1a3a2b7acc8a336d63cec2cd8 *src/extract_matrix.h
 dd962dc48f13a61f8cfbe491d9af9fa8 *src/factor.cc
 d9a08b2df600c3fa8f350fc2226a5327 *src/factor.h
-a75519a0024a8749a318fc416af0fb80 *src/factorize.cc
+e3179a36eac71b38ebce86809e748a7c *src/factorize.cc
 fa4b1298454f3eab5efccd4dc82d2c78 *src/factorize.h
 3016abdb5cb591bb42ad3a95511c8ede *src/init.cc
 f992a41996107422e959ed6bcf8f6c13 *src/matrix.cc
