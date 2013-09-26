@@ -1,6 +1,11 @@
 useDynLib(gmp, .registration=TRUE)
 
 
+#importFrom(base,"%*%")
+#importMethodsFrom(methods,"%*%")
+importFrom("methods",
+           coerce, setOldClass, setGeneric, setMethod)
+
 ## instead of exportPattern() :
 ## MM: but *really* should export considerably less !! (i.e. use  S3method(.) more !
 export(
@@ -28,7 +33,7 @@ export(
        "gmpVersion",
        "inv.bigz", ## "inv",
        ## "is.na.bigq", "is.na.bigz",
-       "is.bigz", "is.bigq",
+       "is.bigz", "is.bigq", "is.matrixZQ",
        "isprime", "is.whole",
        "lcm.bigz", "lcm.default",
        ## "length<-.bigq", "length.bigq", "length<-.bigz", "length.bigz",
@@ -212,10 +217,8 @@ S3method(t,bigz)
 export(asNumeric)
 exportMethods(asNumeric)
 
+exportMethods(which.max, which.min)
+
+exportClasses("bigz", "bigq")# setOldClass()'ed, needed in  Rmpfr
 ## unfortunately, using S4 methods and setOldClass("bigz") is not enough
 ## exportMethods("%*%", "crossprod", "tcrossprod")#-> also exports generics, for R >= 2.15.0
-
-
-
-##importFrom(base,"%*%")
-##importMethodsFrom(methods,"%*%")

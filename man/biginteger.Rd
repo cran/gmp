@@ -1,18 +1,20 @@
 \name{bigz}
 \title{Large Sized Integer Values}
 \alias{bigz}
+\alias{bigz-class}
 \alias{as.bigz}
 \alias{is.bigz}
 \alias{as.character.bigz}
 \alias{as.double.bigz}
 \alias{print.bigz}
 \alias{is.na.bigz}
-% Experimental: these two are C symbols, potentially for other packages:
-% Hence not yet documented at all (FIXME)
+% these two are C symbols, will be removed eventually:
 \alias{biginteger_as}
 \alias{biginteger_as_character}
 \description{
-  Class \code{"bigz"} encodes arbitrarily large integers (via GMP)
+  Class \code{"bigz"} encodes arbitrarily large integers (via GMP).
+  A simple S3 class (internally a \code{\link{raw}} vector), it has been
+  registered as formal (S4) class (via \code{\link{setOldClass}}), too.
 }
 \usage{
 as.bigz(a, mod = NA)
@@ -152,6 +154,10 @@ cc == c
 
 # Return result in hexa
 as.character(c, b=16)
+
+# Depict the "S4-class" bigz, i.e., the formal (S4) methods:
+if(require("Rmpfr")) # mostly interesting there
+  showMethods(class="bigz")
 }
 
 \keyword{arith}

@@ -303,6 +303,10 @@ min.bigq <- function(...,na.rm=FALSE)
  .Call(bigrational_min, c.bigq(...), na.rm)
 }
 
+## FIXME: implement faster in C
+setMethod("which.max", "bigq", function(x) which.max(x == max(x)))
+setMethod("which.min", "bigq", function(x) which.max(x == min(x)))
+
 sum.bigq <- function(..., na.rm = FALSE)
 {
     X <- c.bigq(...)

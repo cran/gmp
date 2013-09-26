@@ -258,6 +258,10 @@ sum.bigz <- function(..., na.rm = FALSE)
 }
 ##------------end{Summary group}------------------------------------
 
+## FIXME: implement faster in C
+setMethod("which.max", "bigz", function(x) which.max(x == max(x)))
+setMethod("which.min", "bigz", function(x) which.max(x == min(x)))
+
 c.bigz <- function(..., recursive = FALSE)
 {
     .Call(biginteger_c, list(...))

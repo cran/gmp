@@ -25,6 +25,7 @@
 #include "bigvec_q.h"
 #include "bigintegerR.h"
 #include <algorithm>
+#include <functional>
 
 extern "C"
 {

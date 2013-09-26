@@ -22,6 +22,8 @@
 
 extern "C"
 {
+  /** \brief is x a bigz or bigz matrix ? */
+  SEXP is_matrix_zq(SEXP x);
 
   /**
    * \brief build a matrix x with dimensions p&q byrow: 0 or 1

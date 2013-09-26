@@ -1,5 +1,6 @@
 \name{bigq}
 \alias{bigq}
+\alias{bigq-class}
 \alias{as.bigq}
 \alias{is.bigq}
 \alias{as.character.bigq}
@@ -13,7 +14,11 @@
 \alias{numerator<-}
 \title{Large sized rationals}
 \description{
-  Type class supporting arithmetic operations on very large rationals.
+  Class \code{"bigq"} encodes rationals encoded as ratios of arbitrary
+  large integers (via GMP).
+  A simple S3 class (internally a \code{\link{raw}} vector), it has been
+  registered as formal (S4) class (via \code{\link{setOldClass}}), too.
+
 }
 \usage{
 as.bigq(n, d = 1)
@@ -83,6 +88,10 @@ stopifnot(is.bigq(x), is.bigq(x + y),
 # convert to string, double
 as.character(x)
 as.double(x)
+
+# Depict the "S4-class" bigq, i.e., the formal (S4) methods:
+if(require("Rmpfr")) # mostly interesting there
+  showMethods(class="bigq")
 }
 
 \keyword{arith}

@@ -26,6 +26,10 @@ using namespace std;
 #include "bigintegerR.h"
 #include "matrix.h"
 
+// return TRUE if x is a "bigz" or "bigq" matrix: R's is.matrixZQ(.)
+SEXP is_matrix_zq(SEXP x) {
+    return Rf_ScalarLogical(Rf_getAttrib(x, Rf_mkString("nrow")) != R_NilValue);
+}
 
 // C++ side of R function matrix.bigz()
 SEXP as_matrixz (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP mod)

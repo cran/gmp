@@ -63,6 +63,12 @@ t.bigz <- function(x) .Call(bigint_transposeR, x)
 ##    ans
 ##}
 
+## MM: the  attr(*, "nrow")  implementation is hack -- not allowing >= 3d arrays
+## --==> advertize  .dimZQ(), .nrowZQ(), etc  instead of the "nrow" attr
+
+##' Is 'x' a "bigz" or "bigq" matrix
+##' @return \code{ !is.null(attr(x,"nrow")) } but faster
+is.matrixZQ <- function(x) .Call(is_matrix_zq, x)
 
 .dimZQ <- function(x) {# return NULL for non-array {as standard R}
     if(is.null(n <- attr(x,"nrow"))) n else c(n, if(n) length(x)/n else 0L)

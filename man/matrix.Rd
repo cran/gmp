@@ -3,6 +3,7 @@
 \alias{matrix.default}
 \alias{matrix.bigz}
 \alias{matrix.bigq}
+\alias{is.matrixZQ}
 \alias{as.matrix.bigz}
 \alias{as.matrix.bigq}
 \alias{as.vector.bigq}
@@ -66,6 +67,8 @@
 \usage{
 \S3method{matrix}{bigz}(data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL, mod = NA,...)
 
+is.matrixZQ(x)
+
 \S3method{\%*\%}{bigz}(x, y)
 \S3method{\%*\%}{bigq}(x, y)
 \S3method{crossprod}{bigq}(x, y=NULL)
@@ -85,8 +88,12 @@
   \item{x,y}{numeric, \code{bigz}, or \code{bigq} matrices or vectors.}
 }
 \details{
-  Extract function is the same use for vector or matrix. Then,
-  \code{x[i]} return same value as \code{x[i,]}.
+  The extract function (\code{"["}) is the same use for vector or
+  matrix.  Hence, \code{x[i]} returns the same values as \code{x[i,]}.
+  This is not considered a feature and may be changed in the future
+  (with warnings).
+
+  All matrix multiplications should work as with numeric matrices.
 
   Special features concerning the \code{"\link{bigz}"} class: the
   modulus can be
@@ -107,11 +114,16 @@
   }
 }
 \value{
-  A matrix of class bigz or bigq
+  \code{matrix()}: A matrix of class \code{"bigz"} or \code{"bigq"}.
+
+  \code{is.matrixZQ()}: \code{\link{TRUE}} or \code{FALSE}.
+
+  \code{dim()}, \code{ncol()}, etc: integer or \code{NULL}, as for
+  simple matrices.
 }
 \author{Antoine Lucas}
 
-\seealso{Solving linear algebra system \code{\link{solve.bigz}};
+\seealso{Solving a linear system: \code{\link{solve.bigz}}.
   \code{\link[base]{matrix}}
 }
 
@@ -123,7 +135,9 @@ stopifnot(dim(C) == dim(t(v)), C == v,
           dim(t(C)) == c(length(v), 1),
           crossprod(V) == sum(V * V),
          tcrossprod(V) == outer(v,v),
-          identical(C, t(t(C))) )
+          identical(C, t(t(C))),
+          is.matrixZQ(C), !is.matrixZQ(V), !is.matrixZQ(5)
+	)
 
 ## a matrix
 x <- diag(1:4)

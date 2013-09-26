@@ -118,6 +118,7 @@ static R_CallMethodDef CallEntries[] = {
   CALLDEF(factorR, 1),
 
 // matrix.h :
+  CALLDEF(is_matrix_zq, 1),
   CALLDEF(as_matrixz, 5),
   CALLDEF(bigint_transposeR, 1),
   CALLDEF(matrix_crossp_z, 2),
