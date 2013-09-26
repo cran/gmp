@@ -21,11 +21,10 @@
 
 #include <R.h>
 #include <Rinternals.h>
-
+#include <functional>
 #include "bigvec_q.h"
 #include "bigintegerR.h"
 #include <algorithm>
-#include <functional>
 
 extern "C"
 {
