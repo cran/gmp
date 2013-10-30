@@ -63,7 +63,7 @@ factor_using_division (mpz_t t, bigvec & factors)
     }
 
   p = 3;
-  for (i = 1; i <= PRIMES_PTAB_ENTRIES;)
+  for (i = 1; i < PRIMES_PTAB_ENTRIES;)
     {
       if (! mpz_divisible_ui_p (t, p))
 	{

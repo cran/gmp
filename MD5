@@ -1,6 +1,6 @@
 d3a68f0e0c98887d6d6f792617abf8ef *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-6f87aedd0cbea8c70db96c8a99a83158 *DESCRIPTION
+32a3b199ce99743878e9dab308e55ff2 *DESCRIPTION
 bf1b2794bc731d5da18f4ce61e5dae5a *Done
 e8e2852fb8eb1439348fc7eea232374a *NAMESPACE
 3c1f7582c53e3690a71d21aa267dde14 *R/AllClasses-etc.R
@@ -85,7 +85,7 @@ ac265fd770384b99e8f5c62487ffd84e *src/bigvec_q.h
 7b4e155913f83c96f715f808984665a2 *src/extract_matrix.h
 dd962dc48f13a61f8cfbe491d9af9fa8 *src/factor.cc
 d9a08b2df600c3fa8f350fc2226a5327 *src/factor.h
-e3179a36eac71b38ebce86809e748a7c *src/factorize.cc
+9e41877195254b6d2c74c7287a4c8238 *src/factorize.cc
 fa4b1298454f3eab5efccd4dc82d2c78 *src/factorize.h
 d1fcf00956d9ef65eafe8789d4e09cd0 *src/init.cc
 5746f0ac69117a9a2ba5abaa2c99ec6b *src/matrix.cc
