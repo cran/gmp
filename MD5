@@ -1,6 +1,6 @@
-d3a68f0e0c98887d6d6f792617abf8ef *ChangeLog
+a6e07a760768242d2eebb13b7f60dc97 *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-32a3b199ce99743878e9dab308e55ff2 *DESCRIPTION
+25c14f9d1f4277d5ad9d0d5a32772665 *DESCRIPTION
 bf1b2794bc731d5da18f4ce61e5dae5a *Done
 e8e2852fb8eb1439348fc7eea232374a *NAMESPACE
 3c1f7582c53e3690a71d21aa267dde14 *R/AllClasses-etc.R
@@ -64,7 +64,7 @@ a7dd42da7e0f791ce922ec54a7c67270 *man/solve.Rd
 a670bc14f246a1616bd860f54e5775ca *man/utils.Rd
 8292ba511dd54d167ba42ac7899e741c *src/Makevars.in
 9276e33437cfc9e26961f62059cf833c *src/Makevars.win
-41f4ddba05fe80ef39cb1d74a54aef69 *src/Rgmp.h
+aab0c510c989613a82fe98efaf5ae0fa *src/Rgmp.h
 124effc2091d5d8198f0619f2afaff22 *src/apply.cc
 2f25f95aedc17f66633efad43411089a *src/apply.h
 8350226d4cf61244918867be4540d835 *src/biginteger.cc
@@ -85,7 +85,7 @@ ac265fd770384b99e8f5c62487ffd84e *src/bigvec_q.h
 7b4e155913f83c96f715f808984665a2 *src/extract_matrix.h
 dd962dc48f13a61f8cfbe491d9af9fa8 *src/factor.cc
 d9a08b2df600c3fa8f350fc2226a5327 *src/factor.h
-9e41877195254b6d2c74c7287a4c8238 *src/factorize.cc
+fc68dd7949af4fbf48ad47be0081b3e6 *src/factorize.cc
 fa4b1298454f3eab5efccd4dc82d2c78 *src/factorize.h
 d1fcf00956d9ef65eafe8789d4e09cd0 *src/init.cc
 5746f0ac69117a9a2ba5abaa2c99ec6b *src/matrix.cc

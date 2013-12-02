@@ -1,8 +1,13 @@
 #ifndef R_gmp_HEADER
 #define R_gmp_HEADER 1
 
-#include <math.h>
+// gmp.h calls cstddef with __need_size_t defined
+#include <cstddef>
+// and avoid the inclusion of stdlib.h
+#include <cstdlib>
+#include <cmath>
 #include <gmp.h>
+
 
 #define USE_RINTERNALS
 #define R_NO_REMAP 			// avoid collisions with stl definitions
