@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 12/12/04
- *  \date Last modified: Time-stamp: <2006-05-25 19:53:58 antoine>
+ *  \date Last modified: Time-stamp: <2014-07-10 08:31:28 antoine>
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
@@ -124,6 +124,7 @@ bigrational operator*(const bigrational& lhs, const bigrational& rhs)
  */
 bigrational operator/(const bigrational& lhs, const bigrational& rhs)
 {
+
   return bigrationalR::create_bigrational(lhs, rhs, mpq_div, false);
 }
 

@@ -320,14 +320,14 @@ sizeinbase <- function(a, b=10)
     .Call(biginteger_sizeinbase, a, as.integer(b))
 }
 
-factorialZ  <- function(n) .Call(bigI_factorial, n)
-chooseZ  <- function(n, k) .Call(bigI_choose,  n, k)
+factorialZ  <- function(n) .Call(bigI_factorial, as.integer(n))
+chooseZ  <- function(n, k) .Call(bigI_choose,  n, as.integer(k))
 
-fibnum  <- function(n) .Call(bigI_fibnum,  n)
-fibnum2 <- function(n) .Call(bigI_fibnum2, n)
+fibnum  <- function(n) .Call(bigI_fibnum,  as.integer(n))
+fibnum2 <- function(n) .Call(bigI_fibnum2, as.integer(n))
 
-lucnum  <- function(n) .Call(bigI_lucnum,  n)
-lucnum2 <- function(n) .Call(bigI_lucnum2, n)
+lucnum  <- function(n) .Call(bigI_lucnum,  as.integer(n))
+lucnum2 <- function(n) .Call(bigI_lucnum2, as.integer(n))
 
 factorize <- function(n) .Call(factorR, as.bigz(n))
 

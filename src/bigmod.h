@@ -2,7 +2,7 @@
  *  \brief Description of class bigmod
  *
  *  \date Created: 22/05/06
- *  \date Last modified: Time-stamp: <2006-05-25 22:22:05 antoine>
+ *  \date Last modified: Time-stamp: <2014-07-10 08:44:04 antoine>
  *
  *  \author Immanuel Scholz
  *
@@ -16,6 +16,14 @@
 #include "biginteger.h"
 
 typedef void (*gmp_binary)(mpz_t, const mpz_t, const mpz_t);
+
+extern "C" {
+  /**
+   * division
+   * result = a / b
+   */
+  void integer_div(mpz_t result,const mpz_t a, const mpz_t b);
+};
 
 
 /**

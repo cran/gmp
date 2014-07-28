@@ -1,5 +1,7 @@
 * Bug Fixes								-*-org-*-
 
+** asNumeric(x) : the generic must get a "..." argument, can use "rounding mode" in Rmpfr
+
 ** URGENT / BAD : Segfaults, Wrong Results, etc
 
 ** Not working  Arithmetic
@@ -16,7 +18,6 @@
  but more importantly from C++ create_SEXP()
     -->  create_SEXP(const bigvec& v)  in ./src/bigintegerR.cc ,
     where currently simply the class attribute is set
-
 
 
 ***  bigz  %% and %/%  fail with "division by zero"

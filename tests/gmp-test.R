@@ -1,7 +1,7 @@
 library(gmp)
 
 ##
-##' @title Test a *binary* function
+##' @title Test a unary (if unary=TRUE) or *binary* function
 ##' @param FUN a function, such as add.bigq() ...
 ##' @param x a list of "numbers"
 ##' @param out string determining output class; if "str", use characters, otherwise double
@@ -168,3 +168,4 @@ stopifnot(identical(D.D, tcrossprod(D,Dm)))
 ## some specific tests
 
 factorize("33162879029270137")
+

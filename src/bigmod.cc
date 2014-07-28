@@ -14,7 +14,6 @@
 #include <Rinternals.h>
 
 
-
 // string representation of (.) wrt base 'b' :
 std::string bigmod::str(int b) const
 {
@@ -102,11 +101,30 @@ bigmod div_via_inv(const bigmod& a, const bigmod& b) {
     return operator*(a, pow(b, bigmod(-1)));
 }
 
+
+void integer_div(mpz_t result,const mpz_t a, const mpz_t b) {
+  mpz_tdiv_q(result,a,b);
+  //
+  // si resulat < 0 et module != 0: on enleve 1.
+  // i.e. 3 / -4 = -1
+  if (mpz_sgn(a) * mpz_sgn(b) == -1) {
+    mpz_t val;
+    mpz_init(val);
+    mpz_t_sentry val_s(val);
+    mpz_mod(val, a, b);
+    if (mpz_cmp_ui(val, 0) != 0) 
+      {	
+	mpz_sub_ui(result, result, 1);
+      }
+  }
+}
+
+
 /* called via biginteger_binary_operation(.) from R's
  * .Call(biginteger_divq, a, b) , itself called from '%/%.bigz' = divq.bigz()
  */
 bigmod operator/(const bigmod& lhs, const bigmod& rhs) {
-  return create_bigmod(lhs, rhs, mpz_tdiv_q, false);
+  return create_bigmod(lhs, rhs, integer_div, false);
 }
 
 bigmod operator%(const bigmod& lhs, const bigmod& rhs)

@@ -40,6 +40,17 @@ stopifnot(isEQ(x, as.integer(x)), isEQ(x, xI), isEQ(x, xQ),
 ## double precision factorial() is exact up to n=22
 stopifnot(factorialZ(0:22) == factorial(0:22))
 
+## factorialZ() etc must also work when passed a bigz instead of an integer;
+## till Jan.2014, they silently produced nonsense.
+N <- as.bigz(n <- 3:8)
+stopifnot(identical(factorialZ(N),  factorialZ(n)), factorialZ (n) == factorial(n), 
+          identical(chooseZ(12, N), chooseZ(12, n)), chooseZ(12,n) == choose(12,n),
+          identical(fibnum (N), fibnum (n)),
+          identical(fibnum2(N), fibnum2(n)),
+          identical(lucnum (N), lucnum (n)),
+          identical(lucnum2(N), lucnum2(n)))
+
+
 ## This one does *NOT* distinguish  NA and NaN -- that's wanted here
 EQ1 <- function(x,y) {
     (abs(x-y) <= 1e-13*(abs(x)+abs(y)) & !(nx <- is.na(x)) & !(ny <- is.na(y))) |
