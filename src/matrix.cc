@@ -25,8 +25,11 @@ using namespace std;
 #include "biginteger.h"
 #include "bigintegerR.h"
 #include "matrix.h"
+// need to call matrix_mul_q()
+#include "matrixq.h"
 
-// return TRUE if x is a "bigz" or "bigq" matrix: R's is.matrixZQ(.)
+// given that x is "bigz" or "bigq",
+// return TRUE if x is a bigz/q *matrix*: R's is.matrixZQ(.)
 SEXP is_matrix_zq(SEXP x) {
     return Rf_ScalarLogical(Rf_getAttrib(x, Rf_mkString("nrow")) != R_NilValue);
 }
@@ -238,6 +241,11 @@ SEXP matrix_crossp_z (SEXP a, SEXP trans)
  */
 SEXP matrix_mul_z (SEXP a, SEXP b, SEXP op)
 {
+  if(!strcmp(class_P(b), "bigq")) { // b  "bigq",  --> use q arithm:
+      return(matrix_mul_q(a, b, op));
+  }
+  // FIXME: we may know that a is 'bigz' - but we don't know at all about b !!
+  // -----  create_bignum(.) should be much more careful (better: have a careful option!)
   bool useMod = FALSE;// if(useMod)  use a *common* modulus
   int o_ = Rf_asInteger(op); // INTEGER(op)[0]
   bigvec mat_a = bigintegerR::create_bignum(a),

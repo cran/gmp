@@ -16,7 +16,7 @@ stopifnot(identical(Nq, as.bigq(N.)),
 	  identical(N., as.bigz(Nq)))# used to fail
 
 xx <- c(NaN, NA, -Inf, -123:-121, -1:2, 7:8, Inf)
-(xxI <- as.bigz(xx))# Inf's and NaN's do not exist
+(xxI <- as.bigz(xx))# Inf's and NaN's do not exist ==> very large integers for  +/- Inf
 (x <- c(NA, xx[is.finite(xx)]))
 xI <- as.bigz(x)
 xQ <- as.bigq(xI)
@@ -43,7 +43,7 @@ stopifnot(factorialZ(0:22) == factorial(0:22))
 ## factorialZ() etc must also work when passed a bigz instead of an integer;
 ## till Jan.2014, they silently produced nonsense.
 N <- as.bigz(n <- 3:8)
-stopifnot(identical(factorialZ(N),  factorialZ(n)), factorialZ (n) == factorial(n), 
+stopifnot(identical(factorialZ(N),  factorialZ(n)), factorialZ (n) == factorial(n),
           identical(chooseZ(12, N), chooseZ(12, n)), chooseZ(12,n) == choose(12,n),
           identical(fibnum (N), fibnum (n)),
           identical(fibnum2(N), fibnum2(n)),
@@ -69,23 +69,34 @@ matOuter <- function(X, Y=X, FUN, ...) {
 	    dim = c(length(Y), length(X))))
 }
 
-
-opEQ <- function(OP, x, xI=as.bigz(x)) {
+##' @title
+##' @param OP an arithmetic OPerator such +, *,.. as R function
+##' @param u  numeric vector
+##' @param uI a bigz/biginteger vector,  "the same" as 'u'.
+##' @return a logical  n x n matrix, say R,  R[i,j] := TRUE iff
+##'   u[i] OP v[j]  are all the same when u,v vary in  {u, uI}.
+##' @author Martin Maechler
+opEQ <- function(OP, u, uI=as.bigz(u), eq=TRUE) {
+    stopifnot(length(u) == length(uI))
+    if(eq) stopifnot(isEQ(u, uI)) # should be the case when result should be all TRUE
+    ##
+    ## choose only some on the RHS:
     iR <-
 	if(no0.R <- (identical(OP, `/`) || identical(OP, `%/%`) || identical(OP, `%%`))) {
 	    ## no zero on the RHS i.e., 2nd operand
-	    is.na(x) | x != 0
+	    is.na(u) | u != 0
 	} else TRUE
+    ## choose only some on the LHS:
     iL <-
 	if(no0.L <- (identical(OP, `^`))) {
 	    ## no zero on the LHS i.e., 1st operand
-	    is.na(x) | x != 0
+	    is.na(u) | u != 0
 	} else TRUE
-
-    EQ(mOuter(x [iL],x [iR], OP) -> R,
-       mOuter(xI[iL],xI[iR], OP)) &
-    EQ(mOuter(x [iL],xI[iR], OP) -> S,
-       mOuter(xI[iL], x[iR], OP)) &
+    ##
+    EQ(mOuter(u [iL],u [iR], OP) -> R,
+       mOuter(uI[iL],uI[iR], OP)) &
+    EQ(mOuter(u [iL],uI[iR], OP) -> S,
+       mOuter(uI[iL], u[iR], OP)) &
     EQ(R, S)
 }
 
@@ -98,11 +109,19 @@ opsA <- ops$Arith
 
 eqA <- lapply(sapply(opsA, get), function(op) opEQ(op, x, xI))
 
+op6 <- c("+","-", "*", "/", "%/%", "^")## << are fine - now including "^" _and_ %/% !
+stopifnot(sapply(eqA, all)[op6])
+## The others: now (2014-07): only %% is left: has several "wrong":
+lapply(eqA[is.na(match(names(eqA), op6))], symnum)
 
-op5 <- c("+","-", "*","/", "^") ## These are fine - now including "^" !
-stopifnot(sapply(eqA, all)[op5])
-## The others:  %/% and %% have several "wrong"
-lapply(eqA[is.na(match(names(eqA), op5))], symnum)
+## For example:
+symnum(opEQ(`%%`, x, xI))# not all TRUE, since, e.g.,
+x [3] %% x
+x [3] %% xI ## (negative turned into >= 0; warning 'division by zero')
+
+x  %% x [3]
+xI %% x [3] ## (no negatives ..)
+
 
 ##-- "^" ------------
 z1i <- 0:1
@@ -114,6 +133,7 @@ stopifnot(isEQ(c(N.^0, N.^0L, z1i^N.), c(1,1,NA,1)),
 ## need non-negative values:
 x.po0 <- x >= 0
 stopifnot(M.pow  <- opEQ(`^`, x[x.po0], xI[x.po0]))
+if(FALSE)# FIXME
 stopifnot(M.powQ <- opEQ(`^`, x[x.po0], xQ[x.po0]))
 if(FALSE)# FIXME {z - q}
 M.poIQ <- opEQ(`^`,xI[x.po0], xQ[x.po0])
@@ -121,8 +141,8 @@ M.poIQ <- opEQ(`^`,xI[x.po0], xQ[x.po0])
 ## Modulo arithmetic
 i <- as.bigz(-5:10, 16); i <- i[i != 0]; i
 stopifnot(identical(as.integer(i), c(11:15, 1:10)))
-(Ii <- 1/i )## BUG: in all versions of gmp up to 0.5-5
-I2 <- i^(-1)## BUG: not considering (mod) // segmentation fault in gmp 0.5-1
+(Ii <- 1/i )## BUG: in all versions of gmp up to 0.5-5 -- now 7 warnings pow(x, -|n|)
+I2 <- i^(-1)## BUG: not considering (mod) // segmentation fault in gmp 0.5-1 {now: 7 warn..}
 stopifnot(identical(Ii, I2),
 	  is.na(Ii[c(2, 4, 7, 9, 11, 13, 15)]),
 	  identical(Ii[c(1,3)], as.bigz(c(3,5), 16)))
@@ -206,23 +226,28 @@ stopifnot(a.EQ(l2[1,], ex),
 xQ1 <- as.bigq(x, 1)
 eqC <- lapply(sapply(ops$Compare, get), function(op) opEQ(op, x, xQ1))
 stopifnot(Reduce(`&`, eqC))##
-## but this fails:
-xQ <- as.bigq(x, 17)
-eqC <- lapply(sapply(ops$Compare, get), function(op) opEQ(op, x, xQ))
-lapply(eqC, symnum)
-sapply(eqC, all) # not one ...  {FIXME}?
+##
+xQ <- as.bigq(x, 17) # == x/17 .. *are* not equal, i.e., not expecting all TRUE:
+eqQ <- lapply(sapply(ops$Compare, get),
+              function(op) opEQ(op, x, xQ, eq=FALSE))
+lapply(eqQ, symnum)## <- symnum, for nice output
 
+Fn <- gmp:::`^.bigq`; q <- 2.3
+stopifnot(inherits(e1 <- tryCatch(Fn(q,q),          error=identity), "error"),
+	  inherits(e2 <- tryCatch(q ^ as.bigq(1,3), error=identity), "error"),
+	  grepl("Rmpfr", e1$message),
+	  identical(e1$message, e2$message))
+
+
+## FIXME(2):  %% and %/%  do not work at all for  bigq
 (opsA4 <- opsA[opsA != "^" & !grepl("^%", opsA)])
-
 eqA1 <- lapply(sapply(opsA4, get), function(op) opEQ(op, x, xQ1))
 sapply(eqA1, table)
 ## .TRUE -.TRUE *.TRUE /.TRUE
 ##   100    100    100     90
-##                        ^^^^ (90: was 81) .. not quite
-eqA <- lapply(sapply(opsA4, get), function(op) opEQ(op, x, xQ))
-sapply(eqA, table)
-##        +  -  *  /
-## FALSE 80 80 64 64
-## TRUE  20 20 36 26 ('26' was '17') <<--- oy oy ... way to go!
+##                        ^^^^ (90: was 81) [not dividing by 0]
 
-## and  %%  and %/%  do not work at all for  bigq  {but do for numeric!} --- FIXME
+## xQ *is* different from x (apart from x[6] (and, NA x[1]))
+eqA <- lapply(sapply(opsA4, get), function(op) opEQ(op, x, xQ, eq=FALSE))
+lapply(eqA, symnum)
+

@@ -1,7 +1,7 @@
 
-R Under development (unstable) (2013-09-06 r63856) -- "Unsuffered Consequences"
-Copyright (C) 2013 The R Foundation for Statistical Computing
-Platform: x86_64-unknown-linux-gnu (64-bit)
+R version 3.3.2 Patched (2016-12-07 r71772) -- "Sincere Pumpkin Patch"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -734,7 +734,7 @@ mul.bigq -> num.fn.: *
 ------------------------------------------
 ^.bigq -> num.fn.: ^
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 43 in current 41 in target"
+[1] "'is.NA' value mismatch: 43 in current 68 in target"
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                23.
 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 20880467999847912034355032910567
 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                142108547152020037174224853515625
@@ -748,32 +748,19 @@ mul.bigq -> num.fn.: *
 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <NA>
 11                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              NA
 12                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    -94143178827
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             25
-1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           11045767571919545466173812409689943
-2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           88817841970012523233890533447265625
-3  21413639174133767093505199715038044466889478084427543014054373353606799973999555952463354291023438787520381906929026918045391637112947382715526121906606283112604854466945907623131972373435188891715298513556332721312474275624288596793752238253786597460093767539962333897980041388322455011164388818122854663154832902275480961648169795509698874173270150359260851124999167621135711669921875/19386284415916351754079089178450564925773557736103804419411555585271880141782314140372424277909703897018770899538474171965166118458515899084769015397275464167677107284570523250425575952346592304246424549348074591181601727656179068362270484463196732647218460003493653290976614849694549301017494559084845337731890794268139677171965009511882361078407710175469865837534369361690624
-4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             -1125899906842624
-5                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              1125899906842624
-6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             0
-7                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       193630125104980427932766033374162714624
-8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 42535295865117307932921825928971026432/1341068619663964900807
-9                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        19232792489931358333837313998767870751
-10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         <NA>
-11                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           NA
-12                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                -847288609443
-                                                               2.3
-1                                                              529
-2                                                              625
-3  6705871675207332498089645661225/1267650600228229401496703205376
-4                                                               16
-5                                                               16
-6                                                                0
-7                                                             1156
-8                                                          1024/49
-9                                                              961
-10                                                            <NA>
-11                                                              NA
-12                                                               9
+      25   2.3
+1  error error
+2  error error
+3  error error
+4  error error
+5  error error
+6  error error
+7  error error
+8  error error
+9  error error
+10 error error
+11 error error
+12 error error
                                                                                                                             -4.
 1                                                                                                                      1/279841
 2                                                                                                                      1/390625
@@ -826,19 +813,19 @@ mul.bigq -> num.fn.: *
 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <NA>
 11                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             NA
 12                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              16677181699666569
-                                                                                                                           32/7
-1                                                                                                                        279841
-2                                                                                                                        390625
-3  44968714924347995877535679665554839525511318324676467468500625/1606938044258990275541962092341162602522202993782792835301376
-4                                                                                                                           256
-5                                                                                                                           256
-6                                                                                                                             0
-7                                                                                                                       1336336
-8                                                                                                                  1048576/2401
-9                                                                                                                        923521
-10                                                                                                                         <NA>
-11                                                                                                                           NA
-12                                                                                                                           81
+    32/7
+1  error
+2  error
+3  error
+4  error
+5  error
+6  error
+7  error
+8  error
+9  error
+10 error
+11 error
+12 error
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (31 %% 45)
 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         1635170022196481349560959748587682926364327
 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        21684043449710088680149056017398834228515625
@@ -852,19 +839,19 @@ mul.bigq -> num.fn.: *
 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               <NA>
 11                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 NA
 12                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   -617673396283947
-   NULL   NA                                                                                            -3L
-1  <NA>   NA                                                                                        1/12167
-2  <NA>   NA                                                                                        1/15625
-3  <NA>   NA 1427247692705959881058285969449495136382746624/17365322677153409849313160265892197722207192875
-4  <NA>   NA                                                                                          -1/64
-5  <NA>   NA                                                                                           1/64
-6  <NA>   NA                                                                                          error
-7  <NA>   NA                                                                                        1/39304
-8  <NA>   NA                                                                                      343/32768
-9  <NA>   NA                                                                                        1/29791
-10 <NA> <NA>                                                                                           <NA>
-11 <NA>   NA                                                                                             NA
-12 <NA>   NA                                                                                          -1/27
+    NULL   NA                                                                                            -3L
+1  error   NA                                                                                        1/12167
+2  error   NA                                                                                        1/15625
+3  error   NA 1427247692705959881058285969449495136382746624/17365322677153409849313160265892197722207192875
+4  error   NA                                                                                          -1/64
+5  error   NA                                                                                           1/64
+6  error   NA                                                                                          error
+7  error   NA                                                                                        1/39304
+8  error   NA                                                                                      343/32768
+9  error   NA                                                                                        1/29791
+10 error <NA>                                                                                           <NA>
+11 error   NA                                                                                             NA
+12 error   NA                                                                                          -1/27
 
 ------------------------------------------
 chooseZ -> num.fn.: choose
@@ -1121,7 +1108,7 @@ abs
 +           dim(x) == dim(y    <- as.bigq(x, 6:1))
 +           ,
 +           apply(ym,1,max) == 1:3,
-+           apply(ym,2,min) == c(1,1,0))
++           apply(ym,2,min) == c(1,0))
 > 
 > x %*% t(x)
      [,1] [,2] [,3]
@@ -1161,6 +1148,7 @@ Big Rational ('bigq') 3 x 3 matrix:
 > 
 > dd <- dim(D  <- diag(1:4))
 > stopifnot(dd == dim(Dmq  <- as.bigq(D)),
++           dd == dim(Dz <- as.bigz(D)),
 +           dd == dim(Dm   <- as.bigz(D,6:1)),
 +           dd == dim(Dmr  <- as.bigz(D,7)),
 +           dd == dim(Dmc  <- as.bigz(D,4)),
@@ -1184,12 +1172,8 @@ Big Rational ('bigq') 4 x 4 matrix:
 [2,] (0 %% 7) (4 %% 7) (0 %% 7) (0 %% 7)
 [3,] (0 %% 7) (0 %% 7) (5 %% 7) (0 %% 7)
 [4,] (0 %% 7) (0 %% 7) (0 %% 7) (2 %% 7)
-> try(solve(Dmc))# Error: argument has no inverse
-Error in solve.bigz(Dmc) : System is singular
-In addition: Warning message:
-In solve.bigz(Dmc) : inv(x) returning NA as x has no inverse
-> try(solve(Dm)) # Error: System is singular
-Error in solve.bigz(Dm) : System is singular
+> tools::assertError(solve(Dmc))# Error: argument has no inverse
+> tools::assertError(solve(Dm)) # Error: System is singular
 > 
 > (D.D <- D %*% t(Dm))# now [>= Jan.2012] works too
 Big Integer ('bigz') 4 x 4 matrix:
@@ -1198,7 +1182,13 @@ Big Integer ('bigz') 4 x 4 matrix:
 [2,] 0    0    0    0   
 [3,] 0    0    3    0   
 [4,] 0    0    0    4   
-> stopifnot(identical(D.D, tcrossprod(D,Dm)))
+> vq <- as.bigq(1:4, 4)
+> r41 <- cbind(as.bigq((1:4)^2, 4))
+> stopifnot(identical(D.D, tcrossprod(D,Dm)),
++ 	  dim(r41) == c(4,1),
++ 	  identical(r41, Dz %*% vq), ## bigz %*% bigq - used to fail
++ 	  identical(r41, crossprod(Dz, vq))## ditto
++ 	  )
 > 
 > ##
 > ## some specific tests
@@ -1210,4 +1200,4 @@ Big Integer ('bigz') object of length 5:
 > 
 > proc.time()
    user  system elapsed 
-  4.460   0.270   4.649 
+  0.394   0.070   0.460 

@@ -174,4 +174,3 @@ for(a in list(A, as.bigq(A, 16), factorialZ(20), as.bigq(2:9, 3:4))) {
 }# {for}
 }
 \keyword{arith}
-

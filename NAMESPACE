@@ -1,16 +1,14 @@
 useDynLib(gmp, .registration=TRUE)
 
-
-#importFrom(base,"%*%")
-#importMethodsFrom(methods,"%*%")
+importMethodsFrom("methods", coerce)
 importFrom("methods",
-           coerce, setOldClass, setGeneric, setMethod)
+           setOldClass, setGeneric, setMethod)
 
 ## instead of exportPattern() :
 ## MM: but *really* should export considerably less !! (i.e. use  S3method(.) more !
 export(
        "%*%", # unfortunately need to make it into an S3 generic
-       "crossprod", "tcrossprod",#<- no longer needed in R >= 2.15.0 (generics come with methods)
+       "crossprod", "tcrossprod",#<- *STILL* needed .. unless S4 and we exportMethods() for them
        ## "abs.bigq", "abs.bigz",
        "add.bigq", "add.bigz",
        "apply", "apply.bigq", "apply.bigz", "apply.default",
@@ -18,6 +16,7 @@ export(
        ## "as.character.bigq", "as.character.bigz",
        ## "as.double.bigq", "as.double.bigz",
        ## "as.matrix.bigq", "as.matrix.bigz",
+       ## this should be a deprecated use:
        "as.vector.bigq", "as.vector.bigz",
        ## "c.bigq", "c.bigz", "cbind.bigq", "cbind.bigz",  "rbind.bigq", "rbind.bigz",
        ## "cumsum.bigq", "cumsum.bigz",
@@ -42,7 +41,7 @@ export(
        "matrix", "matrix.bigq", "matrix.bigz", "matrix.default",
        "max.bigq", "max.bigz", "min.bigq", "min.bigz",
        "mod.bigz",
-       "modulus", "modulus<-", "modulus<-.bigz", "modulus.bigz",
+       "modulus", "modulus<-", # "modulus<-.bigz", "modulus.bigz",
        "mul.bigq", "mul.bigz",
        "ncol.bigq", "ncol.bigz", "nrow.bigq", "nrow.bigz",
        "nextprime",
@@ -120,6 +119,9 @@ S3method(duplicated,bigz)
 S3method(unique,bigz)
 S3method(all.equal,bigz)
 
+S3method(modulus, bigz)
+S3method("modulus<-", bigz)
+
 S3method("+",bigq)
 S3method("-",bigq)
 S3method("*",bigq)
@@ -156,7 +158,12 @@ S3method(unique,bigq)
 S3method(mean,bigq)
 S3method(all.equal,bigq)
 
+S3method(matrix, default)
+S3method(matrix, bigq)
+S3method(matrix, bigz)
+
 ## unfortunately, using S4 methods and setOldClass("bigz") is not enough
+## and so we need S3 methods and mask base (see also R/matrix-prods.R):
 S3method("%*%",default)
 S3method("%*%",bigq)
 S3method("%*%",bigz)
@@ -166,6 +173,10 @@ S3method("crossprod",bigz)
 S3method("tcrossprod",default)
 S3method("tcrossprod",bigq)
 S3method("tcrossprod",bigz)
+
+S3method(apply,default)
+S3method(apply,bigq)
+S3method(apply,bigz)
 
 #S3method(as,bigq)
 #S3method(as,bigz)
@@ -177,6 +188,8 @@ S3method(as.integer,bigq)
 S3method(as.integer,bigz)
 S3method(as.matrix,bigq)
 S3method(as.matrix,bigz)
+S3method(as.vector,bigz)
+S3method(as.vector,bigq)
 
 S3method(formatN,default)
 S3method(formatN,integer)
@@ -205,6 +218,9 @@ S3method(gamma,bigz)
 S3method(cumsum,bigz)
 S3method(cumsum,bigq)
 
+S3method(prod,bigz)
+S3method(prod,bigq)
+
 ##-- end{'Math'}-------------------
 
 S3method(solve,bigq)
@@ -220,5 +236,6 @@ exportMethods(asNumeric)
 exportMethods(which.max, which.min)
 
 exportClasses("bigz", "bigq")# setOldClass()'ed, needed in  Rmpfr
-## unfortunately, using S4 methods and setOldClass("bigz") is not enough
-## exportMethods("%*%", "crossprod", "tcrossprod")#-> also exports generics, for R >= 2.15.0
+## unfortunately, using S4 methods and setOldClass("bigz") is not enough,
+## see R/matrix-prods.R :
+## exportMethods("%*%", "crossprod", "tcrossprod")#-> also exports S4 generics

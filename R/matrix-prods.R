@@ -6,11 +6,11 @@ if(FALSE) {## a nice idea --- but not working:  setOldClass() is fine,
  ## NOTE: %*% is an S4, but *not* an S3 generic ==> Let's use S4 methods here
 
  setMethod("%*%", signature(x = "bigz", y = "bigz"),
-           function(x,y) .Call(matrix_mul_z, x, y, FALSE, FALSE))
+           function(x,y) .Call(matrix_mul_z, x, y, 0L))
  setMethod("%*%", signature(x = "bigz", y = "ANY"),
-           function(x,y) .Call(matrix_mul_z, x, y, FALSE, FALSE))
+           function(x,y) .Call(matrix_mul_z, x, y, 0L))
  setMethod("%*%", signature(x = "ANY", y = "bigz"),
-           function(x,y) .Call(matrix_mul_z, x, y, FALSE, FALSE))
+           function(x,y) .Call(matrix_mul_z, x, y, 0L))
  setMethod("crossprod", signature(x = "bigz", y = "bigz"),
            function(x,y) .NotYetImplemented())
  setMethod("crossprod", signature(x = "bigz", y = "ANY"),
@@ -25,11 +25,11 @@ if(FALSE) {## a nice idea --- but not working:  setOldClass() is fine,
            function(x,y) .NotYetImplemented())
 
  setMethod("%*%", signature(x = "bigq", y = "bigq"),
-           function(x,y) .Call(matrix_mul_q, x, y, FALSE, FALSE))
+           function(x,y) .Call(matrix_mul_q, x, y, 0L))
  setMethod("%*%", signature(x = "bigq", y = "ANY"),
-           function(x,y) .Call(matrix_mul_q, x, y, FALSE, FALSE))
+           function(x,y) .Call(matrix_mul_q, x, y, 0L))
  setMethod("%*%", signature(x = "ANY", y = "bigq"),
-           function(x,y) .Call(matrix_mul_q, x, y, FALSE, FALSE))
+           function(x,y) .Call(matrix_mul_q, x, y, 0L))
  setMethod("crossprod", signature(x = "bigq", y = "bigq"),
            function(x,y) .NotYetImplemented())
  setMethod("crossprod", signature(x = "bigq", y = "ANY"),

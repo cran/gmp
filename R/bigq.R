@@ -23,15 +23,18 @@ mul.bigq <- `*.bigq` <- function(e1, e2) .Call(bigrational_mul, e1, e2)
 
 "/.bigq" <- div.bigq <- function(e1, e2) .Call(bigrational_div, e1, e2)
 
-## note: Here, the 2nd argument must be big integer, not rational:
-"^.bigq" <- pow.bigq <- function(e1, e2) .Call(bigrational_pow, e1, as.bigz(e2))
+"^.bigq" <- pow.bigq <- function(e1, e2) {
+    if(!is.whole(e2))
+	stop("<bigq> ^ <non-int>  is not rational; consider  require(Rmpfr); mpfr(*) ^ *")
+    .Call(bigrational_pow, e1, as.bigz(e2))
+}
 
 print.bigq <- function(x, quote = FALSE, initLine = TRUE, ...)
 {
   if((n <- length(x)) > 0) {
     if(initLine) {
       cat("Big Rational ('bigq') ")
-      kind <- if(isM <- !is.null(nr <- attr(x, "nrow")))
+      kind <- if(!is.null(nr <- attr(x, "nrow")))
         sprintf("%d x %d matrix", nr, n/nr)
       else if(n > 1) sprintf("object of length %d", n) else ""
       cat(kind,":\n", sep="")
@@ -281,15 +284,34 @@ solve.bigq <- function(a,b,...)
 }
 
 
-`[.bigq` <- function(x,i=NULL,j=NULL, drop=TRUE)
+`[.bigq` <- function(x, i=NULL, j=NULL, drop=TRUE)
 {
-  .Call(matrix_get_at_q, x, i,j)
+  has.j <- !missing(j)
+  if(!is.null(attr(x, "nrow"))) { ## matrix
+      ## FIXME  x[i,] vs. x[,j] vs. x[i]
+      .Call(matrix_get_at_q, x, i,j)
+  } else { ## non-matrix
+    if(has.j) stop("invalid vector subsetting")
+    ## ugly "workaround"
+    r <- .Call(matrix_get_at_q, x, i, NULL)
+    attr(r,"nrow") <- NULL
+    r
+  }
 }
 
 
 `[<-.bigq` <- function(x,i=NULL,j=NULL,value)
 {
+  has.j <- !missing(j)
+  if(!is.null(attr(x, "nrow"))) { ## matrix
+      ## FIXME  x[i,] vs. x[,j] vs. x[i]
   .Call(matrix_set_at_q, x, value,i,j )
+  } else { ## non-matrix -- ugly workaround:
+    if(has.j) stop("invalid vector subsetting")
+    r <- .Call(matrix_set_at_q, x, value,i,j ) # '1' or does NULL work ??
+    attr(r,"nrow") <- NULL
+    r
+  }
 }
 
 
@@ -318,6 +340,3 @@ prod.bigq <- function(..., na.rm = FALSE)
     X <- c.bigq(...)
    .Call(bigrational_prod, if(na.rm) X[!is.na(X)] else X)
 }
-
-
-

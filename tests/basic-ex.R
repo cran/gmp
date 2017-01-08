@@ -1,16 +1,16 @@
 library(gmp)
 
-## From ~/R/Pkgs/Matrix/inst/test-tools-1.R:
-
+## From ~/R/Pkgs/Matrix/inst/test-tools-1.R -- only for R <= 3.0.1 --
 ##' @title Ensure evaluating 'expr' signals an error
 ##' @param expr
 ##' @return the caught error, invisibly
 ##' @author Martin Maechler
-assertError <- function(expr) {
+assertError <- function(expr, verbose=getOption("verbose")) {
     d.expr <- deparse(substitute(expr))
     t.res <- tryCatch(expr, error = function(e) e)
     if(!inherits(t.res, "error"))
 	stop(d.expr, "\n\t did not give an error", call. = FALSE)
+    if(verbose) cat("Asserted Error:", conditionMessage(t.res),"\n")
     invisible(t.res)
 }
 
@@ -134,15 +134,47 @@ checkRep(Nu)
 ##------ (because  rep(., length.out) works:
 ## {{MM: compare with ~/R/Pkgs/Rmpfr/tests/arith-ex.R }}
 (x <- as.bigz(ix <- 2^(3* 0:7)))
-x9 <- pmin(x,9)
+(x9 <- pmin(x,9))
 xp123 <- pmax(x, 123)
 stopifnot(x9 == c(1,8, rep(9,6)),
-          identical(x,  pmin(x, Inf)),
-          identical(x9, pmin(x,23, Inf, 9)),
           xp123[1:3] == 123,
           xp123[-(1:3)] > 123)
 
-if(FALSE)## FIXME
+chk.pmin <- function(x) {
+    message(deparse(sys.call()),": ")
+    x9    <- pmin(x, 9)
+    xp123 <- pmax(x, 123)
+    stopifnot(
+        identical(x,  pmin(x, Inf)),
+        identical(x9, pmin(x, 23, Inf, 9))
+      , identical(dim(x9),    dim(x))
+      , identical(dim(xp123), dim(x))
+    )
+}
+chk.pmin(x)
+mx <- matrix(x, nrow=3) # with correct warning
+chk.pmin(mx)
+qq <- x / 47
+Mq <- matrix(qq, nrow=3) # with correct warning
+if(FALSE) { ## FIXME:  pmin() / pmax() are completely wrong for "bigq" !!
+chk.pmin(qq)
+chk.pmin(Mq)
+}
+
+## [<- :  Used to return a *matrix* -- not what we want!
+chk.subassign <- function(x, i, value) {
+    x0 <- x
+    x[i] <- value
+    stopifnot(identical(dim(x0), dim(x)), # only when not indexing *outside*
+              all(x[i] == value))# not always identical()
+    invisible(x)
+}
+
+x. <- chk.subassign(x , 1, -1)
+q. <- chk.subassign(qq, 1, -1)
+q. <- chk.subassign(Mq, 1, -1)
+x. <- chk.subassign(mx, 1, -1)
+
 if(require("Rmpfr") && packageVersion("Rmpfr") >= "0.5-2") {
    stopifnot(
        all.equal(pmin(14,  x, 9),
@@ -152,4 +184,22 @@ if(require("Rmpfr") && packageVersion("Rmpfr") >= "0.5-2") {
                        pmin(14, ix/3, 9), tol= 1e-15)
        ,
        is.bigq(mq))
+   ##
+   ## Now, does pmin etc still work for bigz {it did fail!}
+   chk.pmin(x)
+if(FALSE) ## FIXME:  "Rmpfr's  pmin / pmax methods destroy this ==> Fix Rmpfr!
+   chk.pmin(mx)
+if(FALSE) { ## FIXME:  pmin() / pmax() are completely wrong for "bigq" !!
+   chk.pmin(qq)
+   chk.pmin(Mq)
 }
+   ##
+   ## Ditto for  "[<-" :
+   x. <- chk.subassign(x , 1, -1)
+   q. <- chk.subassign(qq, 1, -1)
+   q. <- chk.subassign(Mq, 1, -1)
+   x. <- chk.subassign(mx, 1, -1)
+   ##
+} else
+    message("{Rmpfr + gmp} checks __not__ done")
+

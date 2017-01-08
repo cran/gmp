@@ -31,6 +31,8 @@
 #undef warning
 #define warning Rf_warning
 
+#define class_P(_x_) CHAR(Rf_asChar(Rf_getAttrib(_x_, R_ClassSymbol)))
+
 #ifdef ENABLE_NLS
 #include <libintl.h>
 #define _(String) dgettext ("main", String)

@@ -23,7 +23,7 @@ extern "C" {
    * result = a / b
    */
   void integer_div(mpz_t result,const mpz_t a, const mpz_t b);
-};
+}
 
 
 /**

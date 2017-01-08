@@ -1,10 +1,6 @@
 is.bigz <- function(x) is.raw(x) && inherits(x, "bigz")
 is.bigq <- function(x) is.raw(x) && inherits(x, "bigq")
 
-## Auxiliaries:
-if(getRversion() < "2.15")
-    paste0 <- function(...) paste(..., sep = '')
-
 setGeneric("asNumeric", useAsDefault = function(x) {
     if(is.numeric(x)) x else if(is.atomic(x)) {
         storage.mode(x) <- "numeric"; x }
@@ -64,7 +60,7 @@ print.bigz <- function(x, quote = FALSE, initLine = is.null(modulus(x)), ...)
   if((n <- length(x)) > 0) {
     if(initLine) {
       cat("Big Integer ('bigz') ")
-      kind <- if(isM <- !is.null(nr <- attr(x, "nrow")))
+      kind <- if(!is.null(nr <- attr(x, "nrow")))
         sprintf("%d x %d matrix", nr, n/nr)
       else if(n > 1) sprintf("object of length %d", n) else ""
       cat(kind,":\n", sep="")
@@ -178,7 +174,7 @@ frexpZ <- function(x) .Call(bigI_frexp, x)
 ##' @author Martin Maechler
 lg2.invFrexp <- function(L) {
     stopifnot(is.list(L), is.numeric(d <- L$d), is.numeric(ex <- L$exp),
-	      (n <- length(d)) == length(ex))
+	      (length(d)) == length(ex))
     ex + log2(d)
 }
 
@@ -187,16 +183,16 @@ lg2.invFrexp <- function(L) {
 ## Most 'Math' group would be hard to implement --- [TODO via Rmpfr -- or stop("...via Rmpfr")?
 ## Fall-back: *not* implemented  {or use as.double() ??}
 Math.bigz <- function(x, ...) { .NotYetImplemented() }
-            ## • ‘abs’, ‘sign’, ‘sqrt’,
-            ##   ‘floor’, ‘ceiling’, ‘trunc’,
-            ##   ‘round’, ‘signif’
-            ## • ‘exp’, ‘log’, ‘expm1’, ‘log1p’,
-            ##   ‘cos’, ‘sin’, ‘tan’,
-            ##   ‘acos’, ‘asin’, ‘atan’
-            ##   ‘cosh’, ‘sinh’, ‘tanh’,
-            ##   ‘acosh’, ‘asinh’, ‘atanh’
-            ## • ‘lgamma’, ‘gamma’, ‘digamma’, ‘trigamma’
-            ## • ‘cumsum’, ‘cumprod’, ‘cummax’, ‘cummin’
+            ## o 'abs', 'sign', 'sqrt',
+            ##   'floor', 'ceiling', 'trunc',
+            ##   'round', 'signif'
+            ## o 'exp', 'log', 'expm1', 'log1p',
+            ##   'cos', 'sin', 'tan',
+            ##   'acos', 'asin', 'atan'
+            ##   'cosh', 'sinh', 'tanh',
+            ##   'acosh', 'asinh', 'atanh'
+            ## o 'lgamma', 'gamma', 'digamma', 'trigamma'
+            ## o 'cumsum', 'cumprod', 'cummax', 'cummin'
 
 abs.bigz <- function(x) .Call(biginteger_abs,x)
 sign.bigz <- function(x) .Call(biginteger_sgn,x)
@@ -347,10 +343,10 @@ solve.bigz <- function(a, b,...)
 
 `[.bigz` <- function(x, i=NULL, j=NULL, drop=TRUE)
 {
-  mdrop <- missing(drop)
-  Narg <- nargs() - (!mdrop)
+  ## mdrop <- missing(drop)
+  ## Narg <- nargs() - (!mdrop)
   has.j <- !missing(j)
-  if(isM <- !is.null(nr <- attr(x, "nrow"))) { ## matrix
+  if(!is.null(attr(x, "nrow"))) { ## matrix
     ## FIXME  x[i,] vs. x[,j] vs. x[i]
     .Call(matrix_get_at_z, x, i,j)
   } else { ## non-matrix
@@ -360,12 +356,20 @@ solve.bigz <- function(a, b,...)
     attr(r,"nrow") <- NULL
     r
   }
-
 }
 
 `[<-.bigz` <- function(x, i=NULL, j=NULL, value)
 {
-  .Call(matrix_set_at_z, x, value, i,j)
+  has.j <- !missing(j)
+  if(!is.null(attr(x, "nrow"))) { ## matrix
+      ## FIXME  x[i,] vs. x[,j] vs. x[i]
+      .Call(matrix_set_at_z, x, value, i,j)
+  } else { ## non-matrix -- ugly workaround:
+    if(has.j) stop("invalid vector subsetting")
+    r <- .Call(matrix_set_at_z, x, value, i, 1) # '1' or does NULL work ??
+    attr(r,"nrow") <- NULL
+    r
+  }
 }
 
 

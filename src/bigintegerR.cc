@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04
- *  \date Last modified: $Id: bigintegerR.cc,v 1.36 2013-06-07 15:16:57 mmaechler Exp $
+ *  \date Last modified: $Id: bigintegerR.cc,v 1.37 2014-09-16 07:33:43 mmaechler Exp $
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
@@ -331,7 +331,7 @@ SEXP biginteger_div (SEXP a, SEXP b) { // called from  "/.bigz" == div.bigz
 SEXP biginteger_pow (SEXP a, SEXP b) {
   bigvec v = bigintegerR::create_bignum(a),
     exp = bigintegerR::create_bignum(b);
-  if(v.modulus.size() == 0) { /* has no modulus: now, if any b < 0 , the
+  if(v.modulus.size() == 0) { /* has no modulus: now, if any b < 0, the
 				 result must be (non-integer) bigrational */
     bool use_rat = FALSE;
     for (unsigned int i = 0; i < exp.value.size(); ++i) {
@@ -759,7 +759,7 @@ SEXP biginteger_gcdex(SEXP a, SEXP b)
     @param newseed Integer, seed initialisation (if exists)
     @param ok Integer 1: seed generation 0 not
 */
-SEXP biginteger_rand_u (SEXP nb ,SEXP length,SEXP newseed, SEXP ok)
+SEXP biginteger_rand_u (SEXP nb, SEXP length, SEXP newseed, SEXP ok)
 {
   mpz_t    bz;
   int i,flag,len,size;

@@ -1,3 +1,25 @@
+2016-01-07
+	** Some fix 
+
+	**Indexing/Subassignment:
+	*** Seg.faults in
+	Z <- as.bigz(1:7);     Z[1] <- list(1) # --> seg.fault
+	Q <- as.bigq(1:7, 7);  Q[1] <- list(1) # --> seg.fault
+	Z <- as.bigz(1:7);     Z[1] <- NULL    # --> seg.fault
+	Q <- as.bigq(1:7, 7);  Q[1] <- NULL    # --> seg.fault
+
+	** Not working Arithmetic
+	*** qq <- as.bigq(c(0:5, NA, 7:8), 12) # shows NA fine, is.na(qq), too, but numerator( qq ) gives 0 instead of NA !!
+
+	** Miscellaneous
+	*** unique() silently gives nonsense !
+	*** duplicated()  ditto
+
+	** Matrix stuff
+	***  as.matrix(as.bigq(1:4)),  as.matrix(as.bigz(1:4)) now (~ 2012) work
+	**** NB: to go "back", now have asNumeric()  {instead of expecting as.matrix() to give numeric}
+
+
 2014-07-28
 	* Fix %/% operator
 	* Remove doxygen auto-generated files.

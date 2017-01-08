@@ -1,12 +1,13 @@
-* Bug Fixes								-*-org-*-
 
-** asNumeric(x) : the generic must get a "..." argument, can use "rounding mode" in Rmpfr
-
-** URGENT / BAD : Segfaults, Wrong Results, etc
-
-** Not working  Arithmetic
-
-***  as.bigz(1:4) + as.bigq(7) fails, so does '*', '/', etc
+* Remove full path in configure script, with example of Rmpfr configure.						-*-org-*-
+* Bug Fixes
+** TODO Not working column assignment :  A[,j] <- vec    does nothing, not warn, nothing -- but  A[i,] <- val  works ??
+** TODO asNumeric(x) : the generic must get a "..." argument, so can use "rounding mode" in Rmpfr
+** DONE URGENT / BAD : Segfaults, Wrong Results, etc
+** TODO completely *wrong* pmin() and pmax(<bigq>, <number>): uses Numerator in comparison ???
+*** TODO: Find the *underlying* reason where pmin() goes wrong w/o warning!
+** TODO Not working  Arithmetic
+*** TODO as.bigz(1:4) + as.bigq(7) fails, so does '*', '/', etc
 
  --> use S4 setMethod() on *group* 'Arith' as in ~/R/Pkgs/Rmpfr/R/Arith.R
   --> "done" in R/mixed-ops.R.~experi~
@@ -19,24 +20,27 @@
     -->  create_SEXP(const bigvec& v)  in ./src/bigintegerR.cc ,
     where currently simply the class attribute is set
 
+*** TODO bigq  %% and %/%  are not even defined (but are for 'numeric')!
 
-***  bigz  %% and %/%  fail with "division by zero"
-     whereas the numeric/integer version of these work fine, returning NA;
-     see matOuter() and eqA[] in tests/arith-ex.R
-***  bigq  %% and %/%  are not even defined (but are for 'numeric')!
+*** DONE more checking: q <- 2.3; Fn <- gmp:::`^.bigq`;  Fn(q,q) silently gave wrong result; now a good error message
+*** DONE <bigz> %*% <bigq>  silently gave wrong result; now works, as does crossprod(), tcrossprod()
+*** DONE bigz %% and %/% should be R compatible, notably fulfilling
+ 	(a %/% b)*b + (a %% b)  ==  a     for all a and b
+ Examples
+    	as.bigz(-2:2) %/% as.bigz(3)
+**** DONE %% and %/% fail with "division by zero": now warning = ok.
+ whereas the numeric/integer version of these work fine, returning NA;
+ see matOuter() and eqA[] in tests/arith-ex.R
 
-
-** Miscellaneous
-
-* gmp <--> Rmpfr:
-
+* Miscellaneous
+** TODO [MM:] is.whole() conflicts with  sfsmisc::is.whole(): maybe get that as default method ?
+** gmp <--> Rmpfr:
 *** Z <- as.bigz(1:7);  Z[1] <- mpfr(1, 20)  now gives an error {did segfault!};
 but later, *with* Rmpfr we should make Z into an 'mpfr'.
 This is completely analogous to
  I <- 1:7    ;typeof(I) #  "integer"
  I[1] <- 1.0 ;typeof(I) #  "double" (aka "numeric")
  I[1] <- 1i  ;typeof(I) #  "complex"
-
 **** Want *in addition*:  "coercion" from mpfr() to bigz / bigq:
 
    Solution: Work via GMP's  mpf_t:
@@ -57,17 +61,15 @@ This is completely analogous to
    3) *and* (careful; these are in R pkg gmp; all the above is in Rmpfr):
       enhance as.bigz()  and as.bigq() to  work for this case !
 
-
-
-* Vectorization; other "desiderata"
+** Vectorization; other "desiderata"
 ***  fibnum(), etc are not vectorized -- learn from chooseZ() !
 
-** allow  +/- Inf "bigq" ?? --  +Inf :=: 1/0   -Inf :=:  (-1)/0
+*** allow  +/- Inf "bigq" ?? --  +Inf :=: 1/0   -Inf :=:  (-1)/0
    This would allow the bigq (and bigz) arithmetic to be closer to the
    other R arithmetic rules.
    Currently we get "division by 0" instead... not really desirably in
    quite some cases.
-*** 2013-03: Currently  as.bigz(Inf) now gives 2^8000 *very* arbitrarily;
+**** 2013-03: Currently  as.bigz(Inf) now gives 2^8000 *very* arbitrarily;
       this allows    <bigz>  <=  Inf   to give something better than  NA,
     *but* does not work the same with <bigq>;
     there, the   +- Inf :=  ( +-1 / 0 )   would seem more sensible.
@@ -76,21 +78,16 @@ This is completely analogous to
 
    One possibility:  Using   +- <LARGE>/1  for "bigq", as   +- <LARGE> for "bigz"
 
-* Matrix things
-
+** Matrix things
 ***  3*M and M*3  are not the same: the first forgets the "nrow"
-
-***  x <- as.bigz(2:5); x[1] <- -1; x # --- is a matrix !!!!
-
+*** DONE x <- as.bigz(2:5);    x[1]  <- -1; x  # -- a matrix !! >> no longer
+*** DONE qq <- as.bigz(2:5)/7; qq[1] <- -1; qq # -- a matrix !!
 ***  also want *different*  M[1,] and M[1] for big[zq] matrices
-
 ***  abs(.) or sign(<big..matrix>) {and probably many others!}
      return vector instead of matrix, i.e.., lose the "nrow" attribute.
-
-***  cbind(<bigz>, <bigq>)  returns raw ...
+***  cbind(<bigz>, <bigq>)  returns raw
 
 * More general, previous 'TODO':
-
 ***  The print() method is improved; but matrices are not "noted" yet.
    Still needs discussion; should be shorter for length 1 ?
    We could have an option() .. to suppress the initial line. Fine for
@@ -116,7 +113,6 @@ This is completely analogous to
     the same as pochMpfr() in "Rmpfr" complements chooseMpfr()
 
 * Systematic Testing
-
 *** Arithmetic, Comparison, etc: ensure pairwise compatibility <bigz>, <bigq>, <numeric>
 
 *** tests/gmp-test.R: contains Antoine's previous test suite;

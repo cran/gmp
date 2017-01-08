@@ -35,24 +35,33 @@
 \seealso{\code{\link{solve}}}
 
 \examples{
- x <- matrix(1:4,2,2)
- ## standard solve
- solve(x)
+x <- matrix(1:4,2,2)  ## standard solve :
+solve(x)
 
- q <- as.bigq(x)
- ## solve with rational
- solve(q)
+q <- as.bigq(x) ## solve with rational
+solve(q)
 
- z <- as.bigz(x)
- modulus(z) <- 7
- ## solve in Z/7Z
- solve(z)
+z <- as.bigz(x)
+modulus(z) <- 7  ## solve in Z/7Z :
+solve(z)
 
- b <- c(1,3)
+b <- c(1,3)
+solve(q,b)
+solve(z,b)
 
- solve(q,b)
+## Inversion of ("non-trivial") rational matrices :
 
- solve(z,b)
+A <- rbind(c(10, 1,  3),
+           c( 4, 2, 10),
+           c( 1, 8,  2))
+(IA.q <- solve(as.bigq(A))) # fractions..
+stopifnot(diag(3) == A \%*\% IA.q)# perfect
+
+set.seed(5); B <- matrix(round(9*runif(5^2, -1,1)), 5)
+B
+(IB.q <- solve(as.bigq(B)))
+stopifnot(diag(5) == B \%*\% IB.q, diag(5) == IB.q \%*\% B,
+          identical(B, asNumeric(solve(IB.q))))
 }
 \keyword{arith}
 

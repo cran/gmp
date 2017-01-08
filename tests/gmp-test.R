@@ -139,7 +139,7 @@ stopifnot(identical(as.bigz(x), matrix(as.bigz(as.vector(x)), 3)),
           dim(x) == dim(y    <- as.bigq(x, 6:1))
           ,
           apply(ym,1,max) == 1:3,
-          apply(ym,2,min) == c(1,1,0))
+          apply(ym,2,min) == c(1,0))
 
 x %*% t(x)
 
@@ -151,6 +151,7 @@ y %*% t(y)
 
 dd <- dim(D  <- diag(1:4))
 stopifnot(dd == dim(Dmq  <- as.bigq(D)),
+          dd == dim(Dz <- as.bigz(D)),
           dd == dim(Dm   <- as.bigz(D,6:1)),
           dd == dim(Dmr  <- as.bigz(D,7)),
           dd == dim(Dmc  <- as.bigz(D,4)),
@@ -158,11 +159,17 @@ stopifnot(dd == dim(Dmq  <- as.bigq(D)),
 solve(D)
 solve(Dmq)
 solve(Dmr)
-try(solve(Dmc))# Error: argument has no inverse
-try(solve(Dm)) # Error: System is singular
+tools::assertError(solve(Dmc))# Error: argument has no inverse
+tools::assertError(solve(Dm)) # Error: System is singular
 
 (D.D <- D %*% t(Dm))# now [>= Jan.2012] works too
-stopifnot(identical(D.D, tcrossprod(D,Dm)))
+vq <- as.bigq(1:4, 4)
+r41 <- cbind(as.bigq((1:4)^2, 4))
+stopifnot(identical(D.D, tcrossprod(D,Dm)),
+	  dim(r41) == c(4,1),
+	  identical(r41, Dz %*% vq), ## bigz %*% bigq - used to fail
+	  identical(r41, crossprod(Dz, vq))## ditto
+	  )
 
 ##
 ## some specific tests

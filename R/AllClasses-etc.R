@@ -6,7 +6,7 @@
 ## But unfortunately the above seems "impossible", see
 ##  see also  setMethod() in ./matrix-prods.R
 
-## OTOH: This *still* help to define single-dispatch methods for  asNumeric() :
+## OTOH: This *still* helps to define single-dispatch methods for  asNumeric() :
 ##       {why does it work there ??}
 
 setOldClass("bigz")#, prototype=as.bigz(integer()))

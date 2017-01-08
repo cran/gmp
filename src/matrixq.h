@@ -8,8 +8,7 @@
  *  \note Licence: GPL
  */
 
-
-
+#include "bigvec_q.h"
 
 extern "C"
 {
