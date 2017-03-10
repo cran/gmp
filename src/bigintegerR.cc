@@ -25,6 +25,7 @@
 
 using namespace std;
 
+#include <Rmath.h>
 
 /* Globals variables */
 

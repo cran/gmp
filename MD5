@@ -1,6 +1,6 @@
 9d0e582946e50f407cdc4203687f3f40 *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-18b6db43c9c06bddb982b2def6718eba *DESCRIPTION
+a5db66114f1ca8c5bf60703b5490c143 *DESCRIPTION
 e75597a5514f2969a7cb5b693165b39d *NAMESPACE
 09553770eec43b55937f40756e1c0c7c *R/AllClasses-etc.R
 d5b7cae90ea3d09107b11f8a93a00068 *R/Stirling-n-etc.R
@@ -53,7 +53,7 @@ e28d9a6c0f39526ef137781f33b39c07 *src/Rgmp.h
 2f25f95aedc17f66633efad43411089a *src/apply.h
 8350226d4cf61244918867be4540d835 *src/biginteger.cc
 599fbfe665097436e3268c760714a48d *src/biginteger.h
-3475640acca253b92ac109626d4485e9 *src/bigintegerR.cc
+5e1f9382b7b7cbcd3becb4ce0da1d853 *src/bigintegerR.cc
 f362a42c98f6ad622dd27e21610406d0 *src/bigintegerR.h
 b549e3597fcc415625681086f42b634d *src/bigmod.cc
 4e1886b16ea8841d039ee30b947b0760 *src/bigmod.h
