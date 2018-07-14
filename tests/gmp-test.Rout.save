@@ -1,6 +1,6 @@
 
-R version 3.3.2 Patched (2016-12-07 r71772) -- "Sincere Pumpkin Patch"
-Copyright (C) 2016 The R Foundation for Statistical Computing
+R Under development (unstable) (2018-07-14 r74963) -- "Unsuffered Consequences"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -137,11 +137,11 @@ List of 12
  $ -4.       : num -4
  $ 4L        : int 4
  $ 0.        : num 0
- $ 34_Z      :Class 'bigz'  raw [1:16] 01 00 00 00 ...
- $ 32/7      :Class 'bigq'  atomic [1:16] 01 00 00 00 ...
-  .. ..- attr(*, "denominator")= raw [1:16] 01 00 00 00 ...
- $ (31 %% 45):Class 'bigz'  atomic [1:16] 01 00 00 00 ...
-  .. ..- attr(*, "mod")=Class 'bigz'  raw [1:16] 01 00 00 00 ...
+ $ 34_Z      : 'bigz' raw 34
+ $ 32/7      : 'bigq' raw 32/7
+  ..- attr(*, "denominator")= raw [1:16] 01 00 00 00 ...
+ $ (31 %% 45): 'bigz' raw (31 %% 45)
+  ..- attr(*, "mod")= 'bigz' raw 45
  $ NULL      : NULL
  $ NA        : logi NA
  $ -3L       : int -3
@@ -1200,4 +1200,4 @@ Big Integer ('bigz') object of length 5:
 > 
 > proc.time()
    user  system elapsed 
-  0.394   0.070   0.460 
+  1.304   0.071   1.365 

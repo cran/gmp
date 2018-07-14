@@ -1,6 +1,6 @@
 9d0e582946e50f407cdc4203687f3f40 *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-a5db66114f1ca8c5bf60703b5490c143 *DESCRIPTION
+c8b588c6f26c4de981ea8d3d265e1ad0 *DESCRIPTION
 e75597a5514f2969a7cb5b693165b39d *NAMESPACE
 09553770eec43b55937f40756e1c0c7c *R/AllClasses-etc.R
 d5b7cae90ea3d09107b11f8a93a00068 *R/Stirling-n-etc.R
@@ -66,7 +66,7 @@ eeba1d7c0ee42ec5f150d0aa2e3df028 *src/bigrationalR.h
 c144d580d508d933b2c60434f0c68b2b *src/bigvec_q.cc
 ac265fd770384b99e8f5c62487ffd84e *src/bigvec_q.h
 50ff06a5ad1980f1fc0291e07e4efe7c *src/extract_matrix.cc
-7b4e155913f83c96f715f808984665a2 *src/extract_matrix.h
+e77ed04c2c066e2610e222b9eec6fbed *src/extract_matrix.h
 dd962dc48f13a61f8cfbe491d9af9fa8 *src/factor.cc
 d9a08b2df600c3fa8f350fc2226a5327 *src/factor.h
 fc68dd7949af4fbf48ad47be0081b3e6 *src/factorize.cc
@@ -82,4 +82,4 @@ b2aaf94becc698dc4ba3968a124186fe *src/solve.h
 a1c5ecc7457baa1cf64174baabc6231a *tests/arith-ex.R
 6529cb5dd0aeac3c39028078adc81cad *tests/basic-ex.R
 9ba348177b1174bd07f67533a0a06163 *tests/gmp-test.R
-d23c1cb77a81ff36649aeecc2b7c6e5c *tests/gmp-test.Rout.save
+2a2703dce72df73e78b90fc0b1d89cdc *tests/gmp-test.Rout.save

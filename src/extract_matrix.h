@@ -168,7 +168,7 @@ namespace extract_gmp_R
 	}
       else //INDJ: numbers
 	{
-	  indJ.erase(std::remove(indJ.begin(), indJ.end(),0), indJ.end()); // remove all zeroes
+	  indJ.erase(std::remove(indJ.begin(), indJ.end(), 0L), indJ.end()); // remove all zeroes
 
 	  if (indJ.empty())
 	    {
@@ -276,7 +276,7 @@ namespace extract_gmp_R
 	}
 	else { // INDI : numbers
 	  // remove zeros:
-	  indI.erase(std::remove(indI.begin(), indI.end(),0), indI.end());
+	  indI.erase(std::remove(indI.begin(), indI.end(), 0L), indI.end());
 
 	  if (indI.empty())
 	    {
