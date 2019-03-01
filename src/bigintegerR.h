@@ -26,6 +26,18 @@ typedef bigmod (*biginteger_binary_fn)(const bigmod&, const bigmod&);
 typedef bool (*biginteger_logical_binary_fn)(const biginteger&, const biginteger&);
 #endif
 
+
+struct lockSexp {
+  lockSexp(const SEXP & value) {
+    PROTECT(value);
+  }
+
+  ~lockSexp(){
+    UNPROTECT(1);
+  }
+};
+
+
 /**
  * \brief set of function useful for manipulation of SEXP and bigvec
  */

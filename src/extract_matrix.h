@@ -325,18 +325,22 @@ namespace extract_gmp_R
 
 	    }
 	  else
-	    // case: positive values: 1;5;7;7;9;10...
 	    {
+	    // case: positive values: 1;5;7;7;9;10...
+	    
 	      // delete too large values or give error iff  INDJ is non-NULL
-	      for(it = indI.begin(); it != indI.end(); ++it)
-		if(*it > static_cast<int>((*matrice)[0]->size()))
-		    if(oldnrow < 0) { // vector case: out-of-bound --> NA
+	      for(it = indI.begin(); it != indI.end(); ++it) 
+		{
+		  if(*it > static_cast<int>((*matrice)[0]->size())) 
+		    {
+		      if(oldnrow < 0) { // vector case: out-of-bound --> NA
 			/* it = indI.erase(it); */
 			/* --it; */
-		    } else { // matrix case:
+		      } else { // matrix case:
 			Rf_error("subscript out of bounds");
+		      }
 		    }
-
+		}
 	      // note : can have duplicates and indices are not sorted
 
 	      //newnrow = indI.size();

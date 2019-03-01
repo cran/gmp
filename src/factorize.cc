@@ -46,16 +46,13 @@ factor_using_division (mpz_t t, bigvec & factors)
 {
   mpz_t q;
   unsigned long int p;
-  int i;
+  
 
-  if (flag_verbose > 0)
-    {
-      //printf ("[trial division] ");
-    }
 
   mpz_init (q);
 
   p = mpz_scan1 (t, 0);
+
   mpz_div_2exp (t, t, p);
   while (p)
     {
@@ -64,7 +61,7 @@ factor_using_division (mpz_t t, bigvec & factors)
     }
 
   p = 3;
-  for (i = 1; i < PRIMES_PTAB_ENTRIES;)
+  for (unsigned int i = 1; i <= PRIMES_PTAB_ENTRIES;)
     {
       if (! mpz_divisible_ui_p (t, p))
 	{
@@ -107,7 +104,7 @@ mp_millerrabin (mpz_srcptr n, mpz_srcptr nm1, mpz_ptr x, mpz_ptr y,
 int
 mp_prime_p (mpz_t n)
 {
-  int k, r, is_prime;
+  int k, is_prime;
   mpz_t q, a, nm1, tmp;
  
   bigvec factors;
@@ -115,9 +112,11 @@ mp_prime_p (mpz_t n)
   if (mpz_cmp_ui (n, 1) <= 0)
     return 0;
 
+
   /* We have already casted out small primes. */
   if (mpz_cmp_ui (n, (long) FIRST_OMITTED_PRIME * FIRST_OMITTED_PRIME) < 0)
     return 1;
+
 
   mpz_init (q);
   mpz_init(a);
@@ -149,14 +148,12 @@ mp_prime_p (mpz_t n)
 
   /* Loop until Lucas proves our number prime, or Miller-Rabin proves our
      number composite.  */
-  for (r = 0; r < PRIMES_PTAB_ENTRIES; r++)
+  for (unsigned int r = 0; r < PRIMES_PTAB_ENTRIES; r++)
     {
-      int i;
-
       if (flag_prove_primality)
 	{
 	  is_prime = 1;
-	  for (i = 0; i < factors.size() && is_prime; i++)
+	  for (unsigned int i = 0; i < factors.size() && is_prime; i++)
 	    {
 	      mpz_divexact (tmp, nm1, factors[i].value.getValue());
 	      mpz_powm (tmp, a, tmp, n);
@@ -181,8 +178,7 @@ mp_prime_p (mpz_t n)
 	}
     }
 
-  //fprintf (stderr, "Lucas prime test failure.  This should not happen\n");
-  //abort ();
+
   error( "Lucas prime test failure.  This should not happen\n");
  ret1:
   if (flag_prove_primality)  
@@ -194,6 +190,7 @@ mp_prime_p (mpz_t n)
   mpz_clear(nm1);
   mpz_clear(tmp);
 
+
   return is_prime;
 }
 
@@ -203,11 +200,6 @@ factor_using_pollard_rho (mpz_t n, unsigned long a, bigvec & factors)
   mpz_t x, z, y, P;
   mpz_t t, t2;
   unsigned long  k, l, i;
-
-  if (flag_verbose > 0)
-    {
-      //printf ("[pollard-rho (%lu)] ", a);
-    }
 
   mpz_init (t);
   mpz_init(t2);
@@ -270,10 +262,6 @@ factor_using_pollard_rho (mpz_t n, unsigned long a, bigvec & factors)
 
       if (!mp_prime_p (t))
 	{
-	  if (flag_verbose > 0)
-	    {
-	      //printf ("[composite factor--restarting pollard-rho] ");
-	    }
 	  factor_using_pollard_rho (t, a + 1, factors);
 	}
       else
@@ -304,23 +292,20 @@ void
 factor (mpz_t t, bigvec & factors)
 {
 
-
   if (mpz_sgn (t) != 0)
     {
       factor_using_division (t, factors);
 
       if (mpz_cmp_ui (t, 1) != 0)
 	{
-	  if (flag_verbose > 0)
-	    {
-	      //printf ("[is number prime?] ");
-	    }
 	  if (mp_prime_p (t))
 	    factors.push_back( t);
 	  else
 	    factor_using_pollard_rho (t, 1, factors);
 	}
     }
+
+
 }
 
 

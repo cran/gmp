@@ -31,7 +31,9 @@ using namespace std;
 // given that x is "bigz" or "bigq",
 // return TRUE if x is a bigz/q *matrix*: R's is.matrixZQ(.)
 SEXP is_matrix_zq(SEXP x) {
-    return Rf_ScalarLogical(Rf_getAttrib(x, Rf_mkString("nrow")) != R_NilValue);
+  SEXP nrowSexp = Rf_mkString("nrow");
+  SEXP attributeRow = Rf_getAttrib(x,nrowSexp );
+    return Rf_ScalarLogical(attributeRow != R_NilValue);
 }
 
 // C++ side of R function matrix.bigz()
@@ -114,7 +116,9 @@ SEXP as_matrixz (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP mod)
  */
 SEXP bigint_transposeR(SEXP x)
 {
-  SEXP dimAttr = Rf_getAttrib(x, Rf_mkString("nrow"));
+  SEXP dimKey =Rf_mkString("nrow");
+  SEXP dimAttr = Rf_getAttrib(x,dimKey );
+  PROTECT(dimAttr);
   bigvec mat = bigintegerR::create_bignum(x);
   int nr, n = mat.size();
 
@@ -125,6 +129,7 @@ SEXP bigint_transposeR(SEXP x)
   } else { nr = -1;// -Wall
     error(_("argument must be a matrix of class \"bigz\""));
   }
+  UNPROTECT(1);
   int nc = (int) n / nr;
   // Rprintf(" o bigI_tr(<%d x %d>) ..\n", nr,nc);
   return( bigintegerR::create_SEXP(matrixz::bigint_transpose(mat, nr,nc)));

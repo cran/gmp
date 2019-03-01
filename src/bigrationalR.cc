@@ -31,6 +31,7 @@ namespace bigrationalR
   /** \brief create a vector of bigrationals, all without a denominator.
    */
   bigvec_q create_vector(SEXP param) {
+    lockSexp lock (param);
     switch (TYPEOF(param)) {
     case NILSXP:
 	return bigvec_q(); // = bigq(0)
@@ -105,15 +106,19 @@ namespace bigrationalR
       if( CHAR(STRING_ELT(param,0)) == "bigz")
 	return(bigvec_q(bigintegerR::create_bignum(param)) );
     */
+    lockSexp lock (param);
 
     bigvec_q v = bigrationalR::create_vector(param);
-    SEXP denAttr = Rf_getAttrib(param, Rf_mkString("denominator"));
-    SEXP dimAttr = Rf_getAttrib(param, Rf_mkString("nrow"));
+    SEXP denKey = Rf_mkString("denominator");
+    SEXP denAttr = Rf_getAttrib(param, denKey);
+    SEXP dimKey = Rf_mkString("nrow");
+    SEXP dimAttr = Rf_getAttrib(param,dimKey );
     if (TYPEOF(dimAttr) == INTSXP)
       v.nrow = INTEGER(dimAttr)[0];
     else {
 	// catch to get std matrix dimensions value
-	dimAttr = Rf_getAttrib(param, Rf_mkString("dim"));
+      dimKey = Rf_mkString("dim");
+	dimAttr = Rf_getAttrib(param,dimKey );
 	v.nrow = (TYPEOF(dimAttr) == INTSXP) ? INTEGER(dimAttr)[0] : -1;
       }
     if (TYPEOF(denAttr) != NILSXP)

@@ -51,6 +51,8 @@ class bigmod {
     value(rhs.value),
     modulus(rhs.modulus){}
 
+  ~bigmod(){};
+
   /**
    * \brief  Return as a human readible string
    */

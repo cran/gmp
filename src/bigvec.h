@@ -41,6 +41,8 @@ class bigvec {
    */
   bigvec(const bigvec & vecteur);
 
+  ~bigvec(){};
+
   /**
    * \brief construct a bigmod at indice i
    *

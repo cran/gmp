@@ -45,9 +45,7 @@ div.bigq(e1, e2)
 \value{
   A bigq class representing the result of the arithmetic operation.
 }
-\references{
-  \url{http://mulcyber.toulouse.inra.fr/projects/gmp/}
-}
+
 \author{Immanuel Scholz and Antoine Lucas}
 
 \examples{

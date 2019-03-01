@@ -36,6 +36,7 @@ namespace bigintegerR
 {
   // \brief create a vector of bigvecs, all without a modulus.
   bigvec create_vector(const SEXP & param) {
+    lockSexp lock (param);
     switch (TYPEOF(param)) {
     case NILSXP:
 	return bigvec(); // = bigz(0)
@@ -119,7 +120,8 @@ namespace bigintegerR
   }
 
   bigvec create_bignum(const SEXP & param) {
-      SEXP
+       lockSexp lock (param);
+       SEXP
 	  modAttr = Rf_getAttrib(param, Rf_mkString("mod")),
 	  dimAttr = Rf_getAttrib(param, Rf_mkString("nrow"));
 
@@ -145,6 +147,7 @@ namespace bigintegerR
   }
 
   std::vector<int> create_int(const SEXP & param) {
+    lockSexp lock (param);
     switch (TYPEOF(param)) {
     case REALSXP:
       {
@@ -195,10 +198,11 @@ namespace bigintegerR
 
     // Rprintf("   o create_SEXP(<bigvec>): v.nrow=%d", v.nrow);
     // set the dim attribute
-    if(v.nrow >= 0) // {
-      Rf_setAttrib(ans, Rf_mkString("nrow"), Rf_ScalarInteger((int) v.nrow));
-      // Rprintf(" *SET*\n");
-      // } else Rprintf(" no set\n");
+    if(v.nrow >= 0)  {
+      SEXP nrowAttr  = Rf_mkString("nrow");
+      SEXP nrowValue = Rf_ScalarInteger((int) v.nrow);
+      Rf_setAttrib(ans, nrowAttr,nrowValue);
+    }
     // set the mod attribute
     if(v.modulus.size() > 0) {
       SEXP mod = PROTECT(create_SEXP(v.modulus)); // and set *its* class
@@ -343,7 +347,8 @@ SEXP biginteger_pow (SEXP a, SEXP b) {
     }
     if (use_rat) { // a ^ b  with some b negative --> rational result
       // 1)  a := as.bigq(a, 1)
-      SEXP aq = bigrational_as(a, Rf_ScalarInteger(1));
+      SEXP one = Rf_ScalarInteger(1);
+      SEXP aq = bigrational_as(a, one);
       // 2)  result =  <bigq a> ^ b:
       return bigrational_pow(aq, b);
     }

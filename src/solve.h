@@ -55,13 +55,13 @@ namespace solve_gmp_R
   template< class T> void solve (T & A , T & B)
     {
       // n = A.nrow
-      unsigned int i;
+      int i;
 
       // a temp value
       T tmpValeur(1);
 
       // A [ i ,j] = A[ i + j * A.nrow]
-      for(unsigned int k = 0 ; k < A.nrow; ++k)
+      for(int k = 0 ; k < A.nrow; ++k)
 	{
 	  if(A[k + k* A.nrow ].sgn() == 0 )
 	    Rf_error("System is singular");

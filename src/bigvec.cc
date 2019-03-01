@@ -288,7 +288,7 @@ void bigvec::print()
   if(nrow > 0) {
     for(int i=0; i < nrow; ++i)
       {
-	for(int j=0; j < (value.size() / nrow); ++j)
+	for(unsigned int j=0; j < (value.size() / nrow); ++j)
 	  Rprintf("%s\t", value[i+j* nrow].str(10).c_str() );
 	Rprintf("\n");
       }

@@ -28,14 +28,14 @@ SEXP inverse_q(SEXP A)
 
 SEXP solve_gmp_R::inverse_q(bigvec_q a)
 {
-  if(a.nrow * a.nrow != a.size())
+  if(a.nrow * a.nrow != (int) a.size())
     error(_("Argument 1 must be a square matrix"));
   bigvec_q b (a.size());
   b.nrow = a.nrow;
 
   // initialize b to identity
-  for(unsigned int i=0; i<b.nrow ; ++i)
-    for(unsigned int j=0; j<b.nrow ; ++j)
+  for(int i=0; i<b.nrow ; ++i)
+    for(int j=0; j<b.nrow ; ++j)
 	b.value[i+j*b.nrow].setValue((i == j) ? 1 : 0);
 
   solve_gmp_R::solve(a,b);
@@ -50,13 +50,13 @@ SEXP inverse_z (SEXP A)
   if(a.modulus.size() == 1 &&  !a.modulus[0].isNA()) {
     bigvec b (a.size() );
     b.nrow = a.nrow;
-    if(a.nrow * a.nrow != a.size())
+    if(a.nrow * a.nrow != (int) a.size())
       error(_("Argument 1 must be a square matrix"));
 
     b.modulus.push_back(a.modulus[0]);
     // initialize b to identity
-    for(unsigned int i=0; i<b.nrow ; ++i)
-      for(unsigned int j=0; j<b.nrow ; ++j)
+    for(int i=0; i<b.nrow ; ++i)
+      for(int j=0; j<b.nrow ; ++j)
 	b.value[i+j*b.nrow].setValue((i == j) ? 1 : 0);
 
     solve_gmp_R::solve(a,b);
@@ -94,7 +94,7 @@ SEXP solve_z(SEXP A,SEXP B)
 	    if(b.nrow<1)
 	      b.nrow = b.size();
 
-	    if(a.nrow * a.nrow != a.size())
+	    if(a.nrow * a.nrow != (int) a.size())
 	      error(_("Argument 1 must be a square matrix"));
 
 	    if(a.nrow != b.nrow)
@@ -124,7 +124,7 @@ SEXP solve_q(SEXP A,SEXP B)
 // solve AX = B
 SEXP solve_gmp_R::solve_q(bigvec_q a, bigvec_q b)
 {
-  if(a.nrow * a.nrow != a.size())
+  if(a.nrow * a.nrow != (int) a.size())
     error(_("Argument 1 must be a square matrix"));
 
   // case: b a vector

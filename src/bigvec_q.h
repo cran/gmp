@@ -55,6 +55,8 @@ class bigvec_q {
   /** \brief create from bigintegers */
   bigvec_q(const bigvec & rhs);
 
+  ~bigvec_q(){};
+
   /**  \brief assignemt operator */
   bigvec_q & operator= (const bigvec_q& rhs);
 
