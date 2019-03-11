@@ -5,16 +5,20 @@
  *
  */
 bigvec::bigvec(unsigned int i) :
+  matrix::Matrix<bigmod>(),
   value(i),
   modulus(0),
+  valuesMod(),
   nrow(-1)
 {
 }
 
 
 bigvec::bigvec(const bigvec & vecteur) :
+  matrix::Matrix<bigmod>(),
   value(vecteur.value.size()),
   modulus(vecteur.modulus.size()),
+  valuesMod(),
   nrow(vecteur.nrow)
 {
   //  *this = vecteur;
@@ -36,6 +40,9 @@ bigvec::bigvec(const bigvec & vecteur) :
     }
 }
 
+bigvec::~bigvec(){
+  clearValuesMod();
+}
 
 //
 std::string bigvec::str(int i,int b) const
@@ -59,24 +66,60 @@ std::string bigvec::str(int i,int b) const
     return s;
 }
 
+bigmod & bigvec::get(unsigned int row, unsigned int col) {
+  return (*this)[row + col*nrow];
+}
 
-bigmod bigvec::operator[] (unsigned int i) const
+
+ bigmod & bigvec::operator[] (unsigned int i) 
 {
-  if(modulus.size()>0)
-    return(bigmod(value[i], modulus[i%modulus.size()]));
-  return(bigmod(value[i]));
+  checkValuesMod();
+  return *valuesMod[i];
+}
+
+
+const bigmod & bigvec::operator[] (unsigned int i) const
+{
+  bigvec * nonConst = const_cast<bigvec*>(this);
+  nonConst->checkValuesMod();
+  return *valuesMod[i];
+}
+
+void bigvec::set(unsigned int row, unsigned int col, const  bigmod & val) {
+  set( row + col*nrow,val);
+}
+
+void bigvec::checkValuesMod() {
+  if (valuesMod.size() != value.size()){
+    // reconstruct bigmod that are references to values and modulus:
+    clearValuesMod();
+    if(modulus.size()>0) {
+      for (int i = 0 ; i < value.size(); i++)
+	valuesMod.push_back(new bigmod(value[i], modulus[i%modulus.size()]));
+    } else {
+      for (int i= 0 ; i < value.size(); i++)
+	valuesMod.push_back(new BigModInt(value[i]));
+    }
+    
+  }
+}
+
+void bigvec::clearValuesMod(){
+  for (int i = 0 ; i < valuesMod.size(); i++){
+    delete valuesMod[i];
+  }
+  valuesMod.clear();
 }
 
 void bigvec::set(unsigned int i,const bigmod & val)
 {
+  value[i] = val.getValue();
 
-  value[i] = val.value;
-
-  if(!val.modulus.isNA())
+  if(!val.getModulus().isNA())
     {
       if(modulus.size()> i)
 	{
-	  modulus[i] = val.modulus ;
+	  modulus[i] = val.getModulus() ;
 	  return;
 	}
 
@@ -86,40 +129,42 @@ void bigvec::set(unsigned int i,const bigmod & val)
       if( (modulus.size() ==  (unsigned int)nrow_mod ) || (modulus.size() == 1) )
 	{
 	  // check "row-mod" or "global" modulus
-	  if(!(val.modulus != modulus[i % modulus.size()]))
+	  if(!(val.getModulus() != modulus[i % modulus.size()])) {
 	    return;
+	  }
 	}
 
       // we add "previous"
       nrow_mod = modulus.size();
       for(unsigned int j = nrow_mod; j< i;++j)
 	modulus.push_back(modulus[j % nrow_mod]);
-      modulus.push_back(val.modulus);
-
+      modulus.push_back(val.getModulus());
+      clearValuesMod();
     }
 }
 
 void bigvec::push_back(const bigmod & number)
 {
   int nrow_mod = (nrow < 0) ? 1 : nrow;
+  clearValuesMod();
 
-  value.push_back(number.value);
+  value.push_back(number.getValue());
 
-  if((!number.modulus.isNA()) || (modulus.size()>0) )
+  if((!number.getModulus().isNA()) || (modulus.size()>0) )
     {
       // pathologic case: value.size >0 ; modulus.size =0
       // we assume previous mod where NA
       if((modulus.size() ==0) && (value.size()>0))
 	{
 	  modulus.resize(value.size()-1);
-	  modulus.push_back( number.modulus);
+	  modulus.push_back( number.getModulus());
 	  return;
 	}
 
       // standard cas
       if((modulus.size() != 1 ) && (static_cast<int>(modulus.size()) != nrow_mod) )
 	{
-	  modulus.push_back(number.modulus);
+	  modulus.push_back(number.getModulus());
 	  return;
 	}
 
@@ -130,12 +175,12 @@ void bigvec::push_back(const bigmod & number)
       //  2     1  push_back: shoud add previous modulus then 1
       // note nrow_mod is either 1 ither nrow (when nrow >1)
       nrow_mod = modulus.size();
-      if(modulus[(value.size() -1)% nrow_mod ] != number.modulus)
+      if(modulus[(value.size() -1)% nrow_mod ] != number.getModulus())
 	{
 	  // we add "previous"
 	  for(unsigned int i = nrow_mod; i< value.size()-1;i++)
 	    modulus.push_back(modulus[i % nrow_mod]);
-	  modulus.push_back(number.modulus);
+	  modulus.push_back(number.getModulus());
 	  }
     }
 }
@@ -145,7 +190,17 @@ void bigvec::push_back(const bigmod & number)
  */
 void bigvec::push_back(int value_p)
 {
+  clearValuesMod();
   value.push_back(biginteger(value_p));
+}
+
+/** 
+ * insert int value
+ */
+void bigvec::push_back(biginteger & value_p)
+{
+  clearValuesMod();
+  value.push_back(value_p);
 }
 
 /**
@@ -153,6 +208,7 @@ void bigvec::push_back(int value_p)
  */
 void bigvec::push_back(const __mpz_struct * value_p)
 {
+  clearValuesMod();
   value.push_back(biginteger(value_p));
 }
 
@@ -163,9 +219,17 @@ unsigned int bigvec::size() const
   return(value.size());
 }
 
+
+unsigned int  bigvec::nRows() const {
+   return abs(nrow);
+}
+
+
 // hummm. to avoid !
 void bigvec::resize(unsigned int i)
 {
+  clearValuesMod();
+
 
   value.resize(i);
   if(i < modulus.size())
@@ -175,6 +239,7 @@ void bigvec::resize(unsigned int i)
 // clear all
 void bigvec::clear()
 {
+  clearValuesMod();
   value.clear();
   modulus.clear();
   nrow = -1;
@@ -233,53 +298,6 @@ bool operator!=(const bigvec & rhs, const bigvec& lhs)
   return(true);
 }
 
-
-
-//
-// \brief substract lambda[0] * line j to line i
-//
-void bigvec::subLine(unsigned int i,unsigned int j,const bigvec & lambda)
-{
-  if(nrow <= 0)
-    error(_("Need matrix with at least one row to do this operation"));
-
-  unsigned int k, n = value.size() / (unsigned int) nrow;
-  if(modulus.size() != 1)
-    {
-      for(k=0; k < n; ++k)
-	value[i + k*nrow] =  value[i + k*nrow] - ( value[j + k*nrow] * lambda.value[0] ) ;
-    }
-  else
-     for(k=0; k < n ; ++k)
-       {
-	 value[i + k*nrow] =  value[i + k*nrow] - ( value[j + k*nrow] * lambda.value[0] ) ;
-	 value[i + k*nrow] =  value[i + k*nrow] % modulus[0];
-       }
-}
-
-/*
- * \brief multiply line i by lambda
- */
-void bigvec::mulLine(unsigned int i,const bigvec & lambda)
-{
-  if(nrow <= 0)
-    error(_("Need matrix with at least one row to do this operation"));
-
-  unsigned int k;
-  // n number of columns
-  unsigned int n = value.size() / (unsigned int) nrow;
-  if(modulus.size() != 1)
-    {
-      for(k=0; k < n; ++k)
-	value[i + k*nrow] =  value[i + k*nrow]  * lambda.value[0]  ;
-    }
-  else
-     for(k=0; k < n ; ++k)
-       {
-	 value[i + k*nrow] =  value[i + k*nrow] * lambda.value [0] ;
-	 value[i + k*nrow] =  value[i + k*nrow] % modulus[0];
-       }
-}
 
 
 // never used

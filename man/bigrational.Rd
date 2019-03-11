@@ -62,8 +62,6 @@ numerator(x)
   corresponding rationals bigq.
 }
 
-
-
 \author{Antoine Lucas}
 
 \examples{

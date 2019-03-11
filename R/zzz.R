@@ -1,6 +1,9 @@
 ## we "need" S4 methods for dispatch on both (x,y)  .noGenerics <- TRUE
 .conflicts.OK <- TRUE
 
+## gmp-ify base function(s):
+environment(outer) <- environment()# i.e. asNamespace("gmp")
+
 .gmpVersion <- function() .Call(R_gmp_get_version)
 gmpVersion <- function()
     numeric_version(sub("^([0-9]+\\.[0-9]+\\.[0-9]+).*","\\1", .gmpVersion()))

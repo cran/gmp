@@ -35,11 +35,11 @@ SEXP as_matrixq (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP den)
   /* get "bigz" vector, this makes all conversion int to bigz etc...*/
   bigvec_q mat = bigrationalR::create_bignum(x),
     denominator = bigrationalR::create_bignum(den);
-  int
-    nc= INTEGER(ncR)[0],
-    nr= INTEGER(nrR)[0],
-    byrow= INTEGER(byrowR)[0],
-    lendat = mat.size();
+  
+  int nc= INTEGER(ncR)[0];
+  int nr= INTEGER(nrR)[0];
+  int byrow= INTEGER(byrowR)[0];
+  int lendat = mat.size();
 
   if(denominator.value.size()>0) // should be allways the case
       if(!denominator.value[0].isNA())
@@ -104,7 +104,10 @@ SEXP as_matrixq (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP den)
 // function called by t(m) when m is a bigrational
 SEXP bigq_transposeR(SEXP x)
 {
-  SEXP dimAttr = Rf_getAttrib(x, Rf_mkString("nrow"));
+  SEXP strAttr = Rf_mkString("nrow");
+  PROTECT(strAttr);
+  SEXP dimAttr = Rf_getAttrib(x, strAttr);
+  PROTECT(dimAttr);
   bigvec_q mat = bigrationalR::create_bignum(x);
   int nr, n = mat.size();
 
@@ -120,6 +123,7 @@ SEXP bigq_transposeR(SEXP x)
   int nc = (int) n / nr;
   bigvec_q mat_transp = matrixq::bigq_transpose(mat, nr,nc);
   mat_transp.nrow = nc; // FIXME - needed ?
+  UNPROTECT(2);
   return( bigrationalR::create_SEXP( mat_transp));
 }
 

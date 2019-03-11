@@ -32,8 +32,12 @@ using namespace std;
 // return TRUE if x is a bigz/q *matrix*: R's is.matrixZQ(.)
 SEXP is_matrix_zq(SEXP x) {
   SEXP nrowSexp = Rf_mkString("nrow");
+  PROTECT(nrowSexp);
   SEXP attributeRow = Rf_getAttrib(x,nrowSexp );
-    return Rf_ScalarLogical(attributeRow != R_NilValue);
+  PROTECT(attributeRow);
+  SEXP ans = Rf_ScalarLogical(attributeRow != R_NilValue);
+  UNPROTECT(2);
+  return ans;
 }
 
 // C++ side of R function matrix.bigz()
@@ -117,6 +121,7 @@ SEXP as_matrixz (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP mod)
 SEXP bigint_transposeR(SEXP x)
 {
   SEXP dimKey =Rf_mkString("nrow");
+  PROTECT(dimKey);
   SEXP dimAttr = Rf_getAttrib(x,dimKey );
   PROTECT(dimAttr);
   bigvec mat = bigintegerR::create_bignum(x);
@@ -129,7 +134,7 @@ SEXP bigint_transposeR(SEXP x)
   } else { nr = -1;// -Wall
     error(_("argument must be a matrix of class \"bigz\""));
   }
-  UNPROTECT(1);
+  UNPROTECT(2);
   int nc = (int) n / nr;
   // Rprintf(" o bigI_tr(<%d x %d>) ..\n", nr,nc);
   return( bigintegerR::create_SEXP(matrixz::bigint_transpose(mat, nr,nc)));
@@ -373,10 +378,10 @@ SEXP matrix_mul_z (SEXP a, SEXP b, SEXP op)
     }
     else { // at least one of the sizemod_*  is > 1 :
       if ((sizemod_a == 1) && !mat_a.modulus[0].isNA()) {
-	mpz_set(common_modulus, mat_a[0].modulus.getValueTemp());
+	mpz_set(common_modulus, mat_a[0].getModulus().getValueTemp());
 	useMod = TRUE;
       } else if ((sizemod_b == 1) && !mat_b.modulus[0].isNA()) {
-	mpz_set(common_modulus, mat_b[0].modulus.getValueTemp());
+	mpz_set(common_modulus, mat_b[0].getModulus().getValueTemp());
 	useMod = TRUE;
       }
     }

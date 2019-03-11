@@ -65,9 +65,11 @@ factor_using_division (mpz_t t, bigvec & factors)
     {
       if (! mpz_divisible_ui_p (t, p))
 	{
-	  p += primes_diff[i++];
-	  if (mpz_cmp_ui (t, p * p) < 0)
-	    break;
+	  if (i < PRIMES_PTAB_ENTRIES) {
+	    p += primes_diff[i++];
+	    if (mpz_cmp_ui (t, p * p) < 0)
+	      break;
+	  } else break;
 	}
       else
 	{
@@ -155,7 +157,7 @@ mp_prime_p (mpz_t n)
 	  is_prime = 1;
 	  for (unsigned int i = 0; i < factors.size() && is_prime; i++)
 	    {
-	      mpz_divexact (tmp, nm1, factors[i].value.getValue());
+	      mpz_divexact (tmp, nm1, factors[i].getValue().getValue());
 	      mpz_powm (tmp, a, tmp, n);
 	      is_prime = mpz_cmp_ui (tmp, 1) != 0;
 	    }

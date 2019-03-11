@@ -46,6 +46,7 @@ export(
        "ncol.bigq", "ncol.bigz", "nrow.bigq", "nrow.bigz",
        "nextprime",
        "numerator", "numerator<-",
+    outer, # our own
        ## "pow",
        "pow.bigz", "powm", "pow.bigq",
        ## "print.bigq", "print.bigz",

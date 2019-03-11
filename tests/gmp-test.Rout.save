@@ -1197,6 +1197,9 @@ Big Integer ('bigz') 4 x 4 matrix:
 Big Integer ('bigz') object of length 5:
 [1] 7      29     11867  75679  181903
 > 
+> factorize(15959989)
+Big Integer ('bigz') object of length 2:
+[1] 3989 4001
 > 
 > proc.time()
    user  system elapsed 

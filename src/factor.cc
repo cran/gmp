@@ -30,7 +30,7 @@ SEXP factorR (SEXP n)
     mpz_t val;
     mpz_init(val);
     mpz_t_sentry val_s(val);
-    mpz_set(val,v[0].value.getValueTemp());
+    mpz_set(val,v[0].getValue().getValueTemp());
 
     int sgn = mpz_sgn(val);
     if(sgn == 0)

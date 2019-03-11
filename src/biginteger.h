@@ -297,7 +297,7 @@ class biginteger
   /**
    * Test prime numbers
    */
-  int isprime(int reps){return  mpz_probab_prime_p(value,reps);}
+  int isprime(int reps) const {return  mpz_probab_prime_p(value,reps);} 
 
 
   /** \brief overload affectation operator
@@ -312,6 +312,9 @@ class biginteger
 /** \brief comparison operator
  */
 bool operator!= (const biginteger& rhs, const biginteger& lhs);
+inline bool operator== (const biginteger& rhs, const biginteger& lhs){
+  return !(rhs != lhs);
+}
 
 
 /** \brief comparison operator

@@ -2,7 +2,7 @@
  *  \brief Description of class bigmod
  *
  *  \date Created: 22/05/06
- *  \date Last modified: Time-stamp: <2014-07-10 08:44:04 antoine>
+ *  \date Last modified: Time-stamp: <2019-03-10 10:30:30 (antoine)>
  *
  *  \author Immanuel Scholz
  *
@@ -26,6 +26,7 @@ extern "C" {
 }
 
 
+
 /**
  * \brief class for bigmod values. Represent any integer in Z/nZ
  *
@@ -34,24 +35,68 @@ extern "C" {
  * to the operation result is applied. If the value is NA, the result is always NA.
  */
 class bigmod {
- public:
-  /** \brief  Value of our bigmod */
-  biginteger value;
+ private:
+  /** optional source */
+  biginteger * value_ptr;
+  biginteger * modulus_ptr;
+ 
+ protected:
+  /** \brief  Value of our bigmod -- only references*/
+  biginteger & value;
   /** \brief  modulus of our bigmod representation: value %% modulus */
-  biginteger modulus;
+  biginteger & modulus;
+ 
+ public:
 
-  /** \brief creator
+  /** keep both references value / modulus
    */
-  bigmod(const biginteger& value_ = biginteger(),
-	 const biginteger& modulus_ = biginteger()) :
-    value(value_),modulus(modulus_) {}
+  bigmod(biginteger& value_,
+	 biginteger& modulus_)  :
+    value_ptr(NULL),
+    modulus_ptr(NULL),
+    value(value_),modulus(modulus_) {};
 
+ /** keep references value / modulus is new object.
+   */
+ bigmod(biginteger& value_)  :
+   value_ptr(NULL),
+   modulus_ptr(new biginteger()),
+   value(value_),modulus(*modulus_ptr) {};
+
+
+  /**
+   * create 2 new objects valus / modulus.
+   */
+ bigmod(const biginteger& value_,
+	 const biginteger& modulus_)  :
+   value_ptr(new biginteger(value_)),
+   modulus_ptr(new biginteger(modulus_)),
+   value(*value_ptr),modulus(*modulus_ptr) {};
+
+ bigmod(const biginteger& value_)  :
+   value_ptr(new biginteger(value_)),
+   modulus_ptr(new biginteger()),
+   value(*value_ptr),modulus(*modulus_ptr) {};
+
+
+ bigmod()  :
+   value_ptr(new biginteger()),
+   modulus_ptr(new biginteger()),
+   value(*value_ptr),modulus(*modulus_ptr) {};
+
+ 
   /** \brief copy operator  */
-  bigmod(const bigmod & rhs) :
-    value(rhs.value),
-    modulus(rhs.modulus){}
+  bigmod(const bigmod & rhs) : 
+    value_ptr(new biginteger(rhs.getValue())),
+    modulus_ptr(new biginteger(rhs.getModulus())),
+   value(*value_ptr),modulus(*modulus_ptr) {
+  };
 
-  ~bigmod(){};
+
+  virtual ~bigmod(){
+    if(value_ptr != NULL) delete value_ptr;
+    if(modulus_ptr != NULL) delete modulus_ptr;
+  };
 
   /**
    * \brief  Return as a human readible string
@@ -63,15 +108,95 @@ class bigmod {
 
   /** \brief return sign (-1 if negative, 0 if 0; +1 if positive)
    */
-  int sgn() const
+  inline int sgn() const
     {
-      return(mpz_sgn(value.getValueTemp()));
+      return(mpz_sgn(getValue().getValueTemp()));
     }
 
-  bigmod inv () const;
+  bigmod  inv () const;
 
+ 
+  biginteger & getValue() {
+    return value;
+  }
+
+  biginteger & getModulus() {
+    return modulus;
+  }
+
+  const biginteger & getValue() const{
+    return value;
+  }
+
+  const biginteger & getModulus() const {
+    return modulus;
+  }
 
 };
+
+
+class DefaultBigMod : public bigmod {
+ private:
+  /** \brief  Value of our bigmod */
+  biginteger valueLocal;
+  /** \brief  modulus of our bigmod representation: value %% modulus */
+  biginteger modulusLocal;
+ 
+ public:
+/** \brief creator
+   */
+  DefaultBigMod(const biginteger& value_ = biginteger(),
+	 const biginteger& modulus_ = biginteger()) :
+  bigmod(valueLocal,modulusLocal),
+    valueLocal(value_),modulusLocal(modulus_) {
+    value = valueLocal;
+    modulus = modulusLocal;
+}
+
+  /** \brief copy operator  */
+ DefaultBigMod(const bigmod & rhs) :
+    bigmod(valueLocal,modulusLocal),
+     valueLocal(rhs.getValue()),modulusLocal(rhs.getModulus()) {
+    value = valueLocal;
+    modulus = modulusLocal;
+}
+
+ /** \brief copy operator  */
+ DefaultBigMod(const DefaultBigMod & rhs) :
+    bigmod(valueLocal,modulusLocal),
+     valueLocal(rhs.getValue()),modulusLocal(rhs.getModulus()) {
+    value = valueLocal;
+    modulus = modulusLocal;
+}
+  ~DefaultBigMod(){};
+ 
+  
+
+};
+
+
+/**
+ * a bigmod that has only integer.
+ */
+class BigModInt : public bigmod {
+ private:
+   /** \brief  modulus of our bigmod representation */
+  biginteger modulusLocal;
+ 
+ public:
+/** \brief creator
+   */
+  BigModInt(biginteger& value_) :
+  bigmod(value_,modulusLocal),
+    modulusLocal() {
+    modulus = modulusLocal;
+}
+
+  ~BigModInt(){};
+ 
+ 
+};
+
 
 
 /** \brief comparison operator
@@ -92,33 +217,33 @@ bool operator== (const bigmod& rhs, const bigmod& lhs);
  * a modulus set. If none modulus for either bigmod is set, the result will not
  * have a modulus as well.
  */
-bigmod operator+(const bigmod& rhs, const bigmod& lhs);
+DefaultBigMod operator+(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief Subtract two bigmods.
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-bigmod operator-(const bigmod& rhs, const bigmod& lhs);
+DefaultBigMod operator-(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief Multiply two bigmods.
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-bigmod operator*(const bigmod& rhs, const bigmod& lhs);
+DefaultBigMod operator*(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief Divide two bigmods   a / b  :=  a * b^(-1)
  */
-bigmod div_via_inv(const bigmod& a, const bigmod& b);
+DefaultBigMod div_via_inv(const bigmod& a, const bigmod& b);
 
 /**
  * \brief Divide two bigmods.
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-bigmod operator/(const bigmod& rhs, const bigmod& lhs);
+DefaultBigMod operator/(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief Calculate the modulus (remainder) of two bigmods.
@@ -128,7 +253,7 @@ bigmod operator/(const bigmod& rhs, const bigmod& lhs);
  * was before, except if rhs and lhs has both no modulus set,
  * in which case the resulting modulus will be unset too.
  */
-bigmod operator%(const bigmod& rhs, const bigmod& lhs);
+DefaultBigMod operator%(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief Return the power of "exp" to the base of "base" (return = base^exp).
@@ -140,14 +265,14 @@ bigmod operator%(const bigmod& rhs, const bigmod& lhs);
  *
  * For other modulus description, see operator+(bigmod, bigmod)
  */
-bigmod pow(const bigmod& base, const bigmod& exp);
+DefaultBigMod pow(const bigmod& base, const bigmod& exp);
 
 /**
  * \brief Return the modulo inverse to x mod m. (return = x^-1 % m)
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-bigmod inv(const bigmod& x, const bigmod& m);
+DefaultBigMod inv(const bigmod& x, const bigmod& m);
 
 /**
  * \brief Return a bigmod with value (x % m) and the intern modulus set to m.
@@ -155,7 +280,7 @@ bigmod inv(const bigmod& x, const bigmod& m);
  *
  * Do not confuse this with operator%(bigmod, bigmod).
  */
-bigmod set_modulus(const bigmod& x, const bigmod& m);
+DefaultBigMod set_modulus(const bigmod& x, const bigmod& m);
 
 
 biginteger get_modulus(const bigmod& b1, const bigmod& b2);
@@ -164,20 +289,20 @@ biginteger get_modulus(const bigmod& b1, const bigmod& b2);
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-bigmod gcd(const bigmod& rhs, const bigmod& lhs);
+DefaultBigMod gcd(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief  Return the least common multiply of both parameter.
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-bigmod lcm(const bigmod& rhs, const bigmod& lhs);
+DefaultBigMod lcm(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief function used to make any binary operation between
  * two bigmod that return a bigmod (addition substraction... )
  */
-bigmod create_bigmod(const bigmod& lhs, const bigmod& rhs, gmp_binary f,
+DefaultBigMod create_bigmod(const bigmod& lhs, const bigmod& rhs, gmp_binary f,
 		     bool zeroRhsAllowed = true) ;
 
 #endif

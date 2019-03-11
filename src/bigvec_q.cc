@@ -41,10 +41,26 @@ bigvec_q & bigvec_q::operator= (const bigvec_q & rhs)
 }
 
 
-bigrational  bigvec_q::operator[] (unsigned int i) const
+const bigrational & bigvec_q::operator[] (unsigned int i) const
 {
   return(value[i]);
 }
+
+bigrational & bigvec_q::operator[] (unsigned int i) 
+{
+  return(value[i]);
+}
+
+bigrational & bigvec_q::get(unsigned int row, unsigned int col) {
+  return (*this)[row + col*nrow];
+}
+
+
+void bigvec_q::set(unsigned int row, unsigned int col, const bigrational & val) {
+  set( row + col*nrow,val);
+}
+
+
 
 void bigvec_q::set(unsigned int i,const bigrational & val)
 {
@@ -79,6 +95,10 @@ unsigned int bigvec_q::size() const
   return(value.size());
 }
 
+unsigned int bigvec_q::nRows() const {
+  return abs(nrow);
+}
+
 void bigvec_q::resize(unsigned int n)
 {
   value.resize(n);
@@ -92,32 +112,6 @@ void bigvec_q::clear()
 
 
 
-//
-// \brief substract lambda[0] * line j to line i
-//
-void bigvec_q::subLine(unsigned int i,unsigned int j,bigvec_q lambda)
-{
-  if(nrow <= 0)
-    error(_("Need matrix with at least one row to do this operation"));
-
-  unsigned int k, n = value.size() /  nrow;
-  for(k=0; k < n; ++k)
-      value[i + k*nrow] =  value[i + k*nrow] - ( value[j + k*nrow] * lambda.value[0] ) ;
-}
-
-
-/*
- * \brief multiply line i by lambda[0]
- */
-void bigvec_q::mulLine(unsigned int i, bigvec_q lambda)
-{
-  if(nrow <= 0)
-    error(_("Need matrix with at least one row to do this operation"));
-
-  unsigned int k, n = value.size() / nrow;
-  for(k=0; k < n; ++k)
-      value[i + k*nrow] =  value[i + k*nrow]  * lambda.value[0];
-}
 
 // never used
 void bigvec_q::print()

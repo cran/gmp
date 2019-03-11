@@ -22,7 +22,7 @@
  * It is a class composed of a vector of bigrational
  * and an nrow parameter.
  */
-class bigvec_q {
+class bigvec_q  : public matrix::Matrix<bigrational> {
  public:
 
   /** \brief The real value */
@@ -62,9 +62,18 @@ class bigvec_q {
 
   /**
    * \brief extract a value.
-   * \note it returns a copy of the value.
+   * \note it returns a reference on the value.
    */
-  bigrational  operator[] (unsigned int i) const;
+  const bigrational & operator[] (unsigned int i) const;
+ /**
+   * \brief extract a value.
+   * \note it returns a reference on the value.
+   */
+  bigrational & operator[] (unsigned int i) ;
+
+  bigrational & get(unsigned int row, unsigned int col) ;
+
+  void set(unsigned int row, unsigned int col, const  bigrational & val);
 
   /**
    * \brief Set a value
@@ -92,21 +101,13 @@ class bigvec_q {
    * \brief resize value
    */
   void resize(unsigned int n);
+ 
+  unsigned int nRows() const;
 
   /**
    * \brief clear all.
    */
   void clear();
-
-  /**
-   * \brief substract lambda[0] * line j to line i
-   */
-  void subLine(unsigned int i,unsigned int j,bigvec_q lambda);
-
-  /**
-   * \brief multiply line i by lambda[0]
-   */
-   void mulLine(unsigned int i, bigvec_q lambda);
 
    /** \brief print matrix to stdout
     *

@@ -15,7 +15,8 @@
 #define BIGVEC_HEADER_ 1
 
 #include "bigmod.h"
-
+#include "templateMatrix.h"
+#include <memory>
 
 /** \brief class bigvec
  *
@@ -23,12 +24,16 @@
  * can be of different size and a nrow
  * parameter (for matrix support)
  */
-class bigvec {
+class bigvec : public matrix::Matrix<bigmod> {
  public:
   /** \brief value */
   std::vector<biginteger> value;
   /** \brief modulus */
   std::vector<biginteger> modulus;
+  
+  /** array with all bigmod, that are references to values in vector. */
+  std::vector<bigmod *> valuesMod;
+  
   /** \brief optional parameter used with matrix -- set to -1 for non-matrix */
   int nrow ;
 
@@ -41,7 +46,9 @@ class bigvec {
    */
   bigvec(const bigvec & vecteur);
 
-  ~bigvec(){};
+  virtual ~bigvec();
+
+  
 
   /**
    * \brief construct a bigmod at indice i
@@ -50,13 +57,18 @@ class bigvec {
    *
    * \note should  not used for assignement
    */
-  bigmod  operator[] (unsigned int i) const;
+  const bigmod & operator[] (unsigned int i) const;
 
+  bigmod & operator[] (unsigned int i) ;
 
   /**
    * \brief assign a value at indice i
    */
   void set(unsigned int i,const bigmod & val);
+
+  void set(unsigned int row, unsigned int col, const bigmod & val) ;
+
+  bigmod & get(unsigned int row, unsigned int col) ;
 
   /**
    * \brief extend our vectors.
@@ -77,13 +89,15 @@ class bigvec {
   /**
    * Insert Big Integer value
    */
-  //  void push_back(mpz_t & value_p);
+  void push_back(biginteger & value_p);
   void push_back(const __mpz_struct* value_p);
 
   /**
    * \brief return size of vector value
    */
   unsigned int size() const ;
+
+  unsigned int nRows() const;
 
   /**
    * \brief extend vector value.
@@ -105,23 +119,17 @@ class bigvec {
    */
   bigvec & operator= (const bigvec & rhs);
 
-
-  /**
-   * \brief substract lambda * line j to line i
-   */
-  void subLine(unsigned int i,unsigned int j,const bigvec & lambda);
-
-  /**
-   * \brief multiply line i by lambda
-   */
-  void mulLine(unsigned int i,const bigvec & lambda);
-
   /** \brief print matrix to stdout
    *
    * use for debug purpose
    */
   void print();
 
+
+
+ private:
+  void checkValuesMod() ;
+  void clearValuesMod() ;
 
 
 };

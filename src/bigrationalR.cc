@@ -106,13 +106,17 @@ namespace bigrationalR
       if( CHAR(STRING_ELT(param,0)) == "bigz")
 	return(bigvec_q(bigintegerR::create_bignum(param)) );
     */
-    lockSexp lock (param);
+    PROTECT (param);
 
     bigvec_q v = bigrationalR::create_vector(param);
     SEXP denKey = Rf_mkString("denominator");
+    PROTECT(denKey);
     SEXP denAttr = Rf_getAttrib(param, denKey);
+    PROTECT(denAttr);
     SEXP dimKey = Rf_mkString("nrow");
+    PROTECT(dimKey);
     SEXP dimAttr = Rf_getAttrib(param,dimKey );
+    PROTECT(dimAttr);
     if (TYPEOF(dimAttr) == INTSXP)
       v.nrow = INTEGER(dimAttr)[0];
     else {
@@ -131,6 +135,7 @@ namespace bigrationalR
 		v.value[i].setDenValue (attrib.value[i%attrib.size()].getValueTemp()) ;
 	    }
       }
+    UNPROTECT(5);
     return v;
   }
 
@@ -621,7 +626,7 @@ SEXP bigrational_c(SEXP args)
   //  if(TYPEOF( args ) != LISTSXP)
   //  error(_("should be a list"));
   bigvec_q result;
-  for(int i = 0; i < Length(args); i++) {
+  for(int i = 0; i < Rf_length(args); i++) {
       bigvec_q v = bigrationalR::create_bignum(VECTOR_ELT(args,i));
       for(unsigned int j=0; j < v.size(); j++)
 	result.push_back(v.value[j]);
@@ -638,7 +643,7 @@ SEXP bigrational_cbind(SEXP args)
   if(result.nrow <= 0)
     result.nrow = result.size();
 
-  for(int i= 1; i < Length(args); i++)
+  for(int i= 1; i < Rf_length(args); i++)
     {
       bigvec_q v = bigrationalR::create_bignum(VECTOR_ELT(args,i));
       for(int j=0; j < (int)v.size() ; j++)

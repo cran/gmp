@@ -18,7 +18,7 @@
 #ifndef T_BIGMOD_BINARY_OPERATION
 #define T_BIGMOD_BINARY_OPERATION 1
 /// A pointer to a binary operator for bigintegers
-typedef bigmod (*biginteger_binary_fn)(const bigmod&, const bigmod&);
+typedef DefaultBigMod (*biginteger_binary_fn)(const bigmod&, const bigmod&);
 #endif
 
 #ifndef T_BIGMOD_BINARY_OPERATION_LOGICAL

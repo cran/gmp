@@ -176,3 +176,4 @@ stopifnot(identical(D.D, tcrossprod(D,Dm)),
 
 factorize("33162879029270137")
 
+factorize(15959989)

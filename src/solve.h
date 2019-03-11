@@ -50,33 +50,28 @@ namespace solve_gmp_R
    * solve A X = B  (return X) with A & B matrix (of rational or biginteger)
    *
    * A is of dimension nxn X nxm and B nxm (X will be return a B address)
-   * We use the Gauss trucmuch algorithm
+   * We use the Gauss algorithm
    */
-  template< class T> void solve (T & A , T & B)
+  template< class T> void solve (matrix::Matrix<T> & A , matrix::Matrix<T> & B)
     {
-      // n = A.nrow
-      int i;
-
-      // a temp value
-      T tmpValeur(1);
 
       // A [ i ,j] = A[ i + j * A.nrow]
-      for(int k = 0 ; k < A.nrow; ++k)
+      for(int k = 0 ; k < A.nRows(); ++k)
 	{
-	  if(A[k + k* A.nrow ].sgn() == 0 )
+	  if(A.get(k, k).sgn() == 0 )
 	    Rf_error("System is singular");
 
 	  // l_k <- (1/akk) l_k
-	  tmpValeur.set(0, A[k + k*A.nrow].inv() );
+	  T tmpValeur =A.get(k , k).inv() ;
 	  A.mulLine(k,tmpValeur);
 	  B.mulLine(k,tmpValeur);
 
-	  for(i = 0; i< A.nrow; ++i)
+	  for(int i = 0; i< A.nRows(); ++i)
 	    {
 	      if(i == k)
 		continue;
 	      // l_i <- l_i - a_ik l_k
-	      tmpValeur.set(0, A[i + k*A.nrow]) ;
+	      tmpValeur= A.get(i, k) ;
 	      A.subLine(i,k, tmpValeur) ;
 	      B.subLine(i,k, tmpValeur) ;
 	    }
