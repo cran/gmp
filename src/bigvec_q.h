@@ -22,7 +22,7 @@
  * It is a class composed of a vector of bigrational
  * and an nrow parameter.
  */
-class bigvec_q  : public matrix::Matrix<bigrational> {
+class bigvec_q  : public math::Matrix<bigrational> {
  public:
 
   /** \brief The real value */
@@ -56,6 +56,10 @@ class bigvec_q  : public matrix::Matrix<bigrational> {
   bigvec_q(const bigvec & rhs);
 
   ~bigvec_q(){};
+
+  inline bool isVector() const{
+    return nrow < 0 ;
+  }
 
   /**  \brief assignemt operator */
   bigvec_q & operator= (const bigvec_q& rhs);

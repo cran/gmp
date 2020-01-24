@@ -3,29 +3,24 @@
 
 
 
-namespace matrix{
+namespace math{
+
+
 
   template< class T>
-    class Matrix{
-    /*
+    class Vector{
 
-    class Row{
-    private :
-      Matrix & source;
-      int start;
-      Row(Matrix & source_p, int rowIndex)
-	: source(source_p),
-	  start(rowIndex*source.nCols()){};
-      ~Row(){};
-    public:
-      T  operator[] (unsigned int i) const {
-	return source.get(start + i);
-      };
+  public:
+    Vector();
+    virtual unsigned int size() const = 0;
 
+    virtual const T & operator[](unsigned int i) const=0;
+    virtual  T & operator[](unsigned int i) =0;
+  };
 
-    };
-    */
-
+  template< class T>
+  class Matrix : public Vector<T> {
+ 
   private:
     Matrix * transposate;
 
@@ -35,28 +30,19 @@ namespace matrix{
     virtual ~Matrix() {
       if (transposate) delete transposate;
     };
-    /*
-    Row  get (unsigned int i) const{
-      Row row (*this, i);
-      return row;
-      }*/
-
-    /** i, j -> index =  i + j*rows */
-    //  virtual T  operator[](unsigned int index) const=0;
-
-    /** return numRow*runCols */
-    virtual unsigned int size() const = 0;
+ 
 
     virtual unsigned int nRows() const = 0;
     
-    virtual unsigned int nCols() const{
-      return size() / nRows();
-    };
+    virtual unsigned int nCols() const;
 
 
     virtual  T & get(unsigned int row, unsigned int col) = 0;
 
     virtual  void set(unsigned int row, unsigned int col, const  T& val) =0;
+
+    /** return true if matrix is supposed to be a vector and not a matrix n x 1 */
+    virtual bool isVector() const = 0;
 
     /**
      * \brief assign a value at indice i
@@ -93,15 +79,15 @@ namespace matrix{
 	: source(source_p) {
       };
 
-      unsigned int size(){
+      unsigned int size() const{
 	return source.size();
       }
 
-      unsigned int nRows(){
+      unsigned int nRows() const {
 	return source.nCols();
       }
-
-      T & get(unsigned int i, unsigned int j) const{
+ 
+      T & get(unsigned int i, unsigned int j) {
 	return source.get(j,i);
       }
 
@@ -113,7 +99,13 @@ namespace matrix{
 
   // template code.
   template<class T>
-    Matrix<T>::Matrix() : transposate(NULL)
+  Vector<T>::Vector() {
+  };
+
+  template<class T>
+    Matrix<T>::Matrix() : 
+      Vector<T>(),
+      transposate(NULL)
   {
   }
 
@@ -125,6 +117,14 @@ namespace matrix{
     return *transposate;
   }
   
+  template<class T>
+    unsigned int Matrix<T>::nCols() const{
+   
+    return this->size() / nRows();
+    };
+
+  
+
 }
 
 #endif

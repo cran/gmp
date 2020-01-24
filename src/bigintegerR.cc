@@ -200,8 +200,8 @@ namespace bigintegerR
     // set the dim attribute
     if(v.nrow >= 0)  {
       SEXP nrowAttr  = Rf_mkString("nrow");
-      SEXP nrowValue = Rf_ScalarInteger((int) v.nrow);
       PROTECT(nrowAttr);
+      SEXP nrowValue = Rf_ScalarInteger((int) v.nrow);
       PROTECT(nrowValue);
       Rf_setAttrib(ans, nrowAttr,nrowValue);
       UNPROTECT(2);

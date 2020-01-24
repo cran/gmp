@@ -8,8 +8,8 @@
   the purpose of secure asymmetric key exchange on the Internet.
 }
 \usage{
-Oakley1
-Oakley2
+data(Oakley1)
+data(Oakley2)
 }
 \value{
   Oakley1 returns an object of class \code{\link{bigz}} for a 768 bit Diffie-Hellman group.  The generator is stored as value with the respective prime number as modulus attribute.

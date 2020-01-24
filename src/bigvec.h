@@ -24,7 +24,7 @@
  * can be of different size and a nrow
  * parameter (for matrix support)
  */
-class bigvec : public matrix::Matrix<bigmod> {
+class bigvec : public math::Matrix<bigmod> {
  public:
   /** \brief value */
   std::vector<biginteger> value;
@@ -48,7 +48,9 @@ class bigvec : public matrix::Matrix<bigmod> {
 
   virtual ~bigvec();
 
-  
+  inline bool isVector() const{
+    return nrow < 0 ;
+  }
 
   /**
    * \brief construct a bigmod at indice i

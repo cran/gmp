@@ -7,5 +7,8 @@ rm -f src/Makedeps
 
 rm -f src/gmp_res.rc 
 
-rm -f src/*.{o,so,d}
+rm -f src/*.o
+rm -f src/.so
+rm -f src/*.d
+
 

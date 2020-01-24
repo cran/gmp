@@ -5,7 +5,7 @@
  *
  */
 bigvec::bigvec(unsigned int i) :
-  matrix::Matrix<bigmod>(),
+  math::Matrix<bigmod>(),
   value(i),
   modulus(0),
   valuesMod(),
@@ -15,7 +15,7 @@ bigvec::bigvec(unsigned int i) :
 
 
 bigvec::bigvec(const bigvec & vecteur) :
-  matrix::Matrix<bigmod>(),
+  math::Matrix<bigmod>(),
   value(vecteur.value.size()),
   modulus(vecteur.modulus.size()),
   valuesMod(),

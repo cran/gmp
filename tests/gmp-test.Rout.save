@@ -1,6 +1,6 @@
 
-R Under development (unstable) (2018-07-14 r74963) -- "Unsuffered Consequences"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R Under development (unstable) (2019-12-09 r77545) -- "Unsuffered Consequences"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -160,7 +160,7 @@ List of 12
 +       if(nfid != fid) cat("-> num.fn.:", nfid)
 +       cat("\n-> all.equal(target = res, current = F(<numeric x>)):\n")
 +       nres <- test(FUN, nx, out = "numeric")
-+       print(all.equal(res, nres))
++      # print(all.equal(res, nres))
 +     } else cat("\n\n")
 +     print(as.data.frame(rc)); cat("\n")
 +     ##    ^^^^^^^^^^^^^ (for now, to diminuish difference to last version )
@@ -168,7 +168,6 @@ List of 12
 ------------------------------------------
 as.bigz 
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 40 in current 31 in target"
           23.         25      2.3       -4.       4L    0.       34_Z       32/7 (31 %% 45) NULL   NA       -3L
 1   (0 %% 23) (23 %% 25) (1 %% 2) (3 %% -4) (3 %% 4) error (23 %% 34) (23 %% 32) (23 %% 31)   23   23 (2 %% -3)
 2   (2 %% 23)  (0 %% 25) (1 %% 2) (1 %% -4) (1 %% 4) error (25 %% 34) (25 %% 32) (25 %% 31)   25   25 (1 %% -3)
@@ -186,7 +185,6 @@ as.bigz
 ------------------------------------------
 add.bigz -> num.fn.: +
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "Mean relative difference: 0.529696"
          23.         25        2.3        -4.         4L         0.       34_Z       32/7 (31 %% 45) NULL   NA        -3L
 1         46         48         25         19         27         23         57         55  (9 %% 45) <NA>   NA         20
 2         48         50         27         21         29         25         59         57 (11 %% 45) <NA>   NA         22
@@ -204,7 +202,6 @@ add.bigz -> num.fn.: +
 ------------------------------------------
 sub.bigz -> num.fn.: -
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 40 in current 31 in target"
          23.        25        2.3        -4.         4L         0.       34_Z       32/7 (31 %% 45)       NULL   NA
 1          0        -2         21         27         19         23        -11         -9 (37 %% 45)        -23   NA
 2          2         0         23         29         21         25         -9         -7 (39 %% 45)        -25   NA
@@ -235,7 +232,6 @@ sub.bigz -> num.fn.: -
 ------------------------------------------
 mul.bigz -> num.fn.: *
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "Mean relative difference: 0.8380853"
           23.         25        2.3        -4.         4L        0.       34_Z      32/7 (31 %% 45) NULL   NA        -3L
 1         529        575         46        -92         92         0        782       736 (38 %% 45) <NA>   NA        -69
 2         575        625         50       -100        100         0        850       800 (10 %% 45) <NA>   NA        -75
@@ -253,7 +249,6 @@ mul.bigz -> num.fn.: *
 ------------------------------------------
 divq.bigz -> num.fn.: %/%
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 41 in current 49 in target"
          23.        25        2.3        -4.        4L   0.      34_Z      32/7 (31 %% 45) NULL   NA        -3L
 1          1         0         11         -6         5   NA         0         0  (0 %% 45) <NA>   NA         -8
 2          1         1         12         -7         6   NA         0         0  (0 %% 45) <NA>   NA         -9
@@ -271,7 +266,6 @@ divq.bigz -> num.fn.: %/%
 ------------------------------------------
 div.bigz -> num.fn.: /
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 41 in current 49 in target"
                                   23.                               25                                 2.3
 1                                   1                            23/25  25895697857380352/2589569785738035
 2                               25/23                                1    5629499534213120/517913957147607
@@ -315,7 +309,6 @@ div.bigz -> num.fn.: /
 ------------------------------------------
 mod.bigz -> num.fn.: %%
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "Mean relative difference: 1.02235"
          23.        25      2.3       -4.       4L   0.       34_Z       32/7 (31 %% 45) NULL   NA       -3L
 1          0        23        1         3        3   NA         23         23 (23 %% 31) <NA>   NA         2
 2          2         0        1         1        1   NA         25         25 (25 %% 31) <NA>   NA         1
@@ -333,7 +326,6 @@ mod.bigz -> num.fn.: %%
 ------------------------------------------
 pow.bigz -> num.fn.: ^
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 43 in current 41 in target"
                                     23.                                      25        2.3
 1      20880467999847912034355032910567     11045767571919545466173812409689943        529
 2     142108547152020037174224853515625     88817841970012523233890533447265625        625
@@ -403,7 +395,6 @@ pow.bigz -> num.fn.: ^
 ------------------------------------------
 inv.bigz 
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "Mean relative difference: 0.6133333"
          23.         25       2.3       -4.        4L   0.       34_Z       32/7 (31 %% 45) NULL   NA       -3L
 1         NA         12         1         3         3   NA          3          7 (27 %% 45) <NA>   NA         2
 2         12         NA         1         1         1   NA         15          9  (5 %% 45) <NA>   NA         1
@@ -421,7 +412,6 @@ inv.bigz
 ------------------------------------------
 gcd.bigz -> num.fn.: gcd
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "Mean relative difference: 0.875"
          23.        25       2.3       -4.        4L         0.      34_Z      32/7 (31 %% 45) NULL   NA       -3L
 1         23         1         1         1         1         23         1         1  (1 %% 45) <NA>   NA         1
 2          1        25         1         1         1         25         1         1  (1 %% 45) <NA>   NA         1
@@ -439,7 +429,6 @@ gcd.bigz -> num.fn.: gcd
 ------------------------------------------
 gcdex 
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "Mean relative difference: 0.875"
     23.   25  2.3  -4.   4L   0. 34_Z 32/7 (31 %% 45) NULL   NA  -3L
 1    23    1    1    1    1   23    1    1          1 <NA>   23    1
 2     1   25    1    1    1   25    1    1          1 <NA>   25    1
@@ -457,7 +446,6 @@ gcdex
 ------------------------------------------
 lcm.bigz -> num.fn.: lcm
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 121 in current 40 in target"
           23.         25        2.3        -4.         4L        0.       34_Z      32/7 (31 %% 45) NULL   NA       -3L
 1          23        575         46         92         92         0        782       736 (38 %% 45) <NA>   NA        69
 2         575         25         50        100        100         0        850       800 (10 %% 45) <NA>   NA        75
@@ -475,7 +463,6 @@ lcm.bigz -> num.fn.: lcm
 ------------------------------------------
 as.bigq 
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] TRUE
                                   23.                               25                                 2.3
 1                                   1                            23/25  25895697857380352/2589569785738035
 2                               25/23                                1    5629499534213120/517913957147607
@@ -519,7 +506,6 @@ as.bigq
 ------------------------------------------
 add.bigq -> num.fn.: +
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] TRUE
                                   23.                                 25                                2.3
 1                                  46                                 48 28485267643118387/1125899906842624
 2                                  48                                 50 30737067456803635/1125899906842624
@@ -576,7 +562,6 @@ add.bigq -> num.fn.: +
 ------------------------------------------
 sub.bigq -> num.fn.: -
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 40 in current 31 in target"
                                    23.                                  25                                2.3
 1                                    0                                  -2 23306128071642317/1125899906842624
 2                                    2                                   0 25557927885327565/1125899906842624
@@ -633,7 +618,6 @@ sub.bigq -> num.fn.: -
 ------------------------------------------
 div.bigq -> num.fn.: /
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 41 in current 49 in target"
                                   23.                               25                                 2.3
 1                                   1                            23/25  25895697857380352/2589569785738035
 2                               25/23                                1    5629499534213120/517913957147607
@@ -677,7 +661,6 @@ div.bigq -> num.fn.: /
 ------------------------------------------
 mul.bigq -> num.fn.: *
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] TRUE
                                   23.                                 25
 1                                 529                                575
 2                                 575                                625
@@ -734,7 +717,6 @@ mul.bigq -> num.fn.: *
 ------------------------------------------
 ^.bigq -> num.fn.: ^
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 43 in current 68 in target"
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                23.
 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 20880467999847912034355032910567
 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                142108547152020037174224853515625
@@ -856,7 +838,6 @@ mul.bigq -> num.fn.: *
 ------------------------------------------
 chooseZ -> num.fn.: choose
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 40 in current 21 in target"
          23.       25  2.3  -4.    4L   0. 34_Z  32/7 (31 %% 45) NULL   NA  -3L
 1          1        0  253    0  8855    1    0  8855          0 <NA>    0    0
 2        300        1  300    0 12650    1    0 12650          0 <NA>    0    0
@@ -874,7 +855,6 @@ chooseZ -> num.fn.: choose
 ------------------------------------------
 max.bigq -> num.fn.: max
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 21 in current 13 in target"
    23. 25                               2.3                               -4.   4L                                0. 34_Z
 1   23 25                                23                                23   23                                23   34
 2   25 25                                25                                25   25                                25   34
@@ -905,7 +885,6 @@ max.bigq -> num.fn.: max
 ------------------------------------------
 max.bigz -> num.fn.: max
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 21 in current 13 in target"
           23.         25        2.3        -4.         4L         0.       34_Z       32/7 (31 %% 45)       NULL   NA
 1          23         25         23         23         23         23         34         32         31         23 <NA>
 2          25         25         25         25         25         25         34         32         31         25 <NA>
@@ -936,7 +915,6 @@ max.bigz -> num.fn.: max
 ------------------------------------------
 min.bigq -> num.fn.: min
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 21 in current 13 in target"
                                  23.                                25                               2.3 -4.
 1                                 23                                23 2589569785738035/1125899906842624  -4
 2                                 23                                25 2589569785738035/1125899906842624  -4
@@ -980,7 +958,6 @@ min.bigq -> num.fn.: min
 ------------------------------------------
 min.bigz -> num.fn.: min
 -> all.equal(target = res, current = F(<numeric x>)):
-[1] "'is.NA' value mismatch: 21 in current 13 in target"
           23.         25       2.3        -4.        4L        0.       34_Z       32/7 (31 %% 45)       NULL   NA
 1          23         23         2         -4         4         0         23         23         23         23 <NA>
 2          23         25         2         -4         4         0         25         25         25         25 <NA>
@@ -1203,4 +1180,4 @@ Big Integer ('bigz') object of length 2:
 > 
 > proc.time()
    user  system elapsed 
-  1.304   0.071   1.365 
+  1.424   0.055   1.479 

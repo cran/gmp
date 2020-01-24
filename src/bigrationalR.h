@@ -185,7 +185,7 @@ namespace bigrationalR{
 
   bigvec_q create_bignum(SEXP param);
 
-  SEXP create_SEXP(const bigvec_q & v);
+  SEXP create_SEXP(const math::Matrix<bigrational> & v);
 
   SEXP bigrational_binary_operation        (SEXP a, SEXP b, bigrational_binary_fn f);
   SEXP bigrational_bigz_binary_operation   (SEXP a, SEXP b, bigrational_bigz_binary_fn f);
