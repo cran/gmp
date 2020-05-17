@@ -62,10 +62,10 @@ if(FALSE) {## a nice idea --- but not working:  setOldClass() is fine,
  `%*%.bigz` <- function(x,y) .Call(matrix_mul_z, x, y, 0L)
  `%*%.bigq` <- function(x,y) .Call(matrix_mul_q, x, y, 0L)
 
- crossprod  <- function(x,y=NULL) UseMethod("crossprod")
- tcrossprod <- function(x,y=NULL) UseMethod("tcrossprod")
+ crossprod  <- function(x,y=NULL, ...) UseMethod("crossprod")
+ tcrossprod <- function(x,y=NULL, ...) UseMethod("tcrossprod")
 
- crossprod.default <- function(x,y=NULL) {
+ crossprod.default <- function(x,y=NULL, ...) {
      if(is.null(y))
 	 return(base::crossprod(x))
      if(inherits(y, "bigz"))
@@ -75,7 +75,7 @@ if(FALSE) {## a nice idea --- but not working:  setOldClass() is fine,
      else base::crossprod(x,y)
  }
 
- crossprod.bigz <- function(x,y=NULL) {
+ crossprod.bigz <- function(x,y=NULL, ...) {
      if(is.null(y))
 	 .Call(matrix_crossp_z, x, FALSE)
      else if(inherits(y, "bigq"))
@@ -84,7 +84,7 @@ if(FALSE) {## a nice idea --- but not working:  setOldClass() is fine,
 	 .Call(matrix_mul_z, x, y, 1L)
  }
 
- crossprod.bigq <- function(x,y=NULL)
+ crossprod.bigq <- function(x,y=NULL, ...)
  {
      if(is.null(y))
 	 .Call(matrix_crossp_q, x, FALSE)
@@ -94,7 +94,7 @@ if(FALSE) {## a nice idea --- but not working:  setOldClass() is fine,
 
  ##-----------------------------------------------
 
- tcrossprod.default <- function(x,y=NULL) {
+ tcrossprod.default <- function(x,y=NULL, ...) {
      if(is.null(y))
 	 return(base::tcrossprod(x))
      if(inherits(y, "bigz"))
@@ -104,7 +104,7 @@ if(FALSE) {## a nice idea --- but not working:  setOldClass() is fine,
      else base::tcrossprod(x,y)
  }
 
- tcrossprod.bigz <- function(x,y=NULL) {
+ tcrossprod.bigz <- function(x,y=NULL, ...) {
      if(is.null(y))
 	 .Call(matrix_crossp_z, x, TRUE)
      else if(inherits(y, "bigq"))
@@ -113,7 +113,7 @@ if(FALSE) {## a nice idea --- but not working:  setOldClass() is fine,
 	 .Call(matrix_mul_z, x, y, 2L)
  }
 
- tcrossprod.bigq <- function(x,y=NULL) {
+ tcrossprod.bigq <- function(x,y=NULL, ...) {
      if(is.null(y))
 	 .Call(matrix_crossp_q, x, TRUE)
      else

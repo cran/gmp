@@ -2,26 +2,14 @@
 * Remove full path in configure script, with example of Rmpfr configure.						-*-org-*-
 * Bug Fixes
 ** TODO Not working column assignment :  A[,j] <- vec    does nothing, not warn, nothing -- but  A[i,] <- val  works ??
+** TODO m <- matrix(1:6, 2); Z <- as.bigz(m); str(Z) fails because e.g. Z[5] fails, contrary m[5]
 ** TODO asNumeric(x) : the generic must get a "..." argument, so can use "rounding mode" in Rmpfr
 ** DONE URGENT / BAD : Segfaults, Wrong Results, etc
 ** TODO completely *wrong* pmin() and pmax(<bigq>, <number>): uses Numerator in comparison ???
 *** TODO: Find the *underlying* reason where pmin() goes wrong w/o warning!
 ** TODO Not working  Arithmetic
-*** TODO as.bigz(1:4) + as.bigq(7) fails, so does '*', '/', etc
-
- --> use S4 setMethod() on *group* 'Arith' as in ~/R/Pkgs/Rmpfr/R/Arith.R
-  --> "done" in R/mixed-ops.R.~experi~
- BUT tried and gave up  <bigz> o <bigq> for now:
- To use S4 method, would need S4 (or setOldClass) class.
- See  ~/R/MM/MISC/S4-dispatch-on-S3.R :
- Also the setOldClass(.) only correctly dispatches when objects are created by
- new("big*") ---> would need to do this not only in as.bigz(), as.bigq(),
- but more importantly from C++ create_SEXP()
-    -->  create_SEXP(const bigvec& v)  in ./src/bigintegerR.cc ,
-    where currently simply the class attribute is set
-
+*** DONE as.bigz(1:4) + as.bigq(7) failed, so do '*', '/', ... Fixed, using the +.bigz, etc _S3_ methods
 *** TODO bigq  %% and %/%  are not even defined (but are for 'numeric')!
-
 *** DONE more checking: q <- 2.3; Fn <- gmp:::`^.bigq`;  Fn(q,q) silently gave wrong result; now a good error message
 *** DONE <bigz> %*% <bigq>  silently gave wrong result; now works, as does crossprod(), tcrossprod()
 *** DONE bigz %% and %/% should be R compatible, notably fulfilling

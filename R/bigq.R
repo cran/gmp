@@ -153,12 +153,21 @@ abs.bigq <- function(x) {
 
 sign.bigq <- function(x) sign(numerator(x))
 
-## TODO
-trunc.bigq <- function(x, ...) .NotYetImplemented()
-floor.bigq   <- function(x) .NotYetImplemented()
-ceiling.bigq <- function(x) .NotYetImplemented()
+trunc.bigq <- function(x, ...) ## := sign(x) * floor(abs(x)) =
+    sign.bigq(x) * as.bigz.bigq(abs.bigq(x))
+floor.bigq   <- function(x) as.bigz.bigq(x)
+ceiling.bigq <- function(x) -as.bigz.bigq(-x)
 round.bigq <- function(x, digits = 0) {
-    .NotYetImplemented()
+    ## round(x * 10^d) / 10^d
+    bigq_half <- as.bigq(1, 2)
+    round0 <- function(x) as.bigz.bigq(x + bigq_half)
+    stopifnot(length(digits) == 1L)
+    if(digits == 0)
+        round0(x)
+    else {
+        p10 <- as.bigz(10) ^ digits # bigz iff digits >= 0,  bigq otherwise
+        round0(x * p10) / p10
+    }
 }
 
 cumsum.bigq <- function(x) .Call(bigrational_cumsum, x)

@@ -70,8 +70,10 @@ t.bigz <- function(x) .Call(bigint_transposeR, x)
 ##' @return \code{ !is.null(attr(x,"nrow")) } but faster
 is.matrixZQ <- function(x) .Call(is_matrix_zq, x)
 
+## NB  '%/%' in .dimZQ() and .ncolZQ()  to "remain" 'integer'
+
 .dimZQ <- function(x) {# return NULL for non-array {as standard R}
-    if(is.null(n <- attr(x,"nrow"))) n else c(n, if(n) length(x)/n else 0L)
+    if(is.null(n <- attr(x,"nrow"))) n else c(n, if(n) length(x) %/% n else 0L)
 }
 
 .dimsetZQ <- function(x,value)
@@ -86,7 +88,7 @@ is.matrixZQ <- function(x) .Call(is_matrix_zq, x)
   x
 }
 .nrowZQ <- function(x) attr(x,"nrow")
-.ncolZQ <- function(x) if(is.null(n <- attr(x,"nrow"))) n else if(n) length(x)/n else 0L
+.ncolZQ <- function(x) if(is.null(n <- attr(x,"nrow"))) n else if(n) length(x) %/% n else 0L
 
 dim.bigz <- .dimZQ
 dim.bigq <- .dimZQ

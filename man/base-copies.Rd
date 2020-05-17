@@ -18,7 +18,7 @@ outer(X, Y, FUN = "*", ...)
 twop <- as.bigz(2)^(99:103)
 (mtw <- outer(twop, 0:2))
 stopifnot(
-   identical(dim(mtw), c(5,3))
+   identical(dim(mtw), as.integer(c(5,3)))
  ,
    mtw[,1] == 0
  ,

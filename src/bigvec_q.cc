@@ -20,6 +20,11 @@ bigvec_q::bigvec_q(const bigvec & rhs):
     }
 }
 
+bigvec_q::~bigvec_q(){
+  value.clear();
+}
+
+
 bigvec_q & bigvec_q::operator= (const bigvec_q & rhs)
 
 {

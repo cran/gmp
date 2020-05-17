@@ -1,5 +1,21 @@
+2020-03-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/matrixz.R[.dimZQ, .ncolZQ]: use `%/%` to get integer dim() and ncol()
+
+	* R/matrix-prods.R: must crossprod() / tcrossprod() generics with
+	the `...` extra argument, compatibly with "R base"  `implicitGeneric("crossprod")`
+
+2020-03-02  Martin Mächler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.5-14
+
+	* R/biginteger.R (floor.bigz, round.bigz, ..): implement
+	(c.bigz, max.bigz, sum.bigz, ..): also work when args contain "bigq"
+
+	* R/bigq.R (floor.bigq, round.bigq, ..): implement
+
 2016-01-07
-	** Some fix 
+	** Some fix
 
 	**Indexing/Subassignment:
 	*** Seg.faults in

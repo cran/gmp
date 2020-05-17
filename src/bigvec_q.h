@@ -55,7 +55,7 @@ class bigvec_q  : public math::Matrix<bigrational> {
   /** \brief create from bigintegers */
   bigvec_q(const bigvec & rhs);
 
-  ~bigvec_q(){};
+  virtual ~bigvec_q();
 
   inline bool isVector() const{
     return nrow < 0 ;

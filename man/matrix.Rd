@@ -71,8 +71,8 @@ is.matrixZQ(x)
 
 \S3method{\%*\%}{bigz}(x, y)
 \S3method{\%*\%}{bigq}(x, y)
-\S3method{crossprod}{bigq}(x, y=NULL)
-\S3method{tcrossprod}{bigz}(x, y=NULL)
+\S3method{crossprod}{bigq}(x, y=NULL,...)
+\S3method{tcrossprod}{bigz}(x, y=NULL,...)
 ## ..... etc
 }
 \arguments{

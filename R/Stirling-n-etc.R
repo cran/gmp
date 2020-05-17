@@ -216,4 +216,3 @@ assign("S2.full.n", 0  , envir = .Stirl..env)
 assign("S1.full.n", 0  , envir = .Stirl..env)
 assign("Eul.tab", list(), envir = .Stirl..env) ## Eul.tab[[n]][k] == A(n, k) == < n \\ k > (Eulerian)
 assign("Eul.full.n", 0	, envir = .Stirl..env)
-
