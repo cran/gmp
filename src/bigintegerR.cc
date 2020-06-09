@@ -9,7 +9,7 @@
  *
  *  \author Immanuel Scholz (help from A. Lucas)
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 #include "Rgmp.h"

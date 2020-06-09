@@ -7,7 +7,7 @@
  *  \date Last modified: Time-stamp: <2008-02-17 21:41:29 antoine>
  *
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 #ifndef GMP_R_FACTOR_HEADER_

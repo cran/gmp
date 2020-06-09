@@ -37,6 +37,19 @@ stopifnot(isEQ(x, as.integer(x)), isEQ(x, xI), isEQ(x, xQ),
 	  isEQ(x, as.numeric(xQ)),
           TRUE)
 
+## Finally (2020-06-06): mixed arithmetic works :
+stopifnot(exprs = {
+    isEQ(xI - xQ, c(NA, rep(0, 9)))
+    isEQ(xI + xQ, 2*xI)
+    isEQ(xI * xQ, x^2)
+    all.equal(xQ^xI, x^x)
+    ## as do mixed comparisons
+    (xI == xQ)[-1]
+    !(xI < xQ)[-1]
+    !(xI > xQ)[-1]
+    (xI >= xQ)[-1]
+})
+
 ## double precision factorial() is exact up to n=22
 stopifnot(factorialZ(0:22) == factorial(0:22))
 
@@ -232,7 +245,7 @@ eqQ <- lapply(sapply(ops$Compare, get),
               function(op) opEQ(op, x, xQ, eq=FALSE))
 lapply(eqQ, symnum)## <- symnum, for nice output
 
-Fn <- gmp:::`^.bigq`; q <- 2.3
+Fn <- gmp:::pow.bigq; q <- 2.3
 stopifnot(inherits(e1 <- tryCatch(Fn(q,q),          error=identity), "error"),
 	  inherits(e2 <- tryCatch(q ^ as.bigq(1,3), error=identity), "error"),
 	  grepl("Rmpfr", e1$message),

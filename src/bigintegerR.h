@@ -7,7 +7,7 @@
  *  \date Last modified: Time-stamp: <2010-04-10 19:21:20 antoine>
  *
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 #ifndef BIGINTEGERRRRRRR_HEADER_

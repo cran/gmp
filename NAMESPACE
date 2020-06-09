@@ -56,6 +56,7 @@ export(
        ## "sign.bigq", "sign.bigz",
        "sizeinbase",
        "solve.bigq", "solve.bigz",
+    .sub.bigq,
        "sub.bigq", "sub.bigz",
        "sum.bigq", "sum.bigz",
        ## "t.bigq", "t.bigz",
@@ -73,19 +74,26 @@ S3method(gcd,default)
 #S3method(lcm,default)
 S3method(is.whole,default)
 
-S3method("+",bigz)
-S3method("-",bigz)
-S3method("*",bigz)
-S3method("/",bigz)
-S3method("%%",bigz)
+### S3methods : NB use the *same* method for the 'Arith' and 'Compare' group
+#   ---------   -- only then, group method dispatch will work for  <bigz> op <bigq>
+
+## Arith --
+S3method("+",bigz, add.big)
+S3method("-",bigz, sub.big)
+S3method("*",bigz, mul.big)
+S3method("/",bigz, div.big)
+S3method("^",bigz, pow.big)
+## bigz only:
+S3method("%%", bigz)
 S3method("%/%",bigz)
-S3method("^",bigz)
-S3method("<",bigz)
-S3method("<=",bigz)
-S3method("==",bigz)
-S3method(">=",bigz)
-S3method(">",bigz)
-S3method("!=",bigz)
+## Compare
+S3method("<", bigz,  lt.big)
+S3method("<=",bigz, lte.big)
+S3method("==",bigz,  eq.big)
+S3method(">=",bigz, gte.big)
+S3method(">", bigz,  gt.big)
+S3method("!=",bigz, neq.big)
+##
 S3method("[<-",bigz)
 S3method("[",bigz)
 S3method("[[<-",bigz)
@@ -123,21 +131,24 @@ S3method(all.equal,bigz)
 S3method(modulus, bigz)
 S3method("modulus<-", bigz)
 
-S3method("+",bigq)
-S3method("-",bigq)
-S3method("*",bigq)
-S3method("/",bigq)
-S3method("^",bigq)
-S3method("<",bigq)
-S3method("<=",bigq)
-S3method("==",bigq)
-S3method(">=",bigq)
-S3method(">",bigq)
-S3method("!=",bigq)
-S3method("[<-",bigq)
-S3method("[",bigq)
+## Arith :
+S3method("+",bigq, add.big)
+S3method("-",bigq, sub.big)
+S3method("*",bigq, mul.big)
+S3method("/",bigq, div.big)
+S3method("^",bigq, pow.big)
+## Compare :
+S3method("<", bigq,  lt.big)
+S3method("<=",bigq, lte.big)
+S3method("==",bigq,  eq.big)
+S3method(">=",bigq, gte.big)
+S3method(">", bigq,  gt.big)
+S3method("!=",bigq, neq.big)
+##
+S3method("[<-", bigq)
+S3method("[",   bigq)
 S3method("[[<-",bigq)
-S3method("[[",bigq)
+S3method("[[",  bigq)
 ##S3method(add,bigq)
 S3method(c,bigq)
 S3method(cbind,bigq)
@@ -229,6 +240,9 @@ S3method(solve,bigz)
 
 S3method(t,bigq)
 S3method(t,bigz)
+
+S3method(diff, bigz, .diff.big)
+S3method(diff, bigq, .diff.big)
 
 ## S4 generic .. also imported in Rmpfr
 export(asNumeric)

@@ -6,7 +6,7 @@
  *
  *  \author Immanuel Scholz
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 #ifndef biginteger_HEADER

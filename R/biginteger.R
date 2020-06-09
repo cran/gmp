@@ -14,26 +14,27 @@ setGeneric("asNumeric", useAsDefault = function(x) {
 #
 #  Brief         : Stub to call the dll functions
 #
-#  Licence       : GPL
+#  Licence       : GPL (>= 2)
 #
 #----------------------------------------------------------
 
-"+.bigz" <- add.bigz <- function(e1, e2) {
+add.bigz <- function(e1, e2) {
     if(inherits(e2, "bigq"))
         .Call(bigrational_add, e1, e2)
     else .Call(biginteger_add, e1, e2)
 }
 
-"-.bigz" <- sub.bigz <- function(e1, e2=NULL)
+sub.bigz <- function(e1, e2=NULL)
 {
     if(is.null(e2))
-      .Call(biginteger_sub, 0, e1)
-    else if(inherits(e2, "bigq"))
-        .Call(bigrational_sub, e1, e2)
-    else .Call(biginteger_sub, e1, e2)
+        .Call(biginteger_sub, 0, e1)
+    ## else if(inherits(e2, "bigq"))
+    ##     .Call(bigrational_sub, e1, e2)
+    else
+        .Call(biginteger_sub, e1, e2)
 }
 
-"*.bigz" <- mul.bigz <- function(e1, e2) {
+mul.bigz <- function(e1, e2) {
     if(inherits(e2, "bigq"))
         .Call(bigrational_mul, e1, e2)
     else .Call(biginteger_mul, e1, e2)
@@ -42,7 +43,7 @@ setGeneric("asNumeric", useAsDefault = function(x) {
 ## divq : integer division
 "%/%.bigz" <- divq.bigz <- function(e1, e2) {
    if(inherits(e2, "bigq")) {
-       if(is.whole(e2))
+       if(!all(is.whole(e2[is.finite(e2)])))
            e2 <- as.bigz(e2)
        else
            stop("In 'n %/% d', d must be integer")
@@ -51,7 +52,7 @@ setGeneric("asNumeric", useAsDefault = function(x) {
 }
 
 ## div : division of integers -> either rational or (mod) integer division
-"/.bigz" <- div.bigz <- function(e1, e2) {
+div.bigz <- function(e1, e2) {
     if(inherits(e2, "bigq"))
         .Call(bigrational_div, e1, e2)
     else .Call(biginteger_div, e1, e2)
@@ -59,7 +60,7 @@ setGeneric("asNumeric", useAsDefault = function(x) {
 
 "%%.bigz" <- mod.bigz <- function(e1, e2) {
    if(inherits(e2, "bigq")) {
-       if(is.whole(e2))
+       if(!all(is.whole(e2[is.finite(e2)])))
            e2 <- as.bigz(e2)
        else
            stop("In 'n %% d', d must be integer")
@@ -67,7 +68,7 @@ setGeneric("asNumeric", useAsDefault = function(x) {
    .Call(biginteger_mod, e1, e2)
 }
 
-"^.bigz" <- pow.bigz <- function(e1, e2,...) {
+pow.bigz <- function(e1, e2,...) {
     if(inherits(e2, "bigq"))
         pow.bigq(e1, e2)
     else .Call(biginteger_pow, e1, e2)
@@ -108,12 +109,15 @@ print.bigz <- function(x, quote = FALSE, initLine = is.null(modulus(x)), ...)
 
 as.bigz <- function(a, mod = NA)
 {
+  if(isZ <- missing(mod) && inherits(a, "bigz"))
+    mod <- modulus(a) # possibly NULL
   if(is.null(mod)) mod <- NA
-  if(inherits(a, "bigq"))
+  if(!isZ && inherits(a, "bigq"))
     as.bigz.bigq(a, mod)
   else
     .Call(biginteger_as, a, mod)
 }
+
 ## the .as*() functions are exported for Rmpfr
 .as.bigz <- function(a, mod = NA) {
   if(inherits(a, "bigq")) as.bigz.bigq(a, mod) else .Call(biginteger_as, a, mod)
@@ -172,12 +176,52 @@ modulus.bigz <- function(a) attr(a, "mod")
 
 powm <- function(x,y, n) .Call(biginteger_powm, x,y,n)
 
-"<.bigz"  <- function(e1, e2) .Call(biginteger_lt, e1, e2)
-">.bigz"  <- function(e1, e2) .Call(biginteger_gt, e1, e2)
-"<=.bigz" <- function(e1, e2) .Call(biginteger_lte, e1, e2)
-">=.bigz" <- function(e1, e2) .Call(biginteger_gte, e1, e2)
-"==.bigz" <- function(e1, e2) .Call(biginteger_eq, e1, e2)
-"!=.bigz" <- function(e1, e2) .Call(biginteger_neq, e1, e2)
+## <op>.bigz(): *not* used
+lt.bigz  <- function(e1, e2) .Call(biginteger_lt, e1, e2)
+gt.bigz  <- function(e1, e2) .Call(biginteger_gt, e1, e2)
+lte.bigz <- function(e1, e2) .Call(biginteger_lte, e1, e2)
+gte.bigz <- function(e1, e2) .Call(biginteger_gte, e1, e2)
+eq.bigz  <- function(e1, e2) .Call(biginteger_eq, e1, e2)
+neq.bigz <- function(e1, e2) .Call(biginteger_neq, e1, e2)
+
+lt.big <- function(e1, e2) {
+    if(!is.bigq(e1) && !is.bigq(e2)) # try integer
+        .Call(biginteger_lt, e1, e2)
+    else
+        .Call(bigrational_lt, e1, e2)
+}
+gt.big <- function(e1, e2) {
+    if(!is.bigq(e1) && !is.bigq(e2)) # try integer
+        .Call(biginteger_gt, e1, e2)
+    else
+        .Call(bigrational_gt, e1, e2)
+}
+
+lte.big <- function(e1, e2) {
+    if(!is.bigq(e1) && !is.bigq(e2)) # try integer
+        .Call(biginteger_lte, e1, e2)
+    else
+        .Call(bigrational_lte, e1, e2)
+}
+gte.big <- function(e1, e2) {
+    if(!is.bigq(e1) && !is.bigq(e2)) # try integer
+        .Call(biginteger_gte, e1, e2)
+    else
+        .Call(bigrational_gte, e1, e2)
+}
+eq.big <- function(e1, e2) {
+    if(!is.bigq(e1) && !is.bigq(e2)) # try integer
+        .Call(biginteger_eq, e1, e2)
+    else
+        .Call(bigrational_eq, e1, e2)
+}
+neq.big <- function(e1, e2) {
+    if(!is.bigq(e1) && !is.bigq(e2)) # try integer
+        .Call(biginteger_neq, e1, e2)
+    else
+        .Call(bigrational_neq, e1, e2)
+}
+
 
 is.whole <- function(x) UseMethod("is.whole")
 is.whole.default <- function(x) {
@@ -214,19 +258,28 @@ lg2.invFrexp <- function(L) {
 
 ###------------------------- 'Math' S3 group ------------------------------
 
-## Most 'Math' group would be hard to implement --- [TODO via Rmpfr -- or stop("...via Rmpfr")?
-## Fall-back: *not* implemented  {or use as.double() ??}
-Math.bigz <- function(x, ...) { .NotYetImplemented() }
-            ## o 'abs', 'sign', 'sqrt',
-            ##   'floor', 'ceiling', 'trunc',
-            ##   'round', 'signif'
-            ## o 'exp', 'log', 'expm1', 'log1p',
-            ##   'cos', 'sin', 'tan',
-            ##   'acos', 'asin', 'atan'
-            ##   'cosh', 'sinh', 'tanh',
-            ##   'acosh', 'asinh', 'atanh'
-            ## o 'lgamma', 'gamma', 'digamma', 'trigamma'
-            ## o 'cumsum', 'cumprod', 'cummax', 'cummin'
+## o 'abs', 'sign', 'sqrt',
+##   'floor', 'ceiling', 'trunc',
+##   'round', 'signif'
+## o 'exp', 'log', 'expm1', 'log1p',
+##   'cos', 'sin', 'tan',
+##   'acos', 'asin', 'atan'
+##   'cosh', 'sinh', 'tanh',
+##   'acosh', 'asinh', 'atanh'
+## o 'lgamma', 'gamma', 'digamma', 'trigamma'
+## o 'cumsum', 'cumprod', 'cummax', 'cummin'
+
+## Most 'Math' group functions should go via CRAN package 'Rmpfr' :
+Math.bigz <- function(x, ...) {
+    if(requireNamespace("Rmpfr", quietly=TRUE)) {
+        NextMethod(Rmpfr::.bigz2mpfr(x)) # FIXME use ..bigz2mpfr (two '.') in future
+    }
+    else
+        stop("Math group method ", dQuote(.Generic),
+             "is available via CRAN R package 'Rmpfr'.\n",
+             "Install it and try again")
+
+}
 
 abs.bigz <- function(x) .Call(biginteger_abs,x)
 sign.bigz <- function(x) .Call(biginteger_sgn,x)

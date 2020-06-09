@@ -7,7 +7,7 @@
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 #ifndef BIGRATIONAL_HEADER_

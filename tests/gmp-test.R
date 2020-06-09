@@ -51,7 +51,7 @@ allfunctionid <- c("as.bigz","add.bigz","sub.bigz","mul.bigz",
 		   "divq.bigz","div.bigz","mod.bigz","pow.bigz",
 		   "inv.bigz", "gcd.bigz", "gcdex", "lcm.bigz",
 		   "as.bigq",
-		   "add.bigq","sub.bigq","div.bigq", "mul.bigq", "^.bigq",
+		   "add.bigq","sub.bigq","div.bigq", "mul.bigq", "pow.bigq",
 		   "chooseZ",
 		   "max.bigq","max.bigz","min.bigq","min.bigz")
 unaryfunctionid <- c("log.bigz","log2.bigz","log10.bigz","c.bigz",

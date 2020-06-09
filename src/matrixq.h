@@ -5,7 +5,7 @@
  *  \date Last modified: Time-stamp: <2006-05-26 14:35:51 antoine>
  *
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 #include "bigvec_q.h"

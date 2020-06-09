@@ -12,7 +12,7 @@
  *  as usually, matrix x[i,j] (n x p) is represented by a vector
  *              x[i + j x n]  (i=0..n-1 ; j=0..p-1)
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 

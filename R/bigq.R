@@ -5,28 +5,67 @@
 #
 #  Brief         : Stub to call the dll functions
 #
-#  Licence       : GPL
+#  Licence       : GPL (>= 2)
 #
 #----------------------------------------------------------
 
-
-add.bigq <- `+.bigq` <- function(e1, e2) .Call(bigrational_add, e1, e2)
-
-sub.bigq<- `-.bigq` <- function(e1, e2=NULL) {
-  if(is.null(e2))
-    .Call(bigrational_sub,0,e1)
-  else
-    .Call(bigrational_sub,e1,e2)
+add.bigq <- function(e1, e2) .Call(bigrational_add, e1, e2)
+add.big <- function(e1, e2) {
+    if(!is.bigq(e1) && !is.bigq(e2)) # try integer
+        .Call(biginteger_add, e1, e2)
+    else
+        .Call(bigrational_add, e1, e2)
 }
 
-mul.bigq <- `*.bigq` <- function(e1, e2) .Call(bigrational_mul, e1, e2)
 
-"/.bigq" <- div.bigq <- function(e1, e2) .Call(bigrational_div, e1, e2)
+## the 'e2=NULL' has been documented forever
+sub.bigq <- function(e1, e2=NULL) {
+    if(is.null(e2))
+        .Call(bigrational_sub, 0,e1)
+    else
+        .Call(bigrational_sub,e1,e2)
+}
+## simple version:
+.sub.bigq <- function(e1, e2) .Call(bigrational_sub,e1,e2)
 
-"^.bigq" <- pow.bigq <- function(e1, e2) {
-    if(!is.whole(e2))
+
+sub.big <- function(e1, e2=NULL) {
+    if(!is.bigq(e1) && !is.bigq(e2)) # try integer
+        sub.bigz(e1, e2)
+    else if(is.null(e2))
+        .Call(bigrational_sub, 0,e1)
+    else
+        .Call(bigrational_sub,e1,e2)
+}
+
+mul.bigq <- function(e1, e2) .Call(bigrational_mul, e1, e2)
+mul.big <- function(e1, e2) {
+    if(!is.bigq(e1) && !is.bigq(e2)) # try integer
+        .Call(biginteger_mul, e1, e2)
+    else
+        .Call(bigrational_mul, e1, e2)
+}
+
+div.bigq <- function(e1, e2) .Call(bigrational_div, e1, e2)
+div.big <- function(e1, e2) {
+    if(!is.bigq(e1) && !is.bigq(e2)) # try integer
+        .Call(biginteger_div, e1, e2)
+    else
+        .Call(bigrational_div, e1, e2)
+}
+
+pow.bigq <- function(e1, e2) {
+    if(!all(is.whole(e2[is.finite(e2)])))
 	stop("<bigq> ^ <non-int>  is not rational; consider  require(Rmpfr); mpfr(*) ^ *")
     .Call(bigrational_pow, e1, as.bigz(e2))
+}
+pow.big <- function(e1, e2) {
+    if(!all(is.whole(e2[is.finite(e2)])))
+	stop("<bigq> ^ <non-int>  is not rational; consider  require(Rmpfr); mpfr(*) ^ *")
+    if(!is.bigq(e1))
+        .Call(biginteger_pow, e1, as.bigz(e2))
+    else
+        .Call(bigrational_pow, e1, as.bigz(e2))
 }
 
 print.bigq <- function(x, quote = FALSE, initLine = TRUE, ...)
@@ -115,12 +154,13 @@ length.bigq<- function(x) .Call(bigrational_length, x)
 `length<-.bigq` <- function(x, value) .Call(bigrational_setlength, x, value)
 
 
-"<.bigq"  <- function(e1,e2) .Call(bigrational_lt,  e1, e2)
-">.bigq"  <- function(e1,e2) .Call(bigrational_gt,  e1, e2)
-"<=.bigq" <- function(e1,e2) .Call(bigrational_lte, e1, e2)
-">=.bigq" <- function(e1,e2) .Call(bigrational_gte, e1, e2)
-"==.bigq" <- function(e1,e2) .Call(bigrational_eq,  e1, e2)
-"!=.bigq" <- function(e1,e2) .Call(bigrational_neq, e1, e2)
+## <op>.bigq(): *not* used
+lt.bigq  <- function(e1, e2) .Call(bigrational_lt, e1, e2)
+gt.bigq  <- function(e1, e2) .Call(bigrational_gt, e1, e2)
+lte.bigq <- function(e1, e2) .Call(bigrational_lte, e1, e2)
+gte.bigq <- function(e1, e2) .Call(bigrational_gte, e1, e2)
+eq.bigq  <- function(e1, e2) .Call(bigrational_eq, e1, e2)
+neq.bigq <- function(e1, e2) .Call(bigrational_neq, e1, e2)
 
 is.na.bigq <- function(x) .Call(bigrational_is_na, x)
 is.whole.bigq <- function(x) .Call(bigrational_is_int, x)
@@ -141,9 +181,17 @@ setMethod("Ops", signature(e1 = "bigz", e2 = "bigq"),
 
 ###------------------------- 'Math' S3 group ------------------------------
 
-## Most 'Math' group would be hard to implement --- [TODO via Rmpfr -- or stop("...via Rmpfr")?
-## Fall-back: *not* implemented  {or use as.double() ??}
-Math.bigq <- function(x, ...) { .NotYetImplemented() }
+## Most 'Math' group functions should go via CRAN package 'Rmpfr' :
+Math.bigq <- function(x, ...) {
+    if(requireNamespace("Rmpfr", quietly=TRUE)) {
+        NextMethod(Rmpfr::.bigq2mpfr(x), ...) # FIXME use ..bigq2mpfr (two '.') in future
+    }
+    else
+        stop("Math group method ", dQuote(.Generic),
+             "is available via CRAN R package 'Rmpfr'.\n",
+             "Install it and try again")
+
+}
 
 
 abs.bigq <- function(x) {

@@ -1,3 +1,18 @@
+2020-06-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* NAMESPACE: use *same* S3method(<op>, <class>, <method_fn>) for bigz and bigq,
+	* R/bigq.R (add.big): so now "mixed" arithmetic and comparisons work
+
+2020-06-06  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.6-0  (not yet released)
+
+	* R/biginteger.R (as.bigz): now  as.bigz(<bigz>)  keeps a modulus
+
+2020-05-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/AllClasses-etc.R (.diff.big): diff.big[zq]() methods
+
 2020-03-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/matrixz.R[.dimZQ, .ncolZQ]: use `%/%` to get integer dim() and ncol()

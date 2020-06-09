@@ -7,7 +7,7 @@
  *  \date Last modified: Time-stamp: <2006-06-16 20:19:01 antoine>
  *
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 #ifndef BIGVEC_Q_HEADER_

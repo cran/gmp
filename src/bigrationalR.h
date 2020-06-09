@@ -7,7 +7,7 @@
  *  \date Last modified: Time-stamp: <2010-04-10 19:27:44 antoine>
  *
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 #ifndef BIG_RATIONALRRRR_
 #define BIG_RATIONALRRRR_ 1

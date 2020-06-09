@@ -8,7 +8,7 @@
  *
  *  \author Immanuel Scholz
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 #define USE_RINTERNALS

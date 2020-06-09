@@ -9,7 +9,7 @@
  *  \author Antoine Lucas (help from Immanuel Scholz) (R adaptation)
  *          Original C code from libgmp.
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 #include "Rgmp.h"

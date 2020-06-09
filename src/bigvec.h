@@ -7,7 +7,7 @@
  *  \date Last modified: Time-stamp: <2013-06-08 22:27:37 antoine>
  *
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 

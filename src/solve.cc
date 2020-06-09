@@ -8,7 +8,7 @@
  *
  *  \author A. Lucas
  *
- *  \note Licence: GPL
+ *  \note Licence: GPL (>= 2)
  */
 
 
