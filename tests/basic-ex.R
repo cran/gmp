@@ -91,6 +91,17 @@ stopifnot(identical(x, as.bigz(i %% 3)),
 	  identical(unlist(lq),
 		    unlist(lapply(Q, unclass))))
 
+## Check that as.bigq(<double>) is exact *and* asNumeric() is its inverse --------------
+set.seed(47)
+summary(x1 <- rt(10000, df = 0.5)) # really long tailed
+summary(x2 <- rlnorm(10000, 200, 100))
+x <- c(x1, x2)
+qx <- as.bigq(x)
+nx <- asNumeric(qx) ## asNumeric()'s method for "bigq" is internal .bigq2num()
+stopifnot(identical(x, nx),
+          identical(nx, gmp:::.bigq2num(qx))
+          )
+
 ## duplicated(), unique() : ----------------------
 q7 <- as.bigq(-5:7, 7)
 if(FALSE)# not yet {well, *HARD* / impossible(?) without S4 }

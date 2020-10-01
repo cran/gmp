@@ -264,3 +264,40 @@ sapply(eqA1, table)
 eqA <- lapply(sapply(opsA4, get), function(op) opEQ(op, x, xQ, eq=FALSE))
 lapply(eqA, symnum)
 
+
+## round(x, digits) -- should work *and* be vectorized in both  (x, digits)
+x1 <- as.bigq((-19:19), 10)
+stopifnot(round(x1, 1) == x1)
+
+half <- as.bigq(1, 2)
+i1 <- (-19:29)
+x <- half + i1
+cbind(x, round(x))
+rx1 <- round(x/10, 1)
+stopifnot(exprs = {
+    as.bigz(round(x)) %% 2 == 0
+    identical(round(x) > x, i1 %% 2 == 1)
+    (rx1 - x/10) * 20 == c(1,-1) # {recycling up/down}: perfect rounding to even
+    (round(x/100, 2) - x/100) * 200 == c(1,-1) #  (ditto)
+})
+(drx1 <- asNumeric(rx1))# shows perfect round to *even*
+## but double precision rounding cannot be perfect (as numbers are not exact!):
+dx   <- asNumeric(x/10)
+dx1  <- round(dx, 1)
+dmat <- cbind(x=dx, r.x = dx1, rQx = drx1)
+## shows "the picture" a bit {see Martin's vignette in CRAN package 'round'}:
+noquote(cbind(apply(dmat, 2, formatC),
+              ER = ifelse(abs(dx1 - drx1) > 1e-10, "*", "")))
+
+## standard R:
+rd <- round(pi*10^(-2:5), digits=7:0)
+formatC(rd, digits=12, width=1)
+## bigq -- show we vectorize in both x, digits
+(rQ <- round(as.bigq(pi*10^(-2:5)), digits=7:0))
+stopifnot(exprs = {
+    as.integer(numerator  (rQ)) == 314159L
+    as.integer(denominator(rQ)) == 10^(7:0)
+    all.equal(asNumeric(rQ), rd, tol = 1e-15)
+})
+
+

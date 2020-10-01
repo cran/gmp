@@ -24,7 +24,7 @@ urand.bigz(nb=1,size=200, seed = 0)
   A biginteger of class bigz.
 }
 \references{
-  \samp{mpz\_urandomb} from the GMP Library, see \url{http://gmplib.org}
+  \samp{mpz\_urandomb} from the GMP Library, see \url{https://gmplib.org}
 }
 \author{Antoine Lucas}
 

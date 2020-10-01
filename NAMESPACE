@@ -18,11 +18,13 @@ export(
        ## "as.matrix.bigq", "as.matrix.bigz",
        ## this should be a deprecated use:
        "as.vector.bigq", "as.vector.bigz",
+       c_bigq, c_bigz,
        ## "c.bigq", "c.bigz", "cbind.bigq", "cbind.bigz",  "rbind.bigq", "rbind.bigz",
        ## "cumsum.bigq", "cumsum.bigz",
        "denominator", "denominator<-",
        ## "dim<-.bigq", "dim.bigq", "dim<-.bigz", "dim.bigz",
        "div.bigq", "div.bigz", "divq.bigz",
+       BernoulliQ, # Rmpfr has 'Bernoulli'; want different name
        "Eulerian", "Eulerian.all",
        "Stirling1", "Stirling1.all", "Stirling2", "Stirling2.all",
        "factorize",
@@ -43,16 +45,18 @@ export(
        "mod.bigz",
        "modulus", "modulus<-", # "modulus<-.bigz", "modulus.bigz",
        "mul.bigq", "mul.bigz",
+    NA_bigz_, NA_bigq_,
        "ncol.bigq", "ncol.bigz", "nrow.bigq", "nrow.bigz",
        "nextprime",
        "numerator", "numerator<-",
-    outer, # our own
+    outer, # our own (= base's, but with our env.!)
        ## "pow",
        "pow.bigz", "powm", "pow.bigq",
        ## "print.bigq", "print.bigz",
        ## "prod", "prod.default",
        "prod.bigq", "prod.bigz",
        "rep.bigq", "rep.bigz",
+    round0, roundQ, # (x, digits, round0)
        ## "sign.bigq", "sign.bigz",
        "sizeinbase",
        "solve.bigq", "solve.bigz",

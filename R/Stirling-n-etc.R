@@ -3,7 +3,6 @@
 ### The "double prec" version of this is currently in package 'nacopula'
 ### (MM: >>> ../../nacopula/R/special-func.R )
 
-
 ##' Compute Stirling numbers of the 1st kind
 ##'
 ##' s(n,k) = (-1)^{n-k} times
@@ -32,16 +31,16 @@ Stirling1 <- function(n,k)
         }
         S
     }
-    if(compute <- (nt <- length(St <- get("S1.tab", .Stirl..env))) < n) {
+    if(compute <- (nt <- length(St <- .Stirl..env$ S1.tab)) < n) {
         ## extend the "table":
         length(St) <- n
-        for(i in (nt+1L):n) St[[i]] <- rep(as.bigz(NA), i)
+        for(i in (nt+1L):n) St[[i]] <- rep.bigz(NA_bigz_, i)
     }
     else compute <- is.na(S <- St[[n]][k])
     if(compute) {
         S <- S1(n,k)
         ## store it back:
-        assign("S1.tab", St, envir = .Stirl..env)
+        .Stirl..env$ S1.tab <- St
     }
     S
 }
@@ -56,11 +55,11 @@ Stirling1.all <- function(n)
 {
     stopifnot(length(n) == 1)
     if(!n) return(as.bigz(numeric(0)))
-    if(get("S1.full.n", .Stirl..env) < n) {
-        assign("S1.full.n", n, envir = .Stirl..env)
+    if(.Stirl..env$ S1.full.n < n) {
+       .Stirl..env$ S1.full.n <- n
         do.call(c, lapply(seq_len(n), Stirling1, n=n))# which fills "S1.tab"
     }
-    else get("S1.tab", .Stirl..env)[[n]]
+    else .Stirl..env$ S1.tab[[n]]
 }
 
 ##' Compute Stirling numbers of the 2nd kind
@@ -99,16 +98,16 @@ Stirling2 <- function(n,k, method = c("lookup.or.store","direct"))
                            S2(n1, k-1) + k* S2(n1, k) else as.bigz(1) ## n = k = 1
                    S
                }
-               if(compute <- (nt <- length(St <- get("S2.tab", .Stirl..env))) < n) {
+               if(compute <- (nt <- length(St <- .Stirl..env$ S2.tab)) < n) {
                    ## extend the "table":
                    length(St) <- n
-                   for(i in (nt+1L):n) St[[i]] <- rep(as.bigz(NA), i)
+                   for(i in (nt+1L):n) St[[i]] <- rep.bigz(NA_bigz_, i)
                }
                else compute <- is.na(S <- St[[n]][k])
                if(compute) {
                    S <- S2(n,k)
                    ## store it back:
-                   assign("S2.tab", St, envir = .Stirl..env)
+                   .Stirl..env$ S2.tab <- St
                }
                S
            })
@@ -124,11 +123,11 @@ Stirling2.all <- function(n)
 {
     stopifnot(length(n) == 1)
     if(!n) return(as.bigz(numeric(0)))
-    if(get("S2.full.n", .Stirl..env) < n) {
-        assign("S2.full.n", n, envir = .Stirl..env)
+    if(.Stirl..env$ S2.full.n < n) {
+       .Stirl..env$ S2.full.n <- n
         do.call(c, lapply(seq_len(n), Stirling2, n=n))# which fills "S2.tab"
     }
-    else get("S2.tab", .Stirl..env)[[n]]
+    else .Stirl..env$ S2.tab[[n]]
 }
 
 
@@ -174,16 +173,16 @@ Eulerian <- function(n,k, method = c("lookup.or.store","direct"))
 			   k1*Eul(n1, k)+ (n-k)* Eul(n1, k-1) else as.bigz(1) ## n=1, k=0
 		   r
 	       }
-	       if(compute <- (nt <- length(E. <- get("Eul.tab", .Stirl..env))) < n) {
+	       if(compute <- (nt <- length(E. <- .Stirl..env$ Eul.tab)) < n) {
 		   ## extend the "table":
 		   length(E.) <- n
-                   for(i in (nt+1L):n) E.[[i]] <- rep(as.bigz(NA), i)
+                   for(i in (nt+1L):n) E.[[i]] <- rep.bigz(NA_bigz_, i)
 	       }
 	       else compute <- is.na(E <- E.[[n]][k+1L])
 	       if(compute) {
 		   E <- Eul(n,k)
 		   ## store it back:
-		   assign("Eul.tab", E., envir = .Stirl..env)
+		   .Stirl..env$ Eul.tab <- E.
 	       }
 	       E
 	   })
@@ -199,13 +198,11 @@ Eulerian.all <- function(n)
 {
     stopifnot(length(n) == 1, n >= 0)
     if(!n) return(as.bigz(1))
-    if(get("Eul.full.n", .Stirl..env) < n) {
-        ## FIXME: do the assign() only when the lapply() below does *not* fail
-        ##  on.exit( ... ) ?
-	assign("Eul.full.n", n, envir = .Stirl..env)
-	do.call(c, lapply(0:(n-1L), Eulerian, n=n))# which fills "Eul.tab"
+    if(.Stirl..env$ Eul.full.n < n) {
+       .Stirl..env$ Eul.full.n <- n
+       do.call(c, lapply(0:(n-1L), Eulerian, n=n))# which fills "Eul.tab"
     }
-    else get("Eul.tab", .Stirl..env)[[n]]
+    else .Stirl..env$ Eul.tab[[n]]
 }
 
 ## Our environment for tables etc:  no hash, as it will contain *few* objects:
@@ -216,3 +213,49 @@ assign("S2.full.n", 0  , envir = .Stirl..env)
 assign("S1.full.n", 0  , envir = .Stirl..env)
 assign("Eul.tab", list(), envir = .Stirl..env) ## Eul.tab[[n]][k] == A(n, k) == < n \\ k > (Eulerian)
 assign("Eul.full.n", 0	, envir = .Stirl..env)
+
+
+## Bernoulli numbers (have also in 'Rmpfr' via zeta(), but they *are* rational after all!)
+.Bernl..env <- new.env(parent=emptyenv(), hash=FALSE)
+## Want  .Bernl..env$B[n] == B_{2n}, n = 1,2,...
+## ==>  not storing BernoulliQ(0) = 1, nor BernoulliQ(1) = +1/2
+
+B1 <- function(n) { # stopifnot( length(n) == 1 )
+    half <- as.bigq(1L, 2L)
+    if(n == 0L)
+        as.bigq(1L)
+    else if(n == 1L)
+        ## B_1 = + 1/2 ("B_n+";  -1/2 according to "old" B_n- definition)
+        half
+    else if(n %% 2 == 1L)
+        as.bigq(0L)
+    else { ## n in {2, 4, 6, ..}:
+        n2 <- n %/% 2L
+        if((lB <- length(B <- .Bernl..env$B)) < n2) { ## compute Bernoulli(n)
+            ## if(verbose) cat("n=",n,": computing from ", lB+1L, sep='', "\n")
+            if(!lB)
+                B <- as.bigq(1L, 6L) # B_2 = 1/6
+            ## n2 >= 2; n >= 4
+            length(B) <- n2 # (fills missing parts with NA_bigq_
+            ## recurse:
+            if(lB+1L < n2)
+                for(k in (lB+1L):(n2-1L)) B[k] <- B1(2*k)
+            k0 <- seq(length=n2-1L) # (1, 2, .., n2-1)
+            B. <- half - (1 + sum( chooseZ(n+1L, k0+k0) * B[k0])) / (n+1L)
+            B[n2] <- B.
+            .Bernl..env$B <- B
+            B.
+        }
+        else
+            B[n2]
+    }
+}# end B1()
+
+BernoulliQ <- function(n, verbose = getOption("verbose", FALSE)) {
+    if(!(N <- length(n))) return(as.bigq(n)) # else: length(n) >= 1 :
+    stopifnot(n >= 0, n == as.integer(n))
+    if(N == 1L)
+        B1(n)
+    else
+        .Call(bigrational_c, lapply(n, B1))
+}

@@ -71,7 +71,7 @@ bigmod & bigvec::get(unsigned int row, unsigned int col) {
 }
 
 
- bigmod & bigvec::operator[] (unsigned int i) 
+ bigmod & bigvec::operator[] (unsigned int i)
 {
   checkValuesMod();
   return *valuesMod[i];
@@ -94,18 +94,18 @@ void bigvec::checkValuesMod() {
     // reconstruct bigmod that are references to values and modulus:
     clearValuesMod();
     if(modulus.size()>0) {
-      for (int i = 0 ; i < value.size(); i++)
+      for (unsigned int i = 0 ; i < value.size(); i++)
 	valuesMod.push_back(new bigmod(value[i], modulus[i%modulus.size()]));
     } else {
-      for (int i= 0 ; i < value.size(); i++)
+      for (unsigned int i= 0 ; i < value.size(); i++)
 	valuesMod.push_back(new BigModInt(value[i]));
     }
-    
+
   }
 }
 
 void bigvec::clearValuesMod(){
-  for (int i = 0 ; i < valuesMod.size(); i++){
+  for (unsigned int i = 0 ; i < valuesMod.size(); i++){
     delete valuesMod[i];
   }
   valuesMod.clear();
@@ -123,7 +123,7 @@ void bigvec::set(unsigned int i,const bigmod & val)
 	  return;
 	}
 
-      int nrow_mod = nrow;
+      unsigned int nrow_mod = nrow;
       if(nrow<1)
 	nrow_mod = 1;
       if( (modulus.size() ==  (unsigned int)nrow_mod ) || (modulus.size() == 1) )
@@ -145,7 +145,7 @@ void bigvec::set(unsigned int i,const bigmod & val)
 
 void bigvec::push_back(const bigmod & number)
 {
-  int nrow_mod = (nrow < 0) ? 1 : nrow;
+  unsigned int nrow_mod = (nrow < 0) ? 1 : nrow;
   clearValuesMod();
 
   value.push_back(number.getValue());
@@ -162,7 +162,7 @@ void bigvec::push_back(const bigmod & number)
 	}
 
       // standard cas
-      if((modulus.size() != 1 ) && (static_cast<int>(modulus.size()) != nrow_mod) )
+      if((modulus.size() != 1 ) && (modulus.size() != nrow_mod))
 	{
 	  modulus.push_back(number.getModulus());
 	  return;
@@ -185,7 +185,7 @@ void bigvec::push_back(const bigmod & number)
     }
 }
 
-/** 
+/**
  * insert int value
  */
 void bigvec::push_back(int value_p)
@@ -194,7 +194,7 @@ void bigvec::push_back(int value_p)
   value.push_back(biginteger(value_p));
 }
 
-/** 
+/**
  * insert int value
  */
 void bigvec::push_back(biginteger & value_p)

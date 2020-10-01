@@ -11,5 +11,12 @@ gmpVersion <- function()
 .onLoad <- function(libname, pkgname) {
     options("gmp:warnModMismatch" = TRUE, ## see ../man/biginteger.Rd
             "gmp:warnNoInv" = TRUE) ## ../man/add.biginteger.Rd | ../src/bigmod.cc
+
+    ## as.big[zq]() need package dynloaded :
+    gmpEnv <- parent.env(environment())
+    gmpEnv$ NA_bigz_ <- as.bigz(NA)
+    gmpEnv$ NA_bigq_ <- as.bigq(NA)
+    invisible()
 }
+
 

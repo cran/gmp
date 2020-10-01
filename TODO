@@ -1,15 +1,21 @@
 
-* Remove full path in configure script, with example of Rmpfr configure.						-*-org-*-
+* Remove full path in `configure.ac` script, with example of Rmpfr configure.						-*-org-*-
 * Bug Fixes
+** TODO Logical ops should work: 0=FALSE NA=NA, <any_else>=TRUE
+*** !as.bigz(0:3)  crashes R badly (!!), but should return !(0:3) (logical vector).
+ terminate called after throwing an instance of 'std::length_error'
+  what():  vector::_M_default_append \\ ...R: line 141: 25400 Aborted (core dumped)
+***  as.bigz(0:3) | as.bigz(0) etc should return logical as with regular numbers in R
+** TODO `format()` currently works via as.character(.), particularly unsatisfying for bigz.
 ** TODO Not working column assignment :  A[,j] <- vec    does nothing, not warn, nothing -- but  A[i,] <- val  works ??
 ** TODO m <- matrix(1:6, 2); Z <- as.bigz(m); str(Z) fails because e.g. Z[5] fails, contrary m[5]
 ** TODO asNumeric(x) : the generic must get a "..." argument, so can use "rounding mode" in Rmpfr
 ** DONE URGENT / BAD : Segfaults, Wrong Results, etc
 ** TODO completely *wrong* pmin() and pmax(<bigq>, <number>): uses Numerator in comparison ???
 *** TODO: Find the *underlying* reason where pmin() goes wrong w/o warning!
-** TODO Not working  Arithmetic
-*** DONE as.bigz(1:4) + as.bigq(7) failed, so do '*', '/', ... Fixed, using the +.bigz, etc _S3_ methods
+** TODO Missing bigq %% and %/% [was 'Not working Arithmetic']
 *** TODO bigq  %% and %/%  are not even defined (but are for 'numeric')!
+*** DONE as.bigz(1:4) + as.bigq(7) failed, so do '*', '/', ... Fixed (for 0.6-0), via new add.big() etc _S3_ methods
 *** DONE more checking: q <- 2.3; Fn <- gmp:::`^.bigq`;  Fn(q,q) silently gave wrong result; now a good error message
 *** DONE <bigz> %*% <bigq>  silently gave wrong result; now works, as does crossprod(), tcrossprod()
 *** DONE bigz %% and %/% should be R compatible, notably fulfilling
@@ -21,7 +27,9 @@
  see matOuter() and eqA[] in tests/arith-ex.R
 
 * Miscellaneous
+** TODO provide as.bigq.fractions(): to accept MASS::fractions() results
 ** TODO [MM:] is.whole() conflicts with  sfsmisc::is.whole(): maybe get that as default method ?
+*** Note that we use  all(is.whole(.)) importantly. --> Make fast all_whole() via C ?
 ** gmp <--> Rmpfr:
 *** Z <- as.bigz(1:7);  Z[1] <- mpfr(1, 20)  now gives an error {did segfault!};
 but later, *with* Rmpfr we should make Z into an 'mpfr'.
@@ -50,7 +58,7 @@ This is completely analogous to
       enhance as.bigz()  and as.bigq() to  work for this case !
 
 ** Vectorization; other "desiderata"
-***  fibnum(), etc are not vectorized -- learn from chooseZ() !
+***  fibnum(), etc are *not* vectorized -- learn from chooseZ() !
 
 *** allow  +/- Inf "bigq" ?? --  +Inf :=: 1/0   -Inf :=:  (-1)/0
    This would allow the bigq (and bigz) arithmetic to be closer to the
@@ -67,10 +75,10 @@ This is completely analogous to
    One possibility:  Using   +- <LARGE>/1  for "bigq", as   +- <LARGE> for "bigz"
 
 ** Matrix things
-***  3*M and M*3  are not the same: the first forgets the "nrow"
+*** TODO want *different*  M[1,] and M[1] for big[zq] matrices
+*** TODO 3*M and M*3  are not the same: the first forgets the "nrow"
 *** DONE x <- as.bigz(2:5);    x[1]  <- -1; x  # -- a matrix !! >> no longer
 *** DONE qq <- as.bigz(2:5)/7; qq[1] <- -1; qq # -- a matrix !!
-***  also want *different*  M[1,] and M[1] for big[zq] matrices
 ***  abs(.) or sign(<big..matrix>) {and probably many others!}
      return vector instead of matrix, i.e.., lose the "nrow" attribute.
 ***  cbind(<bigz>, <bigq>)  returns raw

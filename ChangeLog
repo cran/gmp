@@ -1,3 +1,26 @@
+2020-07-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/bigq.R (roundQ): use simpler *vectorized* version, always
+	returning 'bigq' (as documented).
+	* tests/arith-ex.R: check it works.
+
+2020-07-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/bigq.R (round, round0, roundQ): round0(): "round to even"; make
+	'round0()' the default argument to  'round(x, digits)'.
+
+2020-06-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/biginteger.R (c_bigz): export, to be used, e.g.,
+	* R/bigq.R (c_bigq): on  lapply(<big>, Fn) to give a <big[qz]> result
+
+2020-06-09  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.6-1
+
+	* R/Stirling-n-etc.R (BernoulliQ): Bernoulli numbers as exact fractions.
+	* R/zzz.R (NA_bigz_, NA_bigq_): analogous to `NA_integer_` etc
+
 2020-06-06  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* NAMESPACE: use *same* S3method(<op>, <class>, <method_fn>) for bigz and bigq,

@@ -39,7 +39,7 @@
 }
 
 \value{
-  return an element of class bigz or bigq.
+  an object of class \code{"\link{bigz}"} or \code{"\link{bigq}"}.
 }
 
 \author{Antoine Lucas}% Martin Maechler: which.min & which.max
@@ -63,7 +63,9 @@
 stopifnot(range(x) == c(1,10), 3*range(Q) == c(1,10))
 }
 
-\seealso{\code{\link[base]{max}}}
+\seealso{
+  \code{\link{max}} etc in \pkg{base}.
+}
 
 \keyword{arith}
 

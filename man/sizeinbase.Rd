@@ -22,7 +22,7 @@ sizeinbase(a, b=10)
   integer of the same length as \code{a}: the size, i.e. number of
   digits, of each \code{a[i]}.
 }
-\references{The GNU MP Library, see \url{http://gmplib.org}}
+\references{The GNU MP Library, see \url{https://gmplib.org}}
 \author{Antoine Lucas}
 
 \examples{

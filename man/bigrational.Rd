@@ -1,4 +1,5 @@
 \name{bigq}
+\title{Large sized rationals}
 \alias{bigq}
 \alias{bigq-class}
 \alias{as.bigq}
@@ -7,18 +8,18 @@
 \alias{as.double.bigq}
 \alias{print.bigq}
 \alias{is.na.bigq}
+\alias{NA_bigq_}
 \alias{as.bigz.bigq}
+\alias{c_bigq}
 \alias{denominator}
 \alias{denominator<-}
 \alias{numerator}
 \alias{numerator<-}
-\title{Large sized rationals}
 \description{
   Class \code{"bigq"} encodes rationals encoded as ratios of arbitrary
   large integers (via GMP).
   A simple S3 class (internally a \code{\link{raw}} vector), it has been
   registered as formal (S4) class (via \code{\link{setOldClass}}), too.
-
 }
 \usage{
 as.bigq(n, d = 1)
@@ -30,6 +31,8 @@ is.bigq(x)
 \S3method{print}{bigq}(x, quote=FALSE, initLine = TRUE, ...)
 denominator(x)
 numerator(x)
+NA_bigq_
+c_bigq(L)
 }
 
 \arguments{
@@ -37,7 +40,7 @@ numerator(x)
     (String value: either starting with \code{0x} for hexadecimal, \code{0b} for
     binary or without prefix for decimal values.
     Any format error results in \code{0}).
-    \code{n} stands for numerator, \code{d} for denominator}
+    \code{n} stands for numerator, \code{d} for denominator.}
   \item{a}{an element of class \code{"bigq"}}
   \item{mod}{optional modulus to convert into biginteger}
   \item{x}{a \dQuote{rational number} (vector), of class \code{"bigq"}.}
@@ -52,14 +55,24 @@ numerator(x)
     % those cases where the class is not easily discernable from the
     % print output.
   }
-
+  \item{L}{a \code{\link{list}} where each element contains \code{"bigq"}
+    numbers, for \code{c_bigq()}, this allows something like an
+    \code{\link{sapply}()} for \code{"bigq"} vectors, see \code{sapplyQ()}
+    in the examples below.}
 }
 \value{
   An \R object of (S3) class \code{"bigq"} representing the parameter value.
 }
 \details{
+  \code{as.bigq(x)} when \code{x} is \code{\link{numeric}} (aka
+  \code{\link{double}} precision) calls the \file{GMP} function
+  \code{mpq_set_d()} which is documented to be \emph{exact} (every finite double
+  precision number is a rational number).
+
   \code{as.bigz.bigq()} returns the smallest integers not less than the
   corresponding rationals bigq.
+
+  \code{NA_bigq_} is computed on package load time as \code{as.bigq(NA)}.
 }
 
 \author{Antoine Lucas}
@@ -87,9 +100,18 @@ stopifnot(is.bigq(x), is.bigq(x + y),
 as.character(x)
 as.double(x)
 
+stopifnot( is.na(NA_bigq_) )
+
 # Depict the "S4-class" bigq, i.e., the formal (S4) methods:
 if(require("Rmpfr")) # mostly interesting there
   showMethods(class="bigq")
-}
 
+# an  sapply() version that works for big rationals "bigq":
+sapplyQ <- function(X, FUN, ...) c_bigq(lapply(X, FUN, ...))
+
+# dummy example showing it works (here):
+qq <- as.bigq(1, 1:999)
+q1 <- sapplyQ(qq, function(q) q^2)
+stopifnot( identical(q1, qq^2) )
+}
 \keyword{arith}

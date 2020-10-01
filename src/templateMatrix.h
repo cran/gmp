@@ -29,7 +29,7 @@ namespace math{
 
     virtual ~Matrix() {
       if (transposate) delete transposate;
-    };
+    }
  
 
     virtual unsigned int nRows() const = 0;
@@ -53,7 +53,7 @@ namespace math{
      * \brief substract lambda * line j to line i
      */
     void subLine(unsigned int i,unsigned int j,const T & lambda){
-      for(int k=0; k < nCols() ; ++k)
+      for(unsigned int k=0; k < nCols() ; ++k)
 	set(i , k ,  get(i, k) - ( get(j , k) * lambda ) );
     }
 
@@ -61,7 +61,7 @@ namespace math{
      * \brief multiply line i by lambda
      */
     void mulLine(unsigned int i,const T & lambda){
-      for(int k=0; k < nCols(); ++k)
+      for(unsigned int k=0; k < nCols(); ++k)
 	set(i , k,  get(i,k)  * lambda  );
     }
     
@@ -77,7 +77,7 @@ namespace math{
     public:
       Transpose(Matrix<T> & source_p)
 	: source(source_p) {
-      };
+      }
 
       unsigned int size() const{
 	return source.size();
@@ -95,12 +95,12 @@ namespace math{
 	source.set(j,i,val);
       }
 
-    };
+  };
 
   // template code.
   template<class T>
   Vector<T>::Vector() {
-  };
+  }
 
   template<class T>
     Matrix<T>::Matrix() : 
@@ -121,7 +121,7 @@ namespace math{
     unsigned int Matrix<T>::nCols() const{
    
     return this->size() / nRows();
-    };
+    }
 
   
 

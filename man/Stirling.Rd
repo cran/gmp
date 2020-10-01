@@ -65,7 +65,7 @@ Eulerian.all (n)
   \bold{Eulerians:}
 
   NIST Digital Library of Mathematical Functions,
-  26.14: \url{http://dlmf.nist.gov/26.14}
+  26.14: \url{https://dlmf.nist.gov/26.14}
 
   \bold{Stirling numbers:}
 
@@ -74,7 +74,7 @@ Eulerian.all (n)
   Closed Form : p.824 "C."
 
   NIST Digital Library of Mathematical Functions,
-  26.8: \url{http://dlmf.nist.gov/26.8}
+  26.8: \url{https://dlmf.nist.gov/26.8}
 }
 \seealso{
   \code{\link{chooseZ}} for the binomial coefficients.

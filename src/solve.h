@@ -56,7 +56,7 @@ namespace solve_gmp_R
     {
 
       // A [ i ,j] = A[ i + j * A.nrow]
-      for(int k = 0 ; k < A.nRows(); ++k)
+      for(unsigned int k = 0 ; k < A.nRows(); ++k)
 	{
 	  if(A.get(k, k).sgn() == 0 )
 	    Rf_error("System is singular");
@@ -66,7 +66,7 @@ namespace solve_gmp_R
 	  A.mulLine(k,tmpValeur);
 	  B.mulLine(k,tmpValeur);
 
-	  for(int i = 0; i< A.nRows(); ++i)
+	  for(unsigned int i = 0; i < A.nRows(); ++i)
 	    {
 	      if(i == k)
 		continue;

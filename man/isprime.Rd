@@ -28,7 +28,7 @@ isprime(n, reps = 40)  % we feel better with 40 :)
   \item{1}{\eqn{n} is probably prime}
   \item{2}{\eqn{n} is prime}
 }
-\references{The GNU MP Library, see \url{http://gmplib.org}}
+\references{The GNU MP Library, see \url{https://gmplib.org}}
 
 \author{Antoine Lucas}
 

@@ -8,6 +8,8 @@
 \alias{as.double.bigz}
 \alias{print.bigz}
 \alias{is.na.bigz}
+\alias{NA_bigz_}
+\alias{c_bigz}
 % these two are C symbols, will be removed eventually:
 \alias{biginteger_as}
 \alias{biginteger_as_character}
@@ -18,11 +20,13 @@
 }
 \usage{
 as.bigz(a, mod = NA)
+NA_bigz_
 \S3method{as.character}{bigz}(x, b = 10, \dots)
 % \S3method{as.double}{bigz}(x,\dots)
 is.bigz(x)
 \S3method{is.na}{bigz}(x)
 \S3method{print}{bigz}(x, quote=FALSE, initLine = is.null(modulus(x)), \dots)
+c_bigz(L)
 }
 \arguments{
   \item{a}{either \code{\link{integer}}, \code{\link{numeric}} (i.e.,
@@ -42,6 +46,10 @@ is.bigz(x)
     \bold{init}ial line (with the class and length or dimension) should
     be printed.  The default prints it for those cases where the class
     is not easily discernable from the print output.}
+  \item{L}{a \code{\link{list}} where each element contains \code{"bigz"}
+    numbers, for \code{c_bigz()}, this allows something like an
+    \code{\link{sapply}()} for \code{"bigz"} vectors, see \code{sapplyZ()}
+    in the examples.}
 }
 \value{
   An \R object of (S3) class \code{"bigz"}, representing the argument
@@ -59,6 +67,8 @@ is.bigz(x)
 
   Comparison are supported, i.e., \code{"=="}, \code{"!="},
   \code{"<"}, \code{"<="}, \code{">"}, and \code{">="}.
+
+  \code{NA_bigz_} is computed on package load time as \code{as.bigz(NA)}.
 
   Objects of class \code{"bigz"} may have a \dQuote{modulus}, accessible
   via \code{\link{modulus}()}, currently as an attribute \code{mod}.
@@ -108,7 +118,7 @@ is.bigz(x)
   }
 }
 
-\references{The GNU MP Library, see \url{http://gmplib.org}}
+\references{The GNU MP Library, see \url{https://gmplib.org}}
 \author{Immanuel Scholz}
 
 \examples{
@@ -121,6 +131,7 @@ two <- as.bigz(2)
 p1 <- two^107 -1 ; isprime(p1); p1
 p2 <- two^127 -1 ; isprime(p2); p2
 
+stopifnot( is.na(NA_bigz_) )
 
 ## Calculate c = x^e mod n
 ## --------------------------------------------------------------------
@@ -158,6 +169,13 @@ as.character(c, b=16)
 # Depict the "S4-class" bigz, i.e., the formal (S4) methods:
 if(require("Rmpfr")) # mostly interesting there
   showMethods(class="bigz")
-}
 
+# an  sapply() version that works for big integers "bigz":
+sapplyZ <- function(X, FUN, ...) c_bigz(lapply(X, FUN, ...))
+
+# dummy example showing it works (here):
+zz <- as.bigz(3)^(1000+ 1:999)
+z1 <- sapplyZ(zz, function(z) z^2)
+stopifnot( identical(z1, zz^2) )
+}
 \keyword{arith}

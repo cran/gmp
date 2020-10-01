@@ -18,7 +18,7 @@ nextprime(n)
 \value{
   A (probably) prime number
 }
-\references{The GNU MP Library, see \url{http://gmplib.org}}
+\references{The GNU MP Library, see \url{https://gmplib.org}}
 
 \author{Antoine Lucas}
 

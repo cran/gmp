@@ -14,7 +14,7 @@ gmpVersion()
 }
 % \arguments{
 % }
-\references{The GNU MP Library, see \url{http://gmplib.org}}
+\references{The GNU MP Library, see \url{https://gmplib.org}}
 % \details{
 %   ~~ If necessary, more details than the description above ~~
 % }

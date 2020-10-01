@@ -60,13 +60,14 @@ div.bigz <- function(e1, e2) {
 
 "%%.bigz" <- mod.bigz <- function(e1, e2) {
    if(inherits(e2, "bigq")) {
-       if(!all(is.whole(e2[is.finite(e2)])))
+       if(!all(is.whole.bigq(e2[is.finite(e2)])))
            e2 <- as.bigz(e2)
        else
            stop("In 'n %% d', d must be integer")
    }
    .Call(biginteger_mod, e1, e2)
 }
+.mod.bigz <- function(e1, e2) .Call(biginteger_mod, e1, e2)
 
 pow.bigz <- function(e1, e2,...) {
     if(inherits(e2, "bigq"))
@@ -362,12 +363,16 @@ sum.bigz <- function(..., na.rm = FALSE)
 setMethod("which.max", "bigz", function(x) which.max(x == max(x)))
 setMethod("which.min", "bigz", function(x) which.max(x == min(x)))
 
+##' to be applied e.g. to the result of  lapply(<bigz>, Fn)
+c_bigz <- function(L) .Call(biginteger_c, L)
+
 c.bigz <- function(..., recursive = FALSE)
 {
     argL <- list(...)
     if(any(vapply(argL, inherits, NA, what="bigq")))
-        .Call(bigrational_c, argL)
-    else .Call(biginteger_c, argL)
+        c_bigq(argL)
+    else
+        c_bigz(argL)
 }
 
 ## This is practically identical to  grid :: rep.unit :
