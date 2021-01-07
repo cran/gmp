@@ -1,3 +1,8 @@
+2021-01-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* configure.ac: add definitions of CFLAGS etc  as from R,
+	from a suggestion by Kaspar Daniel Hansen.
+
 2020-07-30  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/bigq.R (roundQ): use simpler *vectorized* version, always
@@ -12,11 +17,12 @@
 2020-06-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/biginteger.R (c_bigz): export, to be used, e.g.,
-	* R/bigq.R (c_bigq): on  lapply(<big>, Fn) to give a <big[qz]> result
+	* R/bigq.R (c_bigq): on  lapply(<big>, Fn) to give a <big[qz]> result, see
+	* man/bigrational.Rd: the  sapplyQ()  utility in the examples.
 
 2020-06-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.6-1
+	* DESCRIPTION (Version): 0.6-1  (not yet released)
 
 	* R/Stirling-n-etc.R (BernoulliQ): Bernoulli numbers as exact fractions.
 	* R/zzz.R (NA_bigz_, NA_bigq_): analogous to `NA_integer_` etc

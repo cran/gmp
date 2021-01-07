@@ -1,6 +1,6 @@
 Package: gmp
-Version: 0.6-1
-Date: 2020-10-01
+Version: 0.6-2
+Date: 2021-01-07
 Title: Multiple Precision Arithmetic
 Author: Antoine Lucas, Immanuel Scholz, Rainer Boehme <rb-gmp@reflex-studio.de>,
   Sylvain Jasson <Sylvain.Jasson@inrae.fr>,
@@ -18,6 +18,6 @@ BuildResaveData: no
 LazyDataNote: not available, as we use data/*.R *and* our classes
 NeedsCompilation: yes
 URL: https://forgemia.inra.fr/sylvain.jasson/gmp
-Packaged: 2020-10-01 14:01:12 UTC; antoine
+Packaged: 2021-01-07 13:01:36 UTC; antoine
 Repository: CRAN
-Date/Publication: 2020-10-01 14:30:02 UTC
+Date/Publication: 2021-01-07 14:10:06 UTC

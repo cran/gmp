@@ -1,6 +1,6 @@
-bd4536b9edf1a10d1b6aa59db743ebb9 *ChangeLog
+08b673189c281130b39e36dd517e9106 *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-8835dd2988007d4adf08a2aca16ea15e *DESCRIPTION
+8dce95853dac1f9382de05782688c28e *DESCRIPTION
 077a366c9fe40923ba402b72b1d8e901 *NAMESPACE
 031eddddcfbf9c2a9bc74c83342699e5 *R/AllClasses-etc.R
 a6eb2430e9ce0c4c619c0176c4492020 *R/Stirling-n-etc.R
@@ -12,8 +12,8 @@ d793f18fb2d2c0dc7647a8c863886146 *R/bigq.R
 95f68ef3a6a5a0effdd2bd05bd6e91ef *R/zzz.R
 b5264f5e34c6b7096ed632c72b3ed2bd *TODO
 a8d707d0cad53cb4e52a114d1a441af8 *cleanup
-65e78781f40ca0bde7c147de655a806b *configure
-5b7f5def4b65b93d8c504e1fff580325 *configure.ac
+39efafd178fd9aa9cf8316c287e0632c *configure
+92474908df6e0895e57c68682282e3a3 *configure.ac
 c4ff09724b77a5383751dacc935b493f *data/Oakley1.R
 76f950c0330af250fae4d9c1d5b13f84 *data/Oakley2.R
 ad746e23b07ecef7d2262f22c121e95b *man/BernoulliQ.Rd
