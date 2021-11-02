@@ -1,5 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(src/biginteger.cc)
+AC_INIT
+AC_CONFIG_SRCDIR([src/biginteger.cc])
 
 CC=`"${R_HOME}/bin/R" CMD config CC`
 CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
@@ -28,7 +29,8 @@ PKG_LIBS="${PKG_LIBS} -L/usr/local/lib/ -lgmp"
 AC_SUBST(PKG_CPPFLAGS)
 AC_SUBST(PKG_LIBS)
 
-AC_OUTPUT(src/Makevars)
+AC_CONFIG_FILES([src/Makevars])
+AC_OUTPUT
 
 
 
