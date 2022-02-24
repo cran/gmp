@@ -353,14 +353,18 @@ solve.bigq <- function(a,b,...)
 
 `[.bigq` <- function(x, i=NULL, j=NULL, drop=TRUE)
 {
+  mdrop <- missing(drop)
+  Narg <- nargs() - (!mdrop)
+  # matrix access [i,j] [,j] [i,]
+  # vector access [i]
+  matrixAccess = Narg > 2
   has.j <- !missing(j)
-  if(!is.null(attr(x, "nrow"))) { ## matrix
-      ## FIXME  x[i,] vs. x[,j] vs. x[i]
+  if(!is.null(attr(x, "nrow")) & matrixAccess) { ## matrix
       .Call(matrix_get_at_q, x, i,j)
   } else { ## non-matrix
     if(has.j) stop("invalid vector subsetting")
-    ## ugly "workaround"
-    r <- .Call(matrix_get_at_q, x, i, NULL)
+    
+    r <- .Call(bigrational_get_at, x, i)
     attr(r,"nrow") <- NULL
     r
   }
@@ -369,14 +373,14 @@ solve.bigq <- function(a,b,...)
 
 `[<-.bigq` <- function(x,i=NULL,j=NULL,value)
 {
+  matrixAccess = nargs() > 3
   has.j <- !missing(j)
-  if(!is.null(attr(x, "nrow"))) { ## matrix
-      ## FIXME  x[i,] vs. x[,j] vs. x[i]
-  .Call(matrix_set_at_q, x, value,i,j )
+  if(!is.null(attr(x, "nrow")) & matrixAccess) { ## matrix
+   .Call(matrix_set_at_q, x, value,i,j )
   } else { ## non-matrix -- ugly workaround:
     if(has.j) stop("invalid vector subsetting")
-    r <- .Call(matrix_set_at_q, x, value,i,j ) # '1' or does NULL work ??
-    attr(r,"nrow") <- NULL
+    r <- .Call(bigrational_set_at, x, i, value )
+    attr(r,"nrow") <- attr(x, "nrow")
     r
   }
 }
@@ -406,4 +410,24 @@ prod.bigq <- function(..., na.rm = FALSE)
 {
     X <- c.bigq(...)
    .Call(bigrational_prod, if(na.rm) X[!is.na(X)] else X)
+}
+
+"!.bigq" <- function(a) a == 0
+
+"|.bigq" <- function(a,b) {
+  a1 = a != 0
+  b1 = b != 0
+  a1 | b1
+}
+
+"&.bigq" <- function(a,b) {
+  a1 = a != 0
+  b1 = b != 0
+  a1 & b1
+}
+
+"xor.bigq" <- function(a,b) {
+  a1 = a != 0
+  b1 = b != 0
+  xor(a1, b1)
 }

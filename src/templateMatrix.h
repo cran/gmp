@@ -65,15 +65,14 @@ namespace math{
 	set(i , k,  get(i,k)  * lambda  );
     }
     
-    Matrix & transpose();
+    Matrix * transpose();
   };
   
   template< class T>
     class Transpose: public Matrix<T> {
     private :
       Matrix<T> & source;
-      
-     
+         
     public:
       Transpose(Matrix<T> & source_p)
 	: source(source_p) {
@@ -83,6 +82,10 @@ namespace math{
 	return source.size();
       }
 
+    bool isVector() const {
+      return false;
+    }
+    
       unsigned int nRows() const {
 	return source.nCols();
       }
@@ -110,11 +113,11 @@ namespace math{
   }
 
   template<class T>
-    Matrix<T> & Matrix<T>::transpose(){
+    Matrix<T> * Matrix<T>::transpose(){
     if (transposate == 0){
       transposate =new Transpose<T>(*this);
     }
-    return *transposate;
+    return transposate;
   }
   
   template<class T>

@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 19/02/06
- *  \date Last modified: Time-stamp: <2008-02-17 19:54:11 antoine>
+ *  \date Last modified: Time-stamp: <2022-02-21 15:42:57 (antoine)>
  *
  *  \author A. Lucas
  *
@@ -25,7 +25,6 @@ using namespace std;
 
 #include "bigrational.h"
 #include "bigrationalR.h"
-//#include "bigintegerR.h"
 #include "matrixq.h"
 
 
@@ -92,7 +91,7 @@ SEXP as_matrixq (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP den)
   mat.nrow = nr;
   if(byrow)
    {
-      bigvec_q mat2 = matrixq::bigq_transpose (mat, nc,nr);
+      bigvec_q mat2 = matrixq::bigq_transpose (mat);
       mat2.nrow = nr;
       return( bigrationalR::create_SEXP (mat2));
    }
@@ -119,9 +118,9 @@ SEXP bigq_transposeR(SEXP x)
     error(_("argument must be a matrix of class \"bigq\""));
     nr = -1;// -Wall
   }
-
+  mat.nrow = nr;
   int nc = (int) n / nr;
-  bigvec_q mat_transp = matrixq::bigq_transpose(mat, nr,nc);
+  bigvec_q mat_transp = matrixq::bigq_transpose(mat);
   mat_transp.nrow = nc; // FIXME - needed ?
   UNPROTECT(2);
   return( bigrationalR::create_SEXP( mat_transp));
@@ -397,37 +396,36 @@ SEXP bigrational_rbind(SEXP args)
   bigvec_q v;
 
   result = bigrationalR::create_bignum(VECTOR_ELT(args,0));
-  if(result.nrow ==0)
+  if(result.nrow <=0)
     result.nrow = result.size();
 
-  result = matrixq::bigq_transpose(result, result.nrow,
-				   result.size() / result.nrow);
+  result = matrixq::bigq_transpose(result);
   for(i=1; i< LENGTH(args); i++) {
     v = bigrationalR::create_bignum(VECTOR_ELT(args,i));
     if(v.nrow == 0 )
       v.nrow = v.size();
-    v = matrixq::bigq_transpose(v,v.nrow,v.size() / v.nrow);
+    v = matrixq::bigq_transpose(v);
 
     for(j=0; j< (int)v.size(); j++)
       result.push_back(v[j]);
     v.clear();
   }
 
-  result = matrixq::bigq_transpose(result, result.nrow,
-				   result.size() / result.nrow);
+  result = matrixq::bigq_transpose(result);
   return bigrationalR::create_SEXP(result);
 }
 
 
-bigvec_q matrixq::bigq_transpose (const  bigvec_q & mat,int nr,int nc)
+bigvec_q matrixq::bigq_transpose (const  bigvec_q & mat)
 {
+
   int i,j;
-  bigvec_q matbis (nr * nc);
-  matbis.nrow = nc;
+  bigvec_q matbis ( mat.size());
+  matbis.nrow = mat.nCols();
   /* we compute transpose */
-  for(i=0; i < nr; i++)
-    for(j=0; j < nc; j++)
-      matbis.value[j+i*nc].setValue(mat.value[i+j*nr]);
+  for(i=0; i < mat.nRows(); i++)
+    for(j=0; j < mat.nCols(); j++)
+      matbis.value[j+i*mat.nCols()].setValue(mat.value[i+j*mat.nRows()]);
 
   return(matbis);
 }

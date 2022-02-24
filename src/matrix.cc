@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 19/02/06
- *  \date Last modified: Time-stamp: <2006-06-17 23:10:44 antoine>
+ *  \date Last modified: Time-stamp: <2022-02-21 16:01:02 (antoine)>
  *
  *  \author A. Lucas
  *
@@ -20,9 +20,6 @@
 
 using namespace std;
 
-#include "Rgmp.h"
-
-#include "biginteger.h"
 #include "bigintegerR.h"
 #include "matrix.h"
 // need to call matrix_mul_q()
@@ -106,8 +103,7 @@ SEXP as_matrixz (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP mod)
   mat.nrow = nr;
   if(byrow)
     {
-      bigvec mat2 = matrixz::bigint_transpose (mat, nc,nr);
-      mat2.nrow = nr;// FIXME - needed ??
+      bigvec mat2 = matrixz::bigint_transpose (mat);
       return( bigintegerR::create_SEXP (mat2));
     }
 
@@ -135,9 +131,10 @@ SEXP bigint_transposeR(SEXP x)
     error(_("argument must be a matrix of class \"bigz\""));
   }
   UNPROTECT(2);
-  int nc = (int) n / nr;
+
+  mat.nrow = nr;
   // Rprintf(" o bigI_tr(<%d x %d>) ..\n", nr,nc);
-  return( bigintegerR::create_SEXP(matrixz::bigint_transpose(mat, nr,nc)));
+  return( bigintegerR::create_SEXP(matrixz::bigint_transpose(mat)));
 }
 
 
@@ -456,25 +453,24 @@ SEXP biginteger_rbind(SEXP args)
   bigvec v;
 
   result = bigintegerR::create_bignum(VECTOR_ELT(args,0));
-  if(result.nrow==0)
+  if(result.nrow<=0)
     result.nrow = result.size();
 
-  result = matrixz::bigint_transpose(result, result.nrow,
-				     result.size() / result.nrow);
+  result = matrixz::bigint_transpose(result);
+
   for(i=1; i < LENGTH(args); i++)
     {
       v = bigintegerR::create_bignum(VECTOR_ELT(args,i));
-      if(v.nrow == 0 )
+      if(v.nrow <= 0 )
 	v.nrow = v.size();
-      v = matrixz::bigint_transpose(v,v.nrow,v.size() / v.nrow);
+      v = matrixz::bigint_transpose(v);
 
       for(j=0; j< (int)v.size(); j++)
 	result.push_back(v[j]);
       v.clear();
     }
 
-  result = matrixz::bigint_transpose(result, result.nrow,
-				     result.size() / result.nrow);
+  result = matrixz::bigint_transpose(result);
   return bigintegerR::create_SEXP(result);
 }
 
@@ -482,18 +478,18 @@ SEXP biginteger_rbind(SEXP args)
 
 namespace matrixz
 {
-  bigvec bigint_transpose ( bigvec & mat,int nr,int nc)
+  bigvec bigint_transpose ( bigvec & mat)
   {
     int i,j;
 
-    /* cas: square matrix */
-    bigvec matbis (nr * nc);
-    matbis.nrow = nc;
+
+    bigvec matbis (mat.size());
+    matbis.nrow = mat.nCols();
 
     /* we compute transpose */
-    for(i =0; i<nr; i++)
-      for(j =0; j<nc; j++)
-	matbis.set(j+i*nc,mat[i+j*nr]);
+    for(i =0; i<mat.nRows(); i++)
+      for(j =0; j<mat.nCols(); j++)
+	matbis.set(j+i*mat.nCols(),mat[i+j*mat.nRows()]);
 
     return matbis;
   }

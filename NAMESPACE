@@ -24,6 +24,8 @@ export(
        "denominator", "denominator<-",
        ## "dim<-.bigq", "dim.bigq", "dim<-.bigz", "dim.bigz",
        "div.bigq", "div.bigz", "divq.bigz",
+       dbinomQ, # dbinom() with exact rationals
+    ## TODO: pbinomQ,
        BernoulliQ, # Rmpfr has 'Bernoulli'; want different name
        "Eulerian", "Eulerian.all",
        "Stirling1", "Stirling1.all", "Stirling2", "Stirling2.all",
@@ -97,6 +99,10 @@ S3method("==",bigz,  eq.big)
 S3method(">=",bigz, gte.big)
 S3method(">", bigz,  gt.big)
 S3method("!=",bigz, neq.big)
+S3method("!",bigz)
+S3method("|",bigz)
+S3method("&",bigz)
+S3method("xor",bigz)
 ##
 S3method("[<-",bigz)
 S3method("[",bigz)
@@ -148,6 +154,12 @@ S3method("==",bigq,  eq.big)
 S3method(">=",bigq, gte.big)
 S3method(">", bigq,  gt.big)
 S3method("!=",bigq, neq.big)
+## Logical
+S3method("!",bigq)
+S3method("|",bigq)
+S3method("&",bigq)
+S3method("xor",bigq)
+
 ##
 S3method("[<-", bigq)
 S3method("[",   bigq)

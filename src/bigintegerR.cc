@@ -26,7 +26,7 @@
 using namespace std;
 
 #include <Rmath.h>
-
+#include "extract_matrix.h"
 /* Globals variables */
 
 static gmp_randstate_t seed_state;
@@ -446,57 +446,17 @@ SEXP biginteger_get_at(SEXP a, SEXP i)
 // also called from  matrix_get_at_z(.)  in ./extract_matrix.cc :
 bigvec bigintegerR::biginteger_get_at_C(bigvec va, SEXP ind)
 {
-  vector<int> v_ind = bigintegerR::create_int(ind);
+  vector<int> v_ind = extract_gmp_R::indice_get_at(va.size(),ind);
   bigvec result;
-  // logical: ind = true/false
-  if (TYPEOF(ind) == LGLSXP) {
-    for (unsigned int i = 0; i < va.size(); ++i)
-      if (v_ind[i%v_ind.size()])
-	{
-	  //std::cout << "cas LOGIC "<< std::endl;
-	  result.push_back(va[i]);
-	}
-    return result;
-  }
-  else {
-    std::remove(v_ind.begin(), v_ind.end(), 0); // remove all zeroes from ind
-    if (v_ind.empty())
-      return bigvec();
-
-    // case: a[-ind]
-    if (v_ind[0] < 0) {
-      //std::cout << "cas ngatif" << std::cout;
-      for (vector<int>::iterator it = v_ind.begin(); it != v_ind.end(); ++it)
-	if (*it > 0)
-	  error(_("only 0's may mix with negative subscripts"));
-	else if (-(*it)-1 >= (int)va.size())
-	  error(_("subscript out of bounds"));
-
-      // TODO: This is optimized for large va.size and small v_ind.size.
-      // Maybe add a condition to use a different approach for large v_ind's
-      result.value.reserve(va.size()-v_ind.size());
-      for (int i = 0; i < (int)va.size(); ++i)
-	if (find(v_ind.begin(), v_ind.end(), -i-1) == v_ind.end())
-	  {
-	    result.push_back(va[i]);
-	  }
-    }
-    else {
-      // standard case: a[ind] with ind: integers
-      result.value.reserve(v_ind.size());
-      for (vector<int>::iterator it = v_ind.begin(); it != v_ind.end(); ++it) {
-	if (*it <= 0)
-	  error(_("only 0's may mix with negative subscripts"));
-	if (*it <= (int)va.size())
-	  {
-	    //std::cout << "on sort " << va.value[(*it)-1].str(10) << std::endl;
-	    result.push_back(va[(*it)-1]);
-	  }
-	else
-	  result.push_back(DefaultBigMod()); // NA for out of range's
-      }
+  for(unsigned int i = 0 ; i < v_ind.size(); i++){
+    int indice = v_ind[i];
+    if(indice < va.size()){
+      result.push_back(va[indice]);
+    } else {
+      result.push_back(bigmod());
     }
   }
+ 
   return (result);
 }
 
@@ -506,55 +466,30 @@ SEXP biginteger_set_at(SEXP src, SEXP idx, SEXP value)
 
   bigvec result = bigintegerR::create_bignum(src);
   bigvec vvalue = bigintegerR::create_bignum(value);
-  vector<int> vidx = bigintegerR::create_int(idx);
+  vector<bool> vidx = extract_gmp_R::indice_set_at(result.size(),idx);
 
+  
   if(vvalue.size() == 0) {
       if(result.size() == 0)
 	  return bigintegerR::create_SEXP(result);
-      else
+      else {
+	int count = 0;
+	for (int i = 0 ; i < vidx.size(); i++){
+	  if(vidx[i]) count++;
+	}
+	if(count >0)
 	  error(_("replacement has length zero"));
-  }
-  //case: logicals
-  if (TYPEOF(idx) == LGLSXP) {
-    int pos = 0;
-    for (unsigned int i = 0; i < result.size(); ++i)
-      if (vidx[i%vidx.size()])
-	result.set(i, vvalue[pos++ % vvalue.size()]);
-    return bigintegerR::create_SEXP(result);
-  }
-  else {
-    std::remove(vidx.begin(), vidx.end(), 0); // remove all zeroes
-    if (vidx.empty())
-      return bigintegerR::create_SEXP(result);
-    // return = (src[-idx] <- value)
-    if (vidx[0] < 0) {
-      for (vector<int>::iterator it = vidx.begin(); it != vidx.end(); ++it)
-	if (*it > 0)
-	  error(_("only 0's may mix with negative subscripts"));
-	else if (-(*it)-1 >= (int)result.size())
-	  error(_("subscript out of bounds"));
-      int pos = 0;
-      for (int i = 0; i < (int)result.size(); ++i)
-	if (find(vidx.begin(), vidx.end(), -i-1) == vidx.end())
-	  result.set(i, vvalue[pos++%vvalue.size()]);
-    }
-    //standard case: return = (src[idx] <- value) with idx: positive integer
-    else {
-      // finding maximum to resize vector if needed
-      int maximum = INT_MIN;
-      for (vector<int>::iterator it = vidx.begin(); it != vidx.end(); ++it)
-	maximum = max(maximum, *it);
-      if (maximum > (int)result.size())
-	result.resize(maximum);
-      int pos = 0;
-      for (vector<int>::iterator it = vidx.begin(); it != vidx.end(); ++it) {
-	if (*it < 0)
-	  error(_("only 0's may mix with negative subscripts"));
-	result.set((*it)-1,vvalue[pos++%vvalue.size()]);
+	else
+ 	  return bigintegerR::create_SEXP(result);
       }
-    }
   }
+  int pos = 0;
+  for(int i = 0 ; i < result.size(); i++){
+    if(vidx[i]) result.set(i,vvalue[pos++ % vvalue.size()]);
+  }
+  
   return bigintegerR::create_SEXP(result);
+  
 }
 
 SEXP biginteger_length(SEXP a)

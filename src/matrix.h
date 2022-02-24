@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 25/05/06
- *  \date Last modified: Time-stamp: <2006-05-26 14:28:09 antoine>
+ *  \date Last modified: Time-stamp: <2022-02-21 15:57:36 (antoine)>
  *
  *  \author A. Lucas
  *
@@ -52,7 +52,7 @@ extern "C"
 namespace matrixz{
 
   /** \brief C function use to transpose a matrix */
-  bigvec bigint_transpose ( bigvec & mat,int nr,int nc);
+  bigvec bigint_transpose ( bigvec & mat);
 
   /** \brief Check dimension compatibility */
   int checkDims(int  dima,int  dimb);

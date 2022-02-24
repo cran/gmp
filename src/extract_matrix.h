@@ -19,12 +19,13 @@
 #ifndef EXTRACT_MATRIX_HEADER_GMP_R_
 #define EXTRACT_MATRIX_HEADER_GMP_R_ 1
 
-#include <R.h>
-#include <Rinternals.h>
 #include <functional>
+#include <algorithm>
+
 #include "bigvec_q.h"
 #include "bigintegerR.h"
-#include <algorithm>
+
+#include <stdio.h>
 
 extern "C"
 {
@@ -57,6 +58,7 @@ namespace extract_gmp_R
    */
   std::vector<bool> indice_set_at (unsigned int n , SEXP & IND);
 
+  std::vector<int> indice_get_at (unsigned int n , SEXP & IND);
 
 
   /**
@@ -419,7 +421,7 @@ namespace extract_gmp_R
     unsigned int ncol = src.size() / src.nrow; // number of col
     std::vector<bool> vidx =  indice_set_at ( src.nrow, IDX);
     std::vector<bool> vjdx =  indice_set_at ( ncol, JDX);
-
+   
     unsigned int k=0;
 
     for(unsigned int j = 0 ; j < ncol; ++j)

@@ -24,7 +24,7 @@ using namespace std;
 #include "bigrationalR.h"
 
 #include "matrix.h"
-
+#include "extract_matrix.h"
 
 namespace bigrationalR
 {
@@ -428,41 +428,22 @@ SEXP bigrational_as_numeric(SEXP a)
 
 SEXP bigrational_get_at(SEXP a, SEXP b)
 {
+
+
   bigvec_q va = bigrationalR::create_bignum(a);
-  vector<int> vb = bigintegerR::create_int(b);
+
+  vector<int> v_ind = extract_gmp_R::indice_get_at(va.size(),b);
   bigvec_q result;
-  if (TYPEOF(b) == LGLSXP) {
-    for (unsigned int i = 0; i < va.size(); ++i)
-      if (vb[i%vb.size()])
-	result.push_back(va.value[i]);
-  } else {
-    std::remove(vb.begin(), vb.end(), 0); // remove all zeroes
-    if (vb.empty())
-      return bigrationalR::create_SEXP(bigvec_q());
-    if (vb[0] < 0) {
-      for (vector<int>::iterator it = vb.begin(); it != vb.end(); ++it)
-	if (*it > 0)
-	  error(_("only 0's may mix with negative subscripts"));
-	else if (-(*it)-1 >= (int)va.size())
-	  error(_("subscript out of bounds"));
-      // TODO: This is optimized for large va.size and small vb.size.
-      // Maybe add a condition to use a different approach for large vb's
-      result.value.reserve(va.size()-vb.size());
-      for (int i = 0; i < (int)va.size(); ++i)
-	if (find(vb.begin(), vb.end(), -i-1) == vb.end())
-	  result.push_back(va.value[i]);
+
+  for(unsigned int i = 0 ; i < v_ind.size(); i++){
+    int indice = v_ind[i];
+    if(indice < va.size()){
+      result.push_back(va[indice]);
     } else {
-      result.value.reserve(vb.size());
-      for (vector<int>::iterator it = vb.begin(); it != vb.end(); ++it) {
-	if (*it < 0)
-	  error(_("only 0's may mix with negative subscripts"));
-	if (*it <= (int)va.size())
-	  result.push_back(va.value[(*it)-1]);
-	else
-	  result.push_back(bigrational()); // NA for out of range's
-      }
+      result.push_back(bigrational());
     }
   }
+
   return bigrationalR::create_SEXP(result);
 }
 
@@ -472,48 +453,29 @@ SEXP bigrational_set_at(SEXP src, SEXP idx, SEXP value)
   int i;
   bigvec_q result = bigrationalR::create_bignum(src);
   bigvec_q vvalue = bigrationalR::create_bignum(value);
-  vector<int> vidx = bigintegerR::create_int(idx);
+  vector<bool> vidx = extract_gmp_R::indice_set_at(result.size(),idx);
+
   int pos = 0;
 
   if(vvalue.size() == 0) {
       if(result.size() == 0)
 	  return bigrationalR::create_SEXP(result);
-      else
+      else{
+	int count = 0;
+	for (int i = 0 ; i < vidx.size(); i++){
+	  if(vidx[i]) count++;
+	}
+	if(count >0)
 	  error(_("replacement has length zero"));
-  }
-  if (TYPEOF(idx) == LGLSXP) {
-    for (i = 0; i < (int)result.size(); ++i)
-      if (vidx[i%vidx.size()])
-	result.value[i] = vvalue.value[pos++%vvalue.size()];
-  } else {
-    std::remove(vidx.begin(), vidx.end(), 0); // remove all zeroes
-    if (vidx.empty())
-      return bigrationalR::create_SEXP(result);
-    if (vidx[0] < 0) {
-      for ( it = vidx.begin(); it != vidx.end(); ++it)
-	if (*it > 0)
-	  error(_("only 0's may mix with negative subscripts"));
-	else if (-(*it)-1 >= (int)result.size())
-	  error(_("subscript out of bounds"));
-      pos = 0;
-      for ( i = 0; i < (int)result.size(); ++i)
-	if (find(vidx.begin(), vidx.end(), -i-1) == vidx.end())
-	  result.value[i] = vvalue.value[pos++%vvalue.size()];
-    } else {
-      // finding maximum to resize vector if needed
-      int maximum = INT_MIN;
-      for (it = vidx.begin(); it != vidx.end(); ++it)
-	maximum = max(maximum, *it);
-      if (maximum > (int)result.size())
-	result.value.resize(maximum);
-      pos = 0;
-      for (it = vidx.begin(); it != vidx.end(); ++it) {
-	if (*it < 0)
-	  error(_("only 0's may mix with negative subscripts"));
-	result.value[(*it)-1] = vvalue[pos++%vvalue.size()];
+	else
+ 	  return  bigrationalR::create_SEXP(result);
       }
-    }
   }
+
+  for(int i = 0 ; i < result.size(); i++){
+    if(vidx[i]) result.set(i,vvalue[pos++ % vvalue.size()]);
+  }
+  
   return bigrationalR::create_SEXP(result);
 }
 

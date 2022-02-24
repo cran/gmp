@@ -78,6 +78,29 @@ pow.bigz <- function(e1, e2,...) {
 ##' Inverse:  inv(a,b) := (1 / a) (modulo b)
 inv.bigz <- function(a,b,...) .Call(biginteger_inv,a,b)
 
+"!.bigz" <- function(a) a == 0
+
+
+## as.boolean(x): x != 0
+
+"|.bigz" <- function(a,b) {
+	 a1 = a != 0
+	 b1 = b != 0
+	 a1 | b1
+}
+
+"&.bigz" <- function(a,b) {
+	 a1 = a != 0
+	 b1 = b != 0
+	 a1 & b1
+}
+
+"xor.bigz" <- function(a,b) {
+	 a1 = a != 0
+	 b1 = b != 0
+	 xor(a1 , b1)
+}
+
 gcd <- function(a,b)
       UseMethod("gcd")
 gcd.default <- function(a,b) as.integer(gcd.bigz(a,b))
@@ -107,6 +130,7 @@ print.bigz <- function(x, quote = FALSE, initLine = is.null(modulus(x)), ...)
     cat("bigz(0)\n")
   invisible(x)
 }
+
 
 as.bigz <- function(a, mod = NA)
 {
@@ -455,16 +479,19 @@ solve.bigz <- function(a, b,...)
 
 `[.bigz` <- function(x, i=NULL, j=NULL, drop=TRUE)
 {
-  ## mdrop <- missing(drop)
-  ## Narg <- nargs() - (!mdrop)
+
+  mdrop <- missing(drop)
+  Narg <- nargs() - (!mdrop)
+  # matrix access [i,j] [,j] [i,]
+  # vector access [i]
+  matrixAccess = Narg > 2
   has.j <- !missing(j)
-  if(!is.null(attr(x, "nrow"))) { ## matrix
-    ## FIXME  x[i,] vs. x[,j] vs. x[i]
+  if(!is.null(attr(x, "nrow")) & matrixAccess) { ## matrix
     .Call(matrix_get_at_z, x, i,j)
   } else { ## non-matrix
     if(has.j) stop("invalid vector subsetting")
-    ## ugly "workaround"
-    r <- .Call(matrix_get_at_z, x, i, NULL)
+  
+    r <- .Call(biginteger_get_at, x, i)
     attr(r,"nrow") <- NULL
     r
   }
@@ -472,14 +499,18 @@ solve.bigz <- function(a, b,...)
 
 `[<-.bigz` <- function(x, i=NULL, j=NULL, value)
 {
+
+  # matrix access [i,j] [,j] [i,]
+  # vector access [i]
+  matrixAccess = nargs() > 3
+
   has.j <- !missing(j)
-  if(!is.null(attr(x, "nrow"))) { ## matrix
-      ## FIXME  x[i,] vs. x[,j] vs. x[i]
+  if(!is.null(attr(x, "nrow")) & matrixAccess) { ## matrix
       .Call(matrix_set_at_z, x, value, i,j)
-  } else { ## non-matrix -- ugly workaround:
+  } else { ## non-matrix 
     if(has.j) stop("invalid vector subsetting")
-    r <- .Call(matrix_set_at_z, x, value, i, 1) # '1' or does NULL work ??
-    attr(r,"nrow") <- NULL
+    r <- .Call(biginteger_set_at, x, i, value) 
+    attr(r,"nrow") <- attr(x, "nrow")
     r
   }
 }

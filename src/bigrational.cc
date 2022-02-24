@@ -12,14 +12,10 @@
  *  \note Licence: GPL (>= 2)
  */
 
-#define USE_RINTERNALS
-#define R_NO_REMAP   // avoid collisions with stl definitions
+#include <cstdio>
 
 #include "bigrational.h"
 #include "bigrationalR.h"
-#include <Rinternals.h>
-
-#include <stdio.h>
 
 using std::string;
 

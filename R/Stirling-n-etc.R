@@ -259,3 +259,32 @@ BernoulliQ <- function(n, verbose = getOption("verbose", FALSE)) {
     else
         .Call(bigrational_c, lapply(n, B1))
 }
+
+## rational dbinom() probabilities
+dbinomQ <- function(x, size, prob, log=FALSE) {
+    if(log) stop("'log=TRUE' not allowed;  use log(mpfr(dbinomQ(..), precB))")
+    if(!is.bigq(prob)) {
+        warning("Calling 'as.bigq(prob)'; rather provide exact bigrational yourself")
+        prob <- as.bigq(prob)
+    }
+    if(!is.bigz(x))       x <- as.bigz(x)
+    if(!is.bigz(size)) size <- as.bigz(size)
+    chooseZ(size,x) * prob^x * (1 - prob)^(size - x)
+}
+
+## rational pbinom() probabilities
+pbinomQ <- function(q, size, prob, lower.tail = TRUE, log.p = FALSE) {
+    if(log) stop("'log.p=TRUE' not allowed;  use log(mpfr(pbinomQ(..), precB))")
+    if(!is.bigq(prob)) {
+        warning("Calling 'as.bigq(prob)'; rather provide exact bigrational yourself")
+        prob <- as.bigq(prob)
+    }
+    if(!is.bigz(q))       q <- as.bigz(q)
+    if(!is.bigz(size)) size <- as.bigz(size)
+    ## FIXME need to vectorize in 'q'  sum(dbinomZ(....))
+    .NotYetImplemented()
+    ## FIXME 2
+    if(!lower.tail) .NotYetImplemented()
+
+    chooseZ(size,q) * prob^q * (1 - prob)^(size - q)
+}

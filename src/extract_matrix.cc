@@ -60,16 +60,6 @@ SEXP matrix_get_at_z(SEXP A,SEXP INDI, SEXP INDJ)
 SEXP matrix_set_at_z(SEXP A, SEXP VAL, SEXP INDI, SEXP INDJ)
 {
   bigvec mat = bigintegerR::create_bignum(A);
-
-  if(TYPEOF(INDI) != LGLSXP ) {
-      if(!length(INDI)) return(A);
-      std::vector<int> vidx = bigintegerR::create_int(INDI);
-      for(std::vector<int>::const_iterator it = vidx.begin();
-	  it != vidx.end();
-	  ++it)
-	if(*it >= static_cast<int>(mat.size())) // in this case: we extend the vector
-	  return( biginteger_set_at(A,INDI,VAL) );
-    }
   bigvec val = bigintegerR::create_bignum(VAL);
   extract_gmp_R::set_at( mat,val,INDI,INDJ);
   return(bigintegerR::create_SEXP(mat));
@@ -80,17 +70,6 @@ SEXP matrix_set_at_z(SEXP A, SEXP VAL, SEXP INDI, SEXP INDJ)
 SEXP matrix_set_at_q(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
 {
   bigvec_q mat = bigrationalR::create_bignum(A);
-
-  if(TYPEOF(INDI) != LGLSXP ) {
-      if(!length(INDI)) return(A);
-      std::vector<int> vidx = bigintegerR::create_int(INDI);
-      for(std::vector<int>::const_iterator it = vidx.begin();
-	  it != vidx.end();
-	  ++it)
-	if(*it >= static_cast<int>(mat.size())) // in this case: we extend the vector
-	  return( bigrational_set_at(A,INDI,VAL) );
-    }
-
   bigvec_q val = bigrationalR::create_bignum(VAL);
 
   extract_gmp_R::set_at( mat,val,INDI,INDJ);
@@ -111,45 +90,113 @@ std::vector<bool> extract_gmp_R::indice_set_at (unsigned int n , SEXP & IND)
   std::vector<bool> result (n,false);
 
 
-  if(TYPEOF(IND) != NILSXP)
-    //LOCICAL
-    if (TYPEOF(IND) == LGLSXP)
-      {
-	for(unsigned int i = 0; i< n; ++i)
-	  result[i] = static_cast<bool>( vidx[i % vidx.size() ] );
+  if(TYPEOF(IND) == NILSXP){
+    //LOCICAL: return true
+    for (std::vector<bool>::iterator it = result.begin(); it != result.end(); ++it)
+      *it = true;
+  }
+  else if (TYPEOF(IND) == LGLSXP)
+    {
+      for(unsigned int i = 0; i< n; ++i)
+	result[i] = static_cast<bool>( vidx[i % vidx.size() ] );
+    }
+  else
+    //INTEGERS
+    {
+      vidx.erase(std::remove(vidx.begin(), vidx.end(), 0L), vidx.end()); // remove all zeroes
+      if(vidx.size() == 0){
+	return result;
       }
-    else
-      //INTEGERS
-      {
-	//negatives integers: all except indices will be modified
-	if (vidx[0] < 0)
-	  {
-	    for (std::vector<bool>::iterator it = result.begin(); it != result.end(); ++it)
-	      *it = true;
-	    for (std::vector<int>::const_iterator jt = vidx.begin(); jt != vidx.end(); ++jt)
-	      {
-		if(*jt > 0)
-		  error(_("only 0's may mix with negative subscripts"));
-		if( (*jt != 0) && (*jt >= - static_cast<int>(n)))
-		  result[-(*jt)-1] = false;
-	      }
-	  }
-	else
+    
+      //negatives integers: all except indices will be modified
+      if (vidx[0] < 0)
+	{
+	  for (std::vector<bool>::iterator it = result.begin(); it != result.end(); ++it)
+	    *it = true;
+	  for (std::vector<int>::const_iterator jt = vidx.begin(); jt != vidx.end(); ++jt)
+	    {
+	      if(*jt > 0)
+		error(_("only 0's may mix with negative subscripts"));
+	      if( (*jt != 0) && (*jt >= - static_cast<int>(n)))
+		result[-(*jt)-1] = false;
+	    }
+	}
+      else
+	{
 	  //INTEGERS (and positive)
 	  for (std::vector<int>::const_iterator jt = vidx.begin(); jt != vidx.end(); ++jt)
 	    {
 	      if(*jt < 0)
 		error(_("only 0's may mix with negative subscripts"));
-
+	      
 	      if((*jt != 0) && (*jt <= static_cast<int>(n)))
 		result[*jt-1] = true;
 	    }
-      }
-  else
-    // NILSXP: return true
-    for (std::vector<bool>::iterator it = result.begin(); it != result.end(); ++it)
-      *it = true;
+	}
+    }
 
+  return(result);
+
+}//end of indice_set_at
+
+
+
+//
+// return a vector of integers corresponding to values that must be affected.
+//
+std::vector<int> extract_gmp_R::indice_get_at (unsigned int n , SEXP & IND)
+{
+
+
+  std::vector<int> vidx = bigintegerR::create_int(IND);
+  std::vector<int> result;
+
+
+  if(TYPEOF(IND) == NILSXP){
+    //LOCICAL: return true
+    for (int i = 0;  i< n ; i++){
+      result.push_back(i);
+    }
+  }
+  else if (TYPEOF(IND) == LGLSXP)
+    {
+      // boolean
+      for(unsigned int i = 0; i< n; ++i)
+	if (vidx[i % vidx.size() ] ) result.push_back(i);
+    }
+  else
+    //INTEGERS
+    {
+      vidx.erase(std::remove(vidx.begin(), vidx.end(), 0L), vidx.end()); // remove all zeroes
+      if(vidx.size() == 0) return result;
+      //negatives integers: all except indices will be modified
+      if (vidx[0] < 0)
+	{
+	  std::vector<bool> tempo(n,true);
+
+	  for (std::vector<int>::const_iterator jt = vidx.begin(); jt != vidx.end(); ++jt)
+	    {
+	      if(*jt > 0)
+		error(_("only 0's may mix with negative subscripts"));
+	      if( (*jt != 0) && (*jt >= - static_cast<int>(n)))
+		tempo[-(*jt)-1] = false;
+	    }
+	  for (unsigned int i =0 ; i < n ; i++){
+	    if(tempo[i]) result.push_back(i);
+	  }
+	}
+      else
+	{
+	  //INTEGERS (and positive)
+	  for (std::vector<int>::const_iterator jt = vidx.begin(); jt != vidx.end(); ++jt) {
+	    int i = *jt;
+	    if(i < 0)
+	      error(_("only 0's may mix with negative subscripts"));
+	    result.push_back(i-1);
+	  }
+
+	}
+    }
 
   return(result);
 

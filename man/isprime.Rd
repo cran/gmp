@@ -37,8 +37,7 @@ isprime(n, reps = 40)  % we feel better with 40 :)
 
   Note that for \dQuote{small} \eqn{n}, which means something like
   \eqn{n < 10'000'000}, non-probabilistic methods (such as
-  \code{\link{factorize}()}) are fast enough. For example,
-  \code{\link[sfsmisc]{primes}} in package \pkg{sfsmisc}.
+  \code{\link{factorize}()}) are fast enough. 
 }
 \examples{
 isprime(210)

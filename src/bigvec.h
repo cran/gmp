@@ -14,9 +14,10 @@
 #ifndef BIGVEC_HEADER_
 #define BIGVEC_HEADER_ 1
 
+#include <memory>
+
 #include "bigmod.h"
 #include "templateMatrix.h"
-#include <memory>
 
 /** \brief class bigvec
  *

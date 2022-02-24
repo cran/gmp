@@ -1,17 +1,15 @@
 
 * Remove full path in `configure.ac` script, with example of Rmpfr configure.						-*-org-*-
 * Bug Fixes
-** TODO Logical ops should work: 0=FALSE NA=NA, <any_else>=TRUE
-*** !as.bigz(0:3)  crashes R badly (!!), but should return !(0:3) (logical vector).
- terminate called after throwing an instance of 'std::length_error'
-  what():  vector::_M_default_append \\ ...R: line 141: 25400 Aborted (core dumped)
-***  as.bigz(0:3) | as.bigz(0) etc should return logical as with regular numbers in R
+** DONE Logical ops should work: 0=FALSE NA=NA, <any_else>=TRUE
+*** DONE !as.bigz(0:3)  crashes R badly (!!), but should return !(0:3) (logical vector).
+*** DONE  as.bigz(0:3) | as.bigz(0) etc should return logical as with regular numbers in R
 ** TODO `format()` currently works via as.character(.), particularly unsatisfying for bigz.
-** TODO Not working column assignment :  A[,j] <- vec    does nothing, not warn, nothing -- but  A[i,] <- val  works ??
-** TODO m <- matrix(1:6, 2); Z <- as.bigz(m); str(Z) fails because e.g. Z[5] fails, contrary m[5]
+** DONE Not working column assignment :  A[,j] <- vec    does nothing, not warn, nothing -- but  A[i,] <- val  works ??
+** DONE m <- matrix(1:6, 2); Z <- as.bigz(m); str(Z) fails because e.g. Z[5] fails, contrary m[5]
 ** TODO asNumeric(x) : the generic must get a "..." argument, so can use "rounding mode" in Rmpfr
 ** DONE URGENT / BAD : Segfaults, Wrong Results, etc
-** TODO completely *wrong* pmin() and pmax(<bigq>, <number>): uses Numerator in comparison ???
+** DONE completely *wrong* pmin() and pmax(<bigq>, <number>): uses Numerator in comparison ???
 *** TODO: Find the *underlying* reason where pmin() goes wrong w/o warning!
 ** TODO Missing bigq %% and %/% [was 'Not working Arithmetic']
 *** TODO bigq  %% and %/%  are not even defined (but are for 'numeric')!
@@ -75,8 +73,8 @@ This is completely analogous to
    One possibility:  Using   +- <LARGE>/1  for "bigq", as   +- <LARGE> for "bigz"
 
 ** Matrix things
-*** TODO want *different*  M[1,] and M[1] for big[zq] matrices
-*** TODO 3*M and M*3  are not the same: the first forgets the "nrow"
+*** DONE want *different*  M[1,] and M[1] for big[zq] matrices
+*** DONE 3*M and M*3  are not the same: the first forgets the "nrow"
 *** DONE x <- as.bigz(2:5);    x[1]  <- -1; x  # -- a matrix !! >> no longer
 *** DONE qq <- as.bigz(2:5)/7; qq[1] <- -1; qq # -- a matrix !!
 ***  abs(.) or sign(<big..matrix>) {and probably many others!}

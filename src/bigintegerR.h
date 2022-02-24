@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2006
- *  \date Last modified: Time-stamp: <2010-04-10 19:21:20 antoine>
+ *  \date Last modified: Time-stamp: <2022-02-21 17:07:08 (antoine)>
  *
  *
  *  \note Licence: GPL (>= 2)
@@ -183,6 +183,7 @@ extern "C"
    * \brief Convert from a biginteger vector to a integer vector.
    */
   SEXP biginteger_as_integer(SEXP a);
+
 
   /**
    * \brief Return the length of the vector

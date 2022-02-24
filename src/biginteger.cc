@@ -11,14 +11,10 @@
  *  \note Licence: GPL (>= 2)
  */
 
-#define USE_RINTERNALS
-#define R_NO_REMAP   // avoid collisions with stl definitions
+#include <cstdio>
+#include <iostream>
 
 #include "biginteger.h"
-#include <Rinternals.h>
-
-#include <stdio.h>
-#include <iostream>
 
 using std::string;
 

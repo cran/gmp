@@ -15,7 +15,6 @@
 
 #include <string>
 
-#include "Rgmp.h"
 #include "biginteger.h"
 
 /**

@@ -47,17 +47,16 @@ test <- function(FUN, x, xlabs, out = "str", unary = FALSE)
 }## end{test}
 
 
-allfunctionid <- c("as.bigz","add.bigz","sub.bigz","mul.bigz",
-		   "divq.bigz","div.bigz","mod.bigz","pow.bigz",
+allfunctionid <- c("as.bigz","+","-","*",
+		   "divq.bigz","/","%%","^",
 		   "inv.bigz", "gcd.bigz", "gcdex", "lcm.bigz",
 		   "as.bigq",
-		   "add.bigq","sub.bigq","div.bigq", "mul.bigq", "pow.bigq",
 		   "chooseZ",
-		   "max.bigq","max.bigz","min.bigq","min.bigz")
-unaryfunctionid <- c("log.bigz","log2.bigz","log10.bigz","c.bigz",
+		   "max","min","|","&","xor")
+unaryfunctionid <- c("log","log2","log10","c",
 		     "isprime","nextprime", "factorialZ",
 		     "sizeinbase","fibnum","fibnum2","lucnum","lucnum2",
-		     "factorize","abs")
+		     "factorize","abs","!")
 numericFunName <- function(gmpName) {
   if(gmpName != (r <- sub("[ZQ]$","", gmpName)) &&
      r!="as" && existsFunction(r)) # e.g. chooseZ
@@ -85,13 +84,14 @@ sapply(allfunctionid,   numericFunName)
 sapply(unaryfunctionid, numericFunName)
 
 
-ex <- expression(23, "25", 2.3, -4, 4L, 0, as.bigz(34),
+ex <- expression(23,as.bigz(23),as.bigq(23),c(3,23),as.bigz(c(3,23)),as.bigq(c(3,23)), "25", 2.3, -4, 4L, 0, as.bigz(34),
                  as.bigq(32,7), as.bigz(31,45), NULL,NA, -3L)## TODO:  as.bigz(3)^700
 x <- lapply(ex, eval)
+
 ## Those "numbers" in x for which arithmetic should also work in double precision:
 ## not modulo-arithmetic, not larger than double.prec
-useN <- sapply(x, function(.) is.null(.) || is.na(.) ||
-               (is.finite(as.numeric(.)) && (!inherits(., "bigz") || is.null(modulus(.)))))
+useN <- sapply(x, function(u) is.null(u[1]) || is.na(u[1]) ||
+               (is.finite(as.numeric(u[1])) && (!inherits(u[1], "bigz") || is.null(modulus(u[1])))))
 ## names(x) <- sapply(ex, format)
 ## shorter & easier:
 names(x) <- sapply(x, formatN)
