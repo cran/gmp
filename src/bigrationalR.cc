@@ -449,8 +449,7 @@ SEXP bigrational_get_at(SEXP a, SEXP b)
 
 SEXP bigrational_set_at(SEXP src, SEXP idx, SEXP value)
 {
-  vector<int>::iterator it;
-  int i;
+
   bigvec_q result = bigrationalR::create_bignum(src);
   bigvec_q vvalue = bigrationalR::create_bignum(value);
   vector<bool> vidx = extract_gmp_R::indice_set_at(result.size(),idx);

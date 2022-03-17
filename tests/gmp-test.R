@@ -40,7 +40,10 @@ test <- function(FUN, x, xlabs, out = "str", unary = FALSE)
       ## ## now, for some functions also compute the corresponding numeric values
       ## d <- if(unary) try(FUN(as.numeric(x[[j]])),                    silent = TRUE) else
       ##                try(FUN(as.numeric(x[[i]]),as.numeric(x[[j]])), silent = TRUE)
-
+      if(length(e) > 0 && is.double(e[1]) && is.finite(e[1]) ) {
+        e = round(e[1],digits=6)
+	e = format(e,digits=7)
+      }
       res[i,j] <- sortie(e)[1]
     }
   res ## for printing, the user may prefer as.data.frame(.)

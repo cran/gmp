@@ -1,6 +1,6 @@
 401f78cbd430e79108c91b83ea1dac34 *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-1f7f268645a6c0518e1fea77a05cfb2b *DESCRIPTION
+01ddf454b2f19ae80e7071ab551dfbe0 *DESCRIPTION
 c0c893f9d5ca79bcf51bec6f6ed1a22d *NAMESPACE
 031eddddcfbf9c2a9bc74c83342699e5 *R/AllClasses-etc.R
 65ac0056c1b5e56444132b029badd500 *R/Stirling-n-etc.R
@@ -63,7 +63,7 @@ b94f17d3b125e4d7f15d24f4545fc4fd *src/bigmod.cc
 46394c774a6bb2d90ffc10ae038a0556 *src/bigmod.h
 f6984082ffe21f74d314a3841d3af034 *src/bigrational.cc
 fc69a6bc518f742836287c62eeabee63 *src/bigrational.h
-ea7918de79189885ec31d54ab16fa068 *src/bigrationalR.cc
+5c41e6f8e0392f4180c5947d0cfda9c0 *src/bigrationalR.cc
 ffd81aa2f88bf05b583cd3cee3ecfcfa *src/bigrationalR.h
 e1ec49fc0a6442772c8639c756868efd *src/bigvec.cc
 230db558df92697884f54bdd6086f5de *src/bigvec.h
@@ -86,5 +86,5 @@ d1fcf00956d9ef65eafe8789d4e09cd0 *src/init.cc
 6adfc957837ffbc56138d50c425310bd *src/templateMatrix.h
 7076c656465f9b92e0278367734a2b5a *tests/arith-ex.R
 514a31d717a791a7fde4a34bc783e9a4 *tests/basic-ex.R
-aef7d08505de05758cc01d6d404bb68b *tests/gmp-test.R
-f9a8198ba53fd865c98243c636333dc5 *tests/gmp-test.Rout.save
+22cbc8c5f5f9c7af41155f0131e8405a *tests/gmp-test.R
+a088149496e477cbb5ee9750682420d0 *tests/gmp-test.Rout.save
