@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 19/02/06
- *  \date Last modified: Time-stamp: <2022-02-21 16:01:02 (antoine)>
+ *  \date Last modified: Time-stamp: <2022-08-04 15:52:15 (antoine)>
  *
  *  \author A. Lucas
  *
@@ -480,15 +480,12 @@ namespace matrixz
 {
   bigvec bigint_transpose ( bigvec & mat)
   {
-    int i,j;
-
-
     bigvec matbis (mat.size());
     matbis.nrow = mat.nCols();
 
     /* we compute transpose */
-    for(i =0; i<mat.nRows(); i++)
-      for(j =0; j<mat.nCols(); j++)
+    for(unsigned int i =0; i<mat.nRows(); i++)
+      for(unsigned int j =0; j<mat.nCols(); j++)
 	matbis.set(j+i*mat.nCols(),mat[i+j*mat.nRows()]);
 
     return matbis;

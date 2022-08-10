@@ -226,3 +226,5 @@ rev(B) # is sorted
 is.unsorted(rev(B))# TRUE but should be FALSE
 if(FALSE) ## not yet
     identical(sort(B), rev(B))
+
+

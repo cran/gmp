@@ -79,67 +79,6 @@ SEXP matrix_set_at_q(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
 }
 
 
-//
-// return a vector of n boolean corresponding to values that must be affected.
-//
-std::vector<bool> extract_gmp_R::indice_set_at (unsigned int n , SEXP & IND)
-{
-
-
-  std::vector<int> vidx = bigintegerR::create_int(IND);
-  std::vector<bool> result (n,false);
-
-
-  if(TYPEOF(IND) == NILSXP){
-    //LOCICAL: return true
-    for (std::vector<bool>::iterator it = result.begin(); it != result.end(); ++it)
-      *it = true;
-  }
-  else if (TYPEOF(IND) == LGLSXP)
-    {
-      for(unsigned int i = 0; i< n; ++i)
-	result[i] = static_cast<bool>( vidx[i % vidx.size() ] );
-    }
-  else
-    //INTEGERS
-    {
-      vidx.erase(std::remove(vidx.begin(), vidx.end(), 0L), vidx.end()); // remove all zeroes
-      if(vidx.size() == 0){
-	return result;
-      }
-    
-      //negatives integers: all except indices will be modified
-      if (vidx[0] < 0)
-	{
-	  for (std::vector<bool>::iterator it = result.begin(); it != result.end(); ++it)
-	    *it = true;
-	  for (std::vector<int>::const_iterator jt = vidx.begin(); jt != vidx.end(); ++jt)
-	    {
-	      if(*jt > 0)
-		error(_("only 0's may mix with negative subscripts"));
-	      if( (*jt != 0) && (*jt >= - static_cast<int>(n)))
-		result[-(*jt)-1] = false;
-	    }
-	}
-      else
-	{
-	  //INTEGERS (and positive)
-	  for (std::vector<int>::const_iterator jt = vidx.begin(); jt != vidx.end(); ++jt)
-	    {
-	      if(*jt < 0)
-		error(_("only 0's may mix with negative subscripts"));
-	      
-	      if((*jt != 0) && (*jt <= static_cast<int>(n)))
-		result[*jt-1] = true;
-	    }
-	}
-    }
-
-  return(result);
-
-}//end of indice_set_at
-
-
 
 //
 // return a vector of integers corresponding to values that must be affected.
@@ -151,10 +90,10 @@ std::vector<int> extract_gmp_R::indice_get_at (unsigned int n , SEXP & IND)
   std::vector<int> vidx = bigintegerR::create_int(IND);
   std::vector<int> result;
 
-
+  
   if(TYPEOF(IND) == NILSXP){
     //LOCICAL: return true
-    for (int i = 0;  i< n ; i++){
+    for (unsigned int i = 0;  i< n ; i++){
       result.push_back(i);
     }
   }

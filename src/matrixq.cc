@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 19/02/06
- *  \date Last modified: Time-stamp: <2022-02-21 15:42:57 (antoine)>
+ *  \date Last modified: Time-stamp: <2022-08-04 15:52:51 (antoine)>
  *
  *  \author A. Lucas
  *
@@ -418,13 +418,11 @@ SEXP bigrational_rbind(SEXP args)
 
 bigvec_q matrixq::bigq_transpose (const  bigvec_q & mat)
 {
-
-  int i,j;
   bigvec_q matbis ( mat.size());
   matbis.nrow = mat.nCols();
   /* we compute transpose */
-  for(i=0; i < mat.nRows(); i++)
-    for(j=0; j < mat.nCols(); j++)
+  for(unsigned int i=0; i < mat.nRows(); i++)
+    for(unsigned int j=0; j < mat.nCols(); j++)
       matbis.value[j+i*mat.nCols()].setValue(mat.value[i+j*mat.nRows()]);
 
   return(matbis);

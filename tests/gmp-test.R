@@ -180,3 +180,17 @@ stopifnot(identical(D.D, tcrossprod(D,Dm)),
 factorize("33162879029270137")
 
 factorize(15959989)
+
+## assignation
+x = as.bigz(1:8)
+x[3:2] = 9:10
+x
+
+x = as.bigz(matrix(1:12,3))
+x[3:2,] = 1:8
+x
+x[,2] = 0
+x
+
+tools::assertError(x[,5])
+

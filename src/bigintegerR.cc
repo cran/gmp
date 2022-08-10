@@ -450,7 +450,7 @@ bigvec bigintegerR::biginteger_get_at_C(bigvec va, SEXP ind)
   bigvec result;
   for(unsigned int i = 0 ; i < v_ind.size(); i++){
     int indice = v_ind[i];
-    if(indice < va.size()){
+    if(indice < (int) va.size()){
       result.push_back(va[indice]);
     } else {
       result.push_back(bigmod());
@@ -464,28 +464,27 @@ SEXP biginteger_set_at(SEXP src, SEXP idx, SEXP value)
 {
   // return = ( src[idx] <- value )
 
-  bigvec result = bigintegerR::create_bignum(src);
-  bigvec vvalue = bigintegerR::create_bignum(value);
-  vector<bool> vidx = extract_gmp_R::indice_set_at(result.size(),idx);
-
   
-  if(vvalue.size() == 0) {
-      if(result.size() == 0)
-	  return bigintegerR::create_SEXP(result);
-      else {
-	int count = 0;
-	for (int i = 0 ; i < vidx.size(); i++){
-	  if(vidx[i]) count++;
-	}
-	if(count >0)
-	  error(_("replacement has length zero"));
-	else
- 	  return bigintegerR::create_SEXP(result);
-      }
+  bigvec vvalue = bigintegerR::create_bignum(value);
+  bigvec result = bigintegerR::create_bignum(src);
+  vector<int> vidx = extract_gmp_R::indice_get_at(result.size(),idx);
+
+
+  if(vidx.size() == 0) {
+    return bigintegerR::create_SEXP(result);
   }
+
+  if(vvalue.size() == 0) {
+    error(_("replacement has length zero"));
+  }
+ 
   int pos = 0;
-  for(int i = 0 ; i < result.size(); i++){
-    if(vidx[i]) result.set(i,vvalue[pos++ % vvalue.size()]);
+
+  for(unsigned int i = 0 ; i < vidx.size(); i++){
+    while(result.size() <=(unsigned int) (vidx[i] )) {
+      result.push_back(bigmod());
+    }
+  result.set(vidx[i],vvalue[pos++ % vvalue.size()]);
   }
   
   return bigintegerR::create_SEXP(result);

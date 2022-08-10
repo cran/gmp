@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2022-02-20 r81781) -- "Unsuffered Consequences"
+R Under development (unstable) (2022-08-03 r82668) -- "Unsuffered Consequences"
 Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -1332,6 +1332,32 @@ Big Integer ('bigz') object of length 5:
 Big Integer ('bigz') object of length 2:
 [1] 3989 4001
 > 
+> ## assignation
+> x = as.bigz(1:8)
+> x[3:2] = 9:10
+> x
+Big Integer ('bigz') object of length 8:
+[1] 1  10 9  4  5  6  7  8 
+> 
+> x = as.bigz(matrix(1:12,3))
+> x[3:2,] = 1:8
+> x
+Big Integer ('bigz') 3 x 4 matrix:
+     [,1] [,2] [,3] [,4]
+[1,] 1    4    7    10  
+[2,] 2    4    6    8   
+[3,] 1    3    5    7   
+> x[,2] = 0
+> x
+Big Integer ('bigz') 3 x 4 matrix:
+     [,1] [,2] [,3] [,4]
+[1,] 1    0    7    10  
+[2,] 2    0    6    8   
+[3,] 1    0    5    7   
+> 
+> tools::assertError(x[,5])
+> 
+> 
 > proc.time()
    user  system elapsed 
-  0.871   0.063   0.931 
+  0.875   0.063   0.934 

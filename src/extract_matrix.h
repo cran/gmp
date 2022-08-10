@@ -56,8 +56,6 @@ namespace extract_gmp_R
    * \return a vector of n boolean corresponding to values that must be affected.
    *
    */
-  std::vector<bool> indice_set_at (unsigned int n , SEXP & IND);
-
   std::vector<int> indice_get_at (unsigned int n , SEXP & IND);
 
 
@@ -419,20 +417,22 @@ namespace extract_gmp_R
       Rf_error("malformed matrix");
 
     unsigned int ncol = src.size() / src.nrow; // number of col
-    std::vector<bool> vidx =  indice_set_at ( src.nrow, IDX);
-    std::vector<bool> vjdx =  indice_set_at ( ncol, JDX);
+    std::vector<int> vidx =  indice_get_at ( src.nrow, IDX);
+    std::vector<int> vjdx =  indice_get_at ( ncol, JDX);
    
     unsigned int k=0;
 
-    for(unsigned int j = 0 ; j < ncol; ++j)
+    for(unsigned int j = 0 ; j < vjdx.size() ; ++j)
       {
-	if(vjdx[j])
-	  for(int i = 0 ; i < src.nrow; ++i)
-	    if(vidx[i])
-	      {
-		src.set(i + j * src.nrow, value[k % value.size()] );
-		++k;
-	      }
+	
+	for(unsigned int i = 0 ; i < vidx.size(); ++i)
+	  {
+	    unsigned int index = vidx[i] + vjdx[j] * src.nrow;
+	    if(index >= src.size()) Rf_error("indice out of bounds");
+
+	    src.set(index, value[k % value.size()] );
+	    ++k;
+	  }
       }
 
     return;

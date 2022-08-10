@@ -92,14 +92,14 @@ SEXP gmpMatToListQ(SEXP X, SEXP line)
 
   SEXP ans;
   // dangerous... no check => use with care in R
-  bool lines =  INTEGER(line)[0];
+  int lines =  INTEGER(line)[0];
 
   bigvec_q matrix = bigrationalR::create_bignum(X);
 
   unsigned int ncol = matrix.size() / matrix.nrow;
   unsigned int nrow =  matrix.nrow;
 
-  if(lines)
+  if(lines == 1)
     {
       // RETURN a list of all lines
       PROTECT (ans = NEW_LIST(matrix.nrow) );

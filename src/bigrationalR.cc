@@ -437,7 +437,7 @@ SEXP bigrational_get_at(SEXP a, SEXP b)
 
   for(unsigned int i = 0 ; i < v_ind.size(); i++){
     int indice = v_ind[i];
-    if(indice < va.size()){
+    if(indice < (int) va.size()){
       result.push_back(va[indice]);
     } else {
       result.push_back(bigrational());
@@ -449,30 +449,25 @@ SEXP bigrational_get_at(SEXP a, SEXP b)
 
 SEXP bigrational_set_at(SEXP src, SEXP idx, SEXP value)
 {
-
-  bigvec_q result = bigrationalR::create_bignum(src);
   bigvec_q vvalue = bigrationalR::create_bignum(value);
-  vector<bool> vidx = extract_gmp_R::indice_set_at(result.size(),idx);
+  bigvec_q result = bigrationalR::create_bignum(src);
+  vector<int> vidx = extract_gmp_R::indice_get_at(result.size(),idx);
 
-  int pos = 0;
-
-  if(vvalue.size() == 0) {
-      if(result.size() == 0)
-	  return bigrationalR::create_SEXP(result);
-      else{
-	int count = 0;
-	for (int i = 0 ; i < vidx.size(); i++){
-	  if(vidx[i]) count++;
-	}
-	if(count >0)
-	  error(_("replacement has length zero"));
-	else
- 	  return  bigrationalR::create_SEXP(result);
-      }
+  if(vidx.size() == 0) {
+    return  bigrationalR::create_SEXP(result);
   }
-
-  for(int i = 0 ; i < result.size(); i++){
-    if(vidx[i]) result.set(i,vvalue[pos++ % vvalue.size()]);
+  
+  if(vvalue.size() == 0) {
+    error(_("replacement has length zero"));
+  }
+  
+  int pos = 0;
+  
+  for(unsigned int i = 0 ; i < vidx.size(); i++){
+    while(result.size() <= (unsigned int ) (vidx[i] )) {
+      result.push_back(bigrational());
+    }
+    result.set(vidx[i],vvalue[pos++ % vvalue.size()]);
   }
   
   return bigrationalR::create_SEXP(result);
