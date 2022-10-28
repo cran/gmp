@@ -1,6 +1,6 @@
 cb49c8696441532f10718914aa6f9c47 *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-449f030837888fed64366a06eb70357b *DESCRIPTION
+3ccf8cfb2926473c1c48cecf097df0f5 *DESCRIPTION
 c0c893f9d5ca79bcf51bec6f6ed1a22d *NAMESPACE
 031eddddcfbf9c2a9bc74c83342699e5 *R/AllClasses-etc.R
 65ac0056c1b5e56444132b029badd500 *R/Stirling-n-etc.R
@@ -10,7 +10,7 @@ c0c893f9d5ca79bcf51bec6f6ed1a22d *NAMESPACE
 91e36fd7733ed9d24d282be854183743 *R/matrixq.R
 33cae7758bad9c6510a7c4d6d5d7aa1d *R/matrixz.R
 95f68ef3a6a5a0effdd2bd05bd6e91ef *R/zzz.R
-74d8de0ffdf577190173ad6cad3aba0b *TODO
+0f1028b8542eaab2e409d127ff93b46b *TODO
 a8d707d0cad53cb4e52a114d1a441af8 *cleanup
 c4b815c07240206fcf7acfea4750ae9e *configure
 65c713341ab0f7a730666645b6e9d007 *configure.ac
@@ -70,7 +70,7 @@ e1ec49fc0a6442772c8639c756868efd *src/bigvec.cc
 bc00dbc4293e1ab6fed83a277ad20208 *src/bigvec_q.cc
 6f1233b11c4fe09df1ec46a788970e58 *src/bigvec_q.h
 a10cddf9d0186b68deb19b6246946bf9 *src/extract_matrix.cc
-0fa23124a478177690b490c864f41ce2 *src/extract_matrix.h
+f5db5e106c711ee35409289cf7e6757f *src/extract_matrix.h
 ce3846aa109f07e4e81aac715e24f7fe *src/factor.cc
 c2c8803dbb6bb4aa409704e91b4ce6b5 *src/factor.h
 b481a12932f9dc8c11ab31c0ae0d5646 *src/factorize.cc
@@ -85,6 +85,6 @@ d1fcf00956d9ef65eafe8789d4e09cd0 *src/init.cc
 424de6e67afb73e0d28ddf5c0f35bd33 *src/solve.h
 6adfc957837ffbc56138d50c425310bd *src/templateMatrix.h
 7076c656465f9b92e0278367734a2b5a *tests/arith-ex.R
-fca8feb69355c06e43726abaa579be03 *tests/basic-ex.R
-08c6a32e1552010c832a47185b76b49b *tests/gmp-test.R
-2524d671329bb2d099e46386b1099abd *tests/gmp-test.Rout.save
+514a31d717a791a7fde4a34bc783e9a4 *tests/basic-ex.R
+f4e8c52d51181373bd6fbc85f6be4ebc *tests/gmp-test.R
+c5923bdfc8c586110611c2d5982c6e03 *tests/gmp-test.Rout.save

@@ -1,4 +1,3 @@
-
 * Remove full path in `configure.ac` script, with example of Rmpfr configure.						-*-org-*-
 * Bug Fixes
 ** DONE Logical ops should work: 0=FALSE NA=NA, <any_else>=TRUE

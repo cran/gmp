@@ -24,26 +24,22 @@ test <- function(FUN, x, xlabs, out = "str", unary = FALSE)
       error <- NA
   }
   nr <- if(unary) 1 else n
-## FIXME  res <- matrix(res, nr, n, dimnames = list(if(!unary) xlabs, xlabs))
-## for now
-  res <- matrix(res, nr, n, dimnames = list(NULL, xlabs))
-
+  xlabs <- gsub(" ", "", xlabs)
+  res <- matrix(res, nr, n,
+                dimnames = list(if(!unary) abbreviate(xlabs, 11, named=FALSE), xlabs))
   for(i in 1:nr)
     for(j in 1:n) {
-      e <- if(unary) try(FUN(x[[j]]),        silent = TRUE) else
-                     try(FUN(x[[i]],x[[j]]), silent = TRUE)
-      if(inherits(e, "try-error"))
+      e <- if(unary) tryCatch(FUN(x[[j]]),        error=identity) else
+                     tryCatch(FUN(x[[i]],x[[j]]), error=identity)
+      if(inherits(e, "error"))
         e <- error
       else if(length(e) == 0)
         e <- numeric()
 
       ## ## now, for some functions also compute the corresponding numeric values
-      ## d <- if(unary) try(FUN(as.numeric(x[[j]])),                    silent = TRUE) else
-      ##                try(FUN(as.numeric(x[[i]]),as.numeric(x[[j]])), silent = TRUE)
-      if(length(e) > 0 && is.double(e[1]) && is.finite(e[1]) ) {
-        e = round(e[1],digits=6)
-	e = format(e,digits=7)
-      }
+      if(length(e) > 0 && is.double(e[1]) && is.finite(e[1]))
+        e <- format(signif(e[1], digits=14), digits=7) # signif(), not round()
+
       res[i,j] <- sortie(e)[1]
     }
   res ## for printing, the user may prefer as.data.frame(.)
@@ -81,7 +77,7 @@ numericFunName <- function(gmpName) {
 }
 
 
-options(width = 125)
+options(width = 140, nwarnings = 10000)
 
 sapply(allfunctionid,   numericFunName)
 sapply(unaryfunctionid, numericFunName)
@@ -95,16 +91,15 @@ x <- lapply(ex, eval)
 ## not modulo-arithmetic, not larger than double.prec
 useN <- sapply(x, function(u) is.null(u[1]) || is.na(u[1]) ||
                (is.finite(as.numeric(u[1])) && (!inherits(u[1], "bigz") || is.null(modulus(u[1])))))
-## names(x) <- sapply(ex, format)
-## shorter & easier:
-names(x) <- sapply(x, formatN)
+names(x) <- vapply(ex, format, "")
+if(FALSE)## shorter & easier {but *not* the original calls from 'ex'}
+    names(x) <- sapply(x, formatN)
 str(x)
 x. <- x[useN]
 nx <- lapply(x., as.numeric)
 gmp.NS <- asNamespace("gmp")# also get namespace *hidden* functions, i.e. methods:
 for(fid in allfunctionid)
   {
-    ##cat ("------------------------------------------\n", fid, "\n\n", sep="")
     cat ("------------------------------------------\n", fid," ", sep="")
     FUN <- get(fid, envir = gmp.NS, mode="function")
     rc   <- test(FUN, x )
@@ -112,13 +107,15 @@ for(fid in allfunctionid)
     if((nfid <- numericFunName(fid)) != fid || existsFunction(nfid, where=baseenv())) {
       FUN <- get(nfid, envir = gmp.NS, mode="function")
       if(nfid != fid) cat("-> num.fn.:", nfid)
-      cat("\n-> all.equal(target = res, current = F(<numeric x>)):\n")
       nres <- test(FUN, nx, out = "numeric")
-     # print(all.equal(res, nres))
+      cat("\n-> all.equal(target = res, current = F(<numeric x>)): ",
+          all.equal(res, nres), "\n")
     } else cat("\n\n")
     print(as.data.frame(rc)); cat("\n")
     ##    ^^^^^^^^^^^^^ (for now, to diminuish difference to last version )
   }
+
+summary(warnings()) # ideally *not* platform dependent
 
 ##==============================================================================
 

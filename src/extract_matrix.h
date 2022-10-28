@@ -86,7 +86,7 @@ namespace extract_gmp_R
       }
     // go !
     for(i= 0 ; i < A.value.size(); ++i)
-      // retour[col        ]  [row        ]
+      // retour[col       ]  [row        ]
       (retour[i / A.nrow ])->value[ i % A.nrow].setValue(A.value[i]);
 
     //return(retour);
