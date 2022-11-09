@@ -1,6 +1,6 @@
 cb49c8696441532f10718914aa6f9c47 *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-3ccf8cfb2926473c1c48cecf097df0f5 *DESCRIPTION
+79bbeaab4269fc1e39c3a2bd937a5fbe *DESCRIPTION
 c0c893f9d5ca79bcf51bec6f6ed1a22d *NAMESPACE
 031eddddcfbf9c2a9bc74c83342699e5 *R/AllClasses-etc.R
 65ac0056c1b5e56444132b029badd500 *R/Stirling-n-etc.R
@@ -86,5 +86,5 @@ d1fcf00956d9ef65eafe8789d4e09cd0 *src/init.cc
 6adfc957837ffbc56138d50c425310bd *src/templateMatrix.h
 7076c656465f9b92e0278367734a2b5a *tests/arith-ex.R
 514a31d717a791a7fde4a34bc783e9a4 *tests/basic-ex.R
-f4e8c52d51181373bd6fbc85f6be4ebc *tests/gmp-test.R
-c5923bdfc8c586110611c2d5982c6e03 *tests/gmp-test.Rout.save
+701bdc2e8cdb1716ef243b8f8e97bd06 *tests/gmp-test.R
+7575762edb1ff0416a550fe08673d45a *tests/gmp-test.Rout.save

@@ -27,14 +27,19 @@ test <- function(FUN, x, xlabs, out = "str", unary = FALSE)
   xlabs <- gsub(" ", "", xlabs)
   res <- matrix(res, nr, n,
                 dimnames = list(if(!unary) abbreviate(xlabs, 11, named=FALSE), xlabs))
-  for(i in 1:nr)
+  for(i in 1:nr){
+    classNameI = class(x[[i]])
     for(j in 1:n) {
+      classNameJ = class(x[[j]])
+
       e <- if(unary) tryCatch(FUN(x[[j]]),        error=identity) else
                      tryCatch(FUN(x[[i]],x[[j]]), error=identity)
       if(inherits(e, "error"))
         e <- error
       else if(length(e) == 0)
         e <- numeric()
+      ## we don't test standard R floating operations.
+      if( (classNameI == "numeric" || classNameI == "integer") && ( classNameJ == "numeric" || classNameJ == "integer") && class(e) == "numeric") e <- "-"
 
       ## ## now, for some functions also compute the corresponding numeric values
       if(length(e) > 0 && is.double(e[1]) && is.finite(e[1]))
@@ -42,6 +47,7 @@ test <- function(FUN, x, xlabs, out = "str", unary = FALSE)
 
       res[i,j] <- sortie(e)[1]
     }
+  }
   res ## for printing, the user may prefer as.data.frame(.)
 }## end{test}
 
