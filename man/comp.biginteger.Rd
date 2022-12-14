@@ -1,4 +1,4 @@
-\name{Relational Operator}
+\name{Relational_Operator}
 
 \alias{==.bigz}
 \alias{!=.bigz}

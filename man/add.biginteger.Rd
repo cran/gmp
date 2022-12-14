@@ -1,4 +1,4 @@
-\name{bigz operators}
+\name{bigz_operators}
 \alias{add.bigz}
 \alias{+.bigz}
 \alias{sub.bigz}

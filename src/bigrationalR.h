@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2005
- *  \date Last modified: Time-stamp: <2010-04-10 19:27:44 antoine>
+ *  \date Last modified: Time-stamp: <2022-12-09 15:08:46 (antoine)>
  *
  *
  *  \note Licence: GPL (>= 2)
@@ -138,9 +138,6 @@ extern "C"
    */
   SEXP bigrational_c(SEXP args) ;
 
-  /** \brief for function cbind
-   */
-  SEXP bigrational_cbind(SEXP args) ;
   /**
    * \brief Create vector as n times x
    */

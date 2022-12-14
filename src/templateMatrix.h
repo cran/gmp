@@ -122,7 +122,7 @@ namespace math{
   
   template<class T>
     unsigned int Matrix<T>::nCols() const{
-   
+    if(nRows() <=0) return this->size();
     return this->size() / nRows();
     }
 

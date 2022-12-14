@@ -39,7 +39,7 @@ test <- function(FUN, x, xlabs, out = "str", unary = FALSE)
       else if(length(e) == 0)
         e <- numeric()
       ## we don't test standard R floating operations.
-      if( (classNameI == "numeric" || classNameI == "integer") && ( classNameJ == "numeric" || classNameJ == "integer") && class(e) == "numeric") e <- "-"
+      if( (classNameI[1] == "numeric" || classNameI[1] == "integer") && ( classNameJ[1] == "numeric" || classNameJ[1] == "integer") && class(e)[1] == "numeric") e <- "-"
 
       ## ## now, for some functions also compute the corresponding numeric values
       if(length(e) > 0 && is.double(e[1]) && is.finite(e[1]))
@@ -57,7 +57,7 @@ allfunctionid <- c("as.bigz","+","-","*",
 		   "inv.bigz", "gcd.bigz", "gcdex", "lcm.bigz",
 		   "as.bigq",
 		   "chooseZ",
-		   "max","min","|","&","xor")
+		   "max","min","|","&","xor","c","cbind","rbind")
 unaryfunctionid <- c("log","log2","log10","c",
 		     "isprime","nextprime", "factorialZ",
 		     "sizeinbase","fibnum","fibnum2","lucnum","lucnum2",

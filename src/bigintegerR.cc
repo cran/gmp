@@ -566,23 +566,6 @@ SEXP biginteger_c(SEXP args)
   return bigintegerR::create_SEXP(result);
 }
 
-SEXP biginteger_cbind(SEXP args)
-{
-  // if(TYPEOF(args) != VECSXP) error(_("should be a list"));
-  bigvec result = bigintegerR::create_bignum(VECTOR_ELT(args,0));
-  if(result.nrow <= 0)
-    result.nrow = result.size();
-
-  for(int i = 1; i < LENGTH(args);i++)
-    {
-      bigvec v = bigintegerR::create_bignum(VECTOR_ELT(args,i));
-      for(unsigned int j=0; j< v.size() ; j++)
-	result.push_back(v[j]);
-      v.clear();
-    }
-
-  return bigintegerR::create_SEXP(result);
-}
 
 SEXP biginteger_rep(SEXP x, SEXP times)
 {

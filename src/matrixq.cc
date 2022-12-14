@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 19/02/06
- *  \date Last modified: Time-stamp: <2022-08-04 15:52:51 (antoine)>
+ *  \date Last modified: Time-stamp: <2022-12-09 15:55:39 (antoine)>
  *
  *  \author A. Lucas
  *
@@ -394,27 +394,67 @@ SEXP bigrational_rbind(SEXP args)
   int i=0,j=0;
   bigvec_q result;
   bigvec_q v;
+  vector<bigvec_q> source;
+  unsigned int maxSize=0;
 
-  result = bigrationalR::create_bignum(VECTOR_ELT(args,0));
-  if(result.nrow <=0)
-    result.nrow = result.size();
-
-  result = matrixq::bigq_transpose(result);
-  for(i=1; i< LENGTH(args); i++) {
+  for(int i = 0 ; i < LENGTH(args) ; i++){
     v = bigrationalR::create_bignum(VECTOR_ELT(args,i));
-    if(v.nrow == 0 )
-      v.nrow = v.size();
-    v = matrixq::bigq_transpose(v);
-
-    for(j=0; j< (int)v.size(); j++)
-      result.push_back(v[j]);
-    v.clear();
+    if(v.size() == 0) continue;
+    for (int row = 0 ; row < v.nRows(); row++){
+        bigvec_q line ;
+	for(int col = 0 ; col < v.nCols(); col++){
+	  line.push_back(v.get(row,col));
+	}
+	source.push_back(line);	
+	maxSize = std::max(maxSize,line.size());
+    }
   }
+  
+  for (int j = 0 ; j < maxSize; j++){
+    for(int i = 0 ; i < source.size() ; i++){
+      bigvec_q  u = source[i];
+      if(u.size() == 0) result.push_back(bigrational());
+      else    result.push_back(u[j % u.size()]); 
+    }
+  }
+  result.nrow =  source.size();
 
-  result = matrixq::bigq_transpose(result);
   return bigrationalR::create_SEXP(result);
 }
 
+SEXP bigrational_cbind(SEXP args){
+  int i=0,j=0;
+  bigvec_q result;
+  bigvec_q v;
+  vector<bigvec_q> source;
+  unsigned int maxSize=0;
+  for(int i = 0 ; i < LENGTH(args) ; i++){
+    v = bigrationalR::create_bignum(VECTOR_ELT(args,i));
+    
+    if(v.size() == 0) continue;
+    if(v.nrow <0) v.nrow = v.size();
+    for(int col = 0 ; col < v.nCols(); col++){
+      bigvec_q column ;
+      for (int row = 0 ; row < v.nRows(); row++){
+	column.push_back(v.get(row,col));
+      }
+      source.push_back(column);	
+      maxSize = std::max(maxSize,column.size());
+    }
+  }
+
+  for(int i = 0 ; i < source.size() ; i++){
+    bigvec_q  u = source[i];
+    for (int j = 0 ; j < maxSize; j++){
+      if(u.size() == 0) result.push_back(bigrational());
+      else    result.push_back(u[j % u.size()]); 
+    }
+  }
+  result.nrow = result.size() /  source.size();
+  
+  return bigrationalR::create_SEXP(result);
+
+}
 
 bigvec_q matrixq::bigq_transpose (const  bigvec_q & mat)
 {

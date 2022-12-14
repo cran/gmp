@@ -67,7 +67,7 @@ std::string bigvec::str(int i,int b) const
 }
 
 bigmod & bigvec::get(unsigned int row, unsigned int col) {
-  return (*this)[row + col*nrow];
+  return (*this)[row + col*nRows()];
 }
 
 
@@ -86,7 +86,7 @@ const bigmod & bigvec::operator[] (unsigned int i) const
 }
 
 void bigvec::set(unsigned int row, unsigned int col, const  bigmod & val) {
-  set( row + col*nrow,val);
+  set( row + col*nRows(),val);
 }
 
 void bigvec::checkValuesMod() {

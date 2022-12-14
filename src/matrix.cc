@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 19/02/06
- *  \date Last modified: Time-stamp: <2022-08-04 15:52:15 (antoine)>
+ *  \date Last modified: Time-stamp: <2022-12-09 15:55:54 (antoine)>
  *
  *  \author A. Lucas
  *
@@ -446,31 +446,85 @@ SEXP matrix_mul_z (SEXP a, SEXP b, SEXP op)
 #undef K_LOOP
 
 
+
+/**
+ * arg = v1, v2, v3.... lines
+ * return matrix
+ * out =[ v1 
+          v2
+          v3 ]
+ */
 SEXP biginteger_rbind(SEXP args)
 {
   int i=0,j=0;
   bigvec result;
   bigvec v;
+  vector<bigvec> source;
+  unsigned int maxSize=0;
+  for(int i = 0 ; i < LENGTH(args) ; i++){
+    v = bigintegerR::create_bignum(VECTOR_ELT(args,i));
 
-  result = bigintegerR::create_bignum(VECTOR_ELT(args,0));
-  if(result.nrow<=0)
-    result.nrow = result.size();
-
-  result = matrixz::bigint_transpose(result);
-
-  for(i=1; i < LENGTH(args); i++)
-    {
-      v = bigintegerR::create_bignum(VECTOR_ELT(args,i));
-      if(v.nrow <= 0 )
-	v.nrow = v.size();
-      v = matrixz::bigint_transpose(v);
-
-      for(j=0; j< (int)v.size(); j++)
-	result.push_back(v[j]);
-      v.clear();
+    if(v.size() == 0) continue;
+    for (int row = 0 ; row < v.nRows(); row++){
+        bigvec line ;
+	for(int col = 0 ; col < v.nCols(); col++){
+	  line.push_back(v.get(row,col));
+	}
+	source.push_back(line);	
+	maxSize = std::max(maxSize,line.size());
     }
+  }
 
-  result = matrixz::bigint_transpose(result);
+
+  
+  for (int j = 0 ; j < maxSize; j++){
+    for(int i = 0 ; i < source.size() ; i++){
+      bigvec  u = source[i];
+      if(u.size() == 0) result.push_back(bigmod());
+      else    result.push_back(u[j % u.size()]); 
+    }
+  }
+  result.nrow =  source.size();
+  
+  return bigintegerR::create_SEXP(result);
+}
+
+/**
+ * arg = v1, v2, v3.... row
+ * return matrix
+ * out =[ v1 v2 v3 ]
+ */
+SEXP biginteger_cbind(SEXP args)
+{
+  int i=0,j=0;
+  bigvec result;
+  bigvec v;
+  vector<bigvec> source;
+  unsigned int maxSize=0;
+  for(int i = 0 ; i < LENGTH(args) ; i++){
+    v = bigintegerR::create_bignum(VECTOR_ELT(args,i));
+ 
+    if(v.size() == 0) continue;
+    if(v.nrow <0) v.nrow = v.size();
+    for(int col = 0 ; col < v.nCols(); col++){
+      bigvec column ;
+      for (int row = 0 ; row < v.nRows(); row++){
+	column.push_back(v.get(row,col));
+      }
+      source.push_back(column);	
+      maxSize = std::max(maxSize,column.size());
+    }
+  }
+
+  for(int i = 0 ; i < source.size() ; i++){
+    bigvec  u = source[i];
+    for (int j = 0 ; j < maxSize; j++){
+      if(u.size() == 0) result.push_back(bigmod());
+      else    result.push_back(u[j % u.size()]); 
+    }
+  }
+  result.nrow = result.size() /  source.size();
+  
   return bigintegerR::create_SEXP(result);
 }
 

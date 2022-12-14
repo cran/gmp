@@ -2,7 +2,7 @@
  *  \brief header for rational matrix functions set
  *
  *  \date Created: 2005
- *  \date Last modified: Time-stamp: <2022-02-21 15:43:22 (antoine)>
+ *  \date Last modified: Time-stamp: <2022-12-09 15:15:01 (antoine)>
  *
  *
  *  \note Licence: GPL (>= 2)
@@ -31,6 +31,8 @@ extern "C"
   /** \brief for function rbind
    */
   SEXP bigrational_rbind(SEXP args) ;
+
+  SEXP bigrational_cbind(SEXP args) ;
 }
 
 /**

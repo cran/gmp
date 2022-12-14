@@ -1,4 +1,4 @@
-\name{Bigq operators}
+\name{Bigq_operators}
 \alias{add.bigq}
 \alias{+.bigq}
 \alias{sub.bigq}

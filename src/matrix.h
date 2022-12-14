@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 25/05/06
- *  \date Last modified: Time-stamp: <2022-02-21 15:57:36 (antoine)>
+ *  \date Last modified: Time-stamp: <2022-12-09 14:56:06 (antoine)>
  *
  *  \author A. Lucas
  *
@@ -44,6 +44,10 @@ extern "C"
   /** \brief for function rbind
    */
   SEXP biginteger_rbind(SEXP args) ;
+
+  /** \brief for function rbind
+   */
+  SEXP biginteger_cbind(SEXP args) ;
 
 }
 

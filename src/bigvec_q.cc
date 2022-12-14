@@ -57,24 +57,19 @@ bigrational & bigvec_q::operator[] (unsigned int i)
 }
 
 bigrational & bigvec_q::get(unsigned int row, unsigned int col) {
-  return (*this)[row + col*nrow];
+  bigrational & val = (*this)[row + col*nRows()];
+  return val;
 }
 
 
 void bigvec_q::set(unsigned int row, unsigned int col, const bigrational & val) {
-  set( row + col*nrow,val);
+  set( row + col*nRows(),val);
 }
 
 
 
 void bigvec_q::set(unsigned int i,const bigrational & val)
 {
-  //DEBUG !!
-  if(i>=value.size())
-    {
-      Rprintf("t nul a bigvec_q_set\n");
-      return;
-    }
   value[i] = val;
 }
 void bigvec_q::set(unsigned int i,const mpq_t & val)
@@ -82,7 +77,7 @@ void bigvec_q::set(unsigned int i,const mpq_t & val)
 
   if(i>=value.size())
     {
-      Rprintf("t nul a bigvec_q_set_mpq __LINE__ \n");
+      Rprintf("ERROR at bigvec_q_set_mpq __LINE__ \n");
       return;
     }
 

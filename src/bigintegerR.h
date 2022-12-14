@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2006
- *  \date Last modified: Time-stamp: <2022-02-21 17:07:08 (antoine)>
+ *  \date Last modified: Time-stamp: <2022-12-09 14:56:21 (antoine)>
  *
  *
  *  \note Licence: GPL (>= 2)
@@ -240,11 +240,6 @@ extern "C"
    * \brief For function c()
    */
   SEXP biginteger_c(SEXP args);
-
-  /** \brief for function cbind()
-   */
-
-  SEXP biginteger_cbind(SEXP args);
 
   /**
    * \brief Create vector as n times x

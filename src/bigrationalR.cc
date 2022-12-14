@@ -592,24 +592,6 @@ SEXP bigrational_c(SEXP args)
 }
 
 
-SEXP bigrational_cbind(SEXP args)
-{
-  bigvec_q result = bigrationalR::create_bignum(VECTOR_ELT(args,0));
-  if(result.nrow <= 0)
-    result.nrow = result.size();
-
-  for(int i= 1; i < Rf_length(args); i++)
-    {
-      bigvec_q v = bigrationalR::create_bignum(VECTOR_ELT(args,i));
-      for(int j=0; j < (int)v.size() ; j++)
-	result.push_back(v[j]);
-      v.clear();
-    }
-
-  return bigrationalR::create_SEXP(result);
-}
-
-
 SEXP bigrational_rep(SEXP x, SEXP times)
 {
   bigvec_q v = bigrationalR::create_bignum(x), result;
