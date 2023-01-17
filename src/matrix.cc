@@ -5,7 +5,7 @@
  *  \version 1
  *
  *  \date Created: 19/02/06
- *  \date Last modified: Time-stamp: <2022-12-09 15:55:54 (antoine)>
+ *  \date Last modified: Time-stamp: <2023-01-16 18:58:59 (antoine)>
  *
  *  \author A. Lucas
  *
@@ -458,20 +458,19 @@ SEXP biginteger_rbind(SEXP args)
 {
   int i=0,j=0;
   bigvec result;
-  bigvec v;
-  vector<bigvec> source;
+  vector<bigvec*> source;
   unsigned int maxSize=0;
   for(int i = 0 ; i < LENGTH(args) ; i++){
-    v = bigintegerR::create_bignum(VECTOR_ELT(args,i));
+   bigvec v = bigintegerR::create_bignum(VECTOR_ELT(args,i));
 
     if(v.size() == 0) continue;
     for (int row = 0 ; row < v.nRows(); row++){
-        bigvec line ;
+      bigvec * line = new bigvec();
 	for(int col = 0 ; col < v.nCols(); col++){
-	  line.push_back(v.get(row,col));
+	  line->push_back(v.get(row,col));
 	}
 	source.push_back(line);	
-	maxSize = std::max(maxSize,line.size());
+	maxSize = std::max(maxSize,line->size());
     }
   }
 
@@ -479,13 +478,16 @@ SEXP biginteger_rbind(SEXP args)
   
   for (int j = 0 ; j < maxSize; j++){
     for(int i = 0 ; i < source.size() ; i++){
-      bigvec  u = source[i];
-      if(u.size() == 0) result.push_back(bigmod());
-      else    result.push_back(u[j % u.size()]); 
+      bigvec *  u = source[i];
+      if(u->size() == 0) result.push_back(bigmod());
+      else    result.push_back((*u)[j % u->size()]); 
     }
   }
   result.nrow =  source.size();
-  
+  for (int i = 0 ; i < source.size() ; i++){
+    if(source[i] != nullptr) delete source[i];
+    source[i] = nullptr;
+  }
   return bigintegerR::create_SEXP(result);
 }
 
@@ -498,32 +500,35 @@ SEXP biginteger_cbind(SEXP args)
 {
   int i=0,j=0;
   bigvec result;
-  bigvec v;
-  vector<bigvec> source;
+  vector<bigvec*> source;
   unsigned int maxSize=0;
   for(int i = 0 ; i < LENGTH(args) ; i++){
-    v = bigintegerR::create_bignum(VECTOR_ELT(args,i));
+   bigvec v = bigintegerR::create_bignum(VECTOR_ELT(args,i));
  
     if(v.size() == 0) continue;
     if(v.nrow <0) v.nrow = v.size();
     for(int col = 0 ; col < v.nCols(); col++){
-      bigvec column ;
+      bigvec * column = new bigvec();
       for (int row = 0 ; row < v.nRows(); row++){
-	column.push_back(v.get(row,col));
+	column->push_back(v.get(row,col));
       }
       source.push_back(column);	
-      maxSize = std::max(maxSize,column.size());
+      maxSize = std::max(maxSize,column->size());
     }
   }
 
   for(int i = 0 ; i < source.size() ; i++){
-    bigvec  u = source[i];
+    bigvec *  u = source[i];
     for (int j = 0 ; j < maxSize; j++){
-      if(u.size() == 0) result.push_back(bigmod());
-      else    result.push_back(u[j % u.size()]); 
+      if(u->size() == 0) result.push_back(bigmod());
+      else    result.push_back((*u)[j % u->size()]); 
     }
   }
   result.nrow = result.size() /  source.size();
+  for (int i = 0 ; i < source.size() ; i++){
+    if(source[i] != nullptr) delete source[i];
+    source[i] = nullptr;
+  }
   
   return bigintegerR::create_SEXP(result);
 }

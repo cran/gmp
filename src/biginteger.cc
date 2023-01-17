@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04
- *  \date Last modified: Time-stamp: <2008-02-17 21:42:37 antoine>
+ *  \date Last modified: Time-stamp: <2023-01-16 18:48:41 (antoine)>
  *
  *  \author Immanuel Scholz
  *
@@ -17,6 +17,79 @@
 #include "biginteger.h"
 
 using std::string;
+
+biginteger::biginteger() 
+  : na(true) {
+
+  mpz_init(value);}
+
+
+
+/**
+ * Construct a biginteger from a int value.
+ */
+biginteger::biginteger(const int value_) : na(false) {
+  if(value_ ==  NA_INTEGER)
+    {mpz_init(value); na = true  ;}
+  else
+    mpz_init_set_si(value, value_);}
+
+/**
+ * Construct a biginteger from a long value.
+ */
+biginteger::biginteger(const long int value_) : na(false) {
+  if(value_ ==  NA_INTEGER)
+    {mpz_init(value); na = true  ;}
+  else
+    mpz_init_set_si(value, value_);}
+
+/**
+ * Construct a biginteger from a unsigned long value.
+ */
+biginteger:: biginteger(const unsigned long int value_) : na(false) {
+  if(value_ == (unsigned long int) NA_INTEGER)
+    {mpz_init(value); na = true  ;}
+  else
+    mpz_init_set_ui(value, value_);}
+
+/**
+ * Construct a biginteger from a double value.
+ */
+biginteger::biginteger(const double value_) : na(false) {
+  if( R_FINITE(value_) )
+    mpz_init_set_d(value, value_);
+  else
+    {mpz_init(value); na = true  ;}
+}
+
+/**
+ * Construct a biginteger from a string value.
+ */
+biginteger::biginteger(const std::string& value_) : na(false)
+{
+  /* mpz_init.. return -1 when error, 0: ok */
+  if(mpz_init_set_str(value, value_.c_str(), 0))
+    {
+      mpz_set_si(value, 0);
+      na=true;
+    }
+  /*	if(mpz_init_set_str(value, value_.c_str(), 0) == -1)
+	Rf_error("Not a valid number");    */
+}
+
+/**
+ *  Copy constructor (mpz_t aren't standard-copyable)
+ */
+biginteger::biginteger(const biginteger& rhs) : na(rhs.na)
+{
+  mpz_init_set(value, rhs.getValueTemp());
+}
+
+
+  /**
+   * Free the owned mpz_t structs
+   */
+biginteger::~biginteger() {mpz_clear(value);}
 
 biginteger::biginteger(const char* raw)
 {

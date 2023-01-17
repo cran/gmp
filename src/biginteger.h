@@ -2,7 +2,7 @@
  *  \brief Description of class biginteger
  *
  *  \date Created: 2004
- *  \date Last modified: Time-stamp: <2010-04-10 19:09:32 antoine>
+ *  \date Last modified: Time-stamp: <2023-01-16 19:17:13 (antoine)>
  *
  *  \author Immanuel Scholz
  *
@@ -79,7 +79,7 @@ class biginteger
   /**
    * Construct a "NA" biginteger.
    */
-  biginteger() : na(true) {mpz_init(value);}
+  biginteger() ;
 
   /**
    * Construct a biginteger from a raw expression.
@@ -96,85 +96,55 @@ class biginteger
   /**
    * Construct a biginteger from a int value.
    */
-  biginteger(const int value_) : na(false) {
-    if(value_ ==  NA_INTEGER)
-      {mpz_init(value); na = true  ;}
-    else
-      mpz_init_set_si(value, value_);}
+  biginteger(const int value_);
 
   /**
    * Construct a biginteger from a long value.
    */
-  biginteger(const long int value_) : na(false) {
-    if(value_ ==  NA_INTEGER)
-      {mpz_init(value); na = true  ;}
-    else
-      mpz_init_set_si(value, value_);}
+  biginteger(const long int value_);
 
   /**
    * Construct a biginteger from a unsigned long value.
    */
-  biginteger(const unsigned long int value_) : na(false) {
-    if(value_ == (unsigned long int) NA_INTEGER)
-      {mpz_init(value); na = true  ;}
-    else
-      mpz_init_set_ui(value, value_);}
+  biginteger(const unsigned long int value_);
 
   /**
    * Construct a biginteger from a double value.
    */
-  biginteger(const double value_) : na(false) {
-    if( R_FINITE(value_) )
-      mpz_init_set_d(value, value_);
-    else
-      {mpz_init(value); na = true  ;}
-  }
+  biginteger(const double value_);
 
   /**
    * Construct a biginteger from a string value.
    */
-  biginteger(const std::string& value_) : na(false)
-    {
-      /* mpz_init.. return -1 when error, 0: ok */
-      if(mpz_init_set_str(value, value_.c_str(), 0))
-	{
-	  mpz_set_si(value, 0);
-	  na=true;
-	}
-      /*	if(mpz_init_set_str(value, value_.c_str(), 0) == -1)
-		Rf_error("Not a valid number");    */
-    }
+  biginteger(const std::string& value_);
 
   /**
    *  Copy constructor (mpz_t aren't standard-copyable)
    */
-  biginteger(const biginteger& rhs) : na(rhs.na)
-    {
-      mpz_init_set(value, rhs.getValueTemp());
-    }
+  biginteger(const biginteger& rhs) ;
 
 
   /**
    * Free the owned mpz_t structs
    */
-  virtual ~biginteger() {mpz_clear(value);}
+  virtual ~biginteger();
 
 
   /**
    * Set the biginteger to state "NA".
    */
-  void setValue() {mpz_set_si(value, 0); na = true;}
+  inline void setValue() {mpz_set_si(value, 0); na = true;}
 
   /**
    * Set the biginteger to a specific value.
    */
-  void setValue(const mpz_t & value_ ) {
+  inline void setValue(const mpz_t & value_ ) {
     mpz_set(value, value_); na = false;
   }
 
   /** \brief set value from an integer
    */
-  void setValue(int value_) {
+  inline void setValue(int value_) {
     if(value_ == NA_INTEGER)
       {mpz_set_ui(value, 0); na = true  ;}
     else
@@ -185,7 +155,7 @@ class biginteger
   }
   /** \brief set value from a long integer
    */
-  void setValue(long int value_) {
+  inline void setValue(long int value_) {
     if(value_ == NA_INTEGER)
       {mpz_set_ui(value, 0); na = true  ;}
     else
@@ -197,7 +167,7 @@ class biginteger
 
   /** \brief set value from an unsigned int
    */
-  void setValue(unsigned long int value_) {
+  inline void setValue(unsigned long int value_) {
     if((int)value_ == NA_INTEGER)
       {mpz_set_ui(value, 0); na = true  ;}
     else
@@ -209,7 +179,7 @@ class biginteger
 
   /** \brief set value from a float
    */
-  void setValue(double value_) {
+  inline void setValue(double value_) {
     if(R_FINITE (value_) )
       {mpz_set_d(value, value_); na = false;}
     else
@@ -229,12 +199,12 @@ class biginteger
    * only lives as long as this class live, so do not call getValueTemp on
    * temporary objects.
    */
-  const mpz_t& getValueTemp() const {return value;}
+  inline const mpz_t& getValueTemp() const {return value;}
 
 
   /** \brief accessor on value
    */
-  mpz_t & getValue()
+  inline mpz_t & getValue()
   {
     return value;
   }
@@ -242,17 +212,17 @@ class biginteger
   /**
    * Return true, if the value is NA.
    */
-  bool isNA() const {return na;}
+  inline bool isNA() const {return na;}
 
   /**
    * set NA value
    */
-  void NA(bool value_p)  {na = value_p;}
+  inline void NA(bool value_p)  {na = value_p;}
 
   /**
    * Return true, if the value is 0.
    */
-  int sgn() const {return mpz_sgn(value);}
+  inline int sgn() const {return mpz_sgn(value);}
 
   /**
    *  Convert the biginteger into a standard string.
@@ -263,13 +233,13 @@ class biginteger
    * Convert the biginteger into a long value (cut off the msb's if it don't
    * fit).
    */
-  long as_long() const {return mpz_get_si(value);}
+  inline long as_long() const {return mpz_get_si(value);}
 
   /**
    * \brief Convert the biginteger into a double value
    * (you may loose precision)
    */
-  double as_double() const {return mpz_get_d(value);}
+  inline double as_double() const {return mpz_get_d(value);}
 
   /**
    * Convert the biginteger to a raw memory block. Obtain the size needed
@@ -305,7 +275,6 @@ class biginteger
   biginteger & operator= (const biginteger& rhs);
 
 };
-
 
 
 

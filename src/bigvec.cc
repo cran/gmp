@@ -1,42 +1,42 @@
 
 #include "bigvec.h"
 
+
 /** \brief constructor
  *
  */
-bigvec::bigvec(unsigned int i) :
+bigvec::bigvec(unsigned int size) :
   math::Matrix<bigmod>(),
-  value(i),
-  modulus(0),
+  value(),
+  modulus(),
   valuesMod(),
   nrow(-1)
 {
+
+  for (int i=0 ; i < size; i++){
+    value.push_back(biginteger());
+  }
 }
 
 
 bigvec::bigvec(const bigvec & vecteur) :
   math::Matrix<bigmod>(),
-  value(vecteur.value.size()),
-  modulus(vecteur.modulus.size()),
+  value(),
+  modulus(),
   valuesMod(),
   nrow(vecteur.nrow)
 {
   //  *this = vecteur;
-  value.resize(vecteur.value.size());
-  modulus.resize(vecteur.modulus.size());
-  std::vector<biginteger>::const_iterator jt=vecteur.modulus.begin();
-  std::vector<biginteger>::iterator it = modulus.begin();
-  while(it != modulus.end())
+  std::vector<biginteger>::const_iterator it;
+
+  for(it = vecteur.modulus.begin();it !=  vecteur.modulus.end(); ++it)
     {
-      *it = *jt;
-      ++it;
-      ++jt;
+      modulus.push_back(*it);
     }
-  jt = vecteur.value.begin();
-  for(it=value.begin(); it != value.end(); ++it)
+
+  for(it= vecteur.value.begin(); it !=  vecteur.value.end(); ++it)
     {
-      *it= *jt;
-      ++jt;
+      value.push_back(*it);
     }
 }
 
@@ -67,7 +67,7 @@ std::string bigvec::str(int i,int b) const
 }
 
 bigmod & bigvec::get(unsigned int row, unsigned int col) {
-  return (*this)[row + col*nRows()];
+  return (*this)[row + col*nRows() % size()];
 }
 
 
@@ -251,22 +251,21 @@ bigvec & bigvec::operator= (const bigvec & rhs)
 {
   if(this != &rhs)
     {
-      value.resize(rhs.value.size());
-      modulus.resize(rhs.modulus.size());
-      std::vector<biginteger>::const_iterator jt=rhs.modulus.begin();
-      std::vector<biginteger>::iterator it = modulus.begin();
-      while(it != modulus.end())
+      clearValuesMod();
+      value.resize(0);
+      modulus.resize(0);
+      std::vector<biginteger>::const_iterator it;
+      
+      for(it = rhs.modulus.begin();it !=  rhs.modulus.end(); ++it)
 	{
-	  *it = *jt;
-	  ++it;
-	  ++jt;
+	  modulus.push_back(*it);
 	}
-      jt = rhs.value.begin();
-      for(it=value.begin(); it != value.end(); ++it)
+      
+      for(it= rhs.value.begin(); it !=  rhs.value.end(); ++it)
 	{
-	  *it= *jt;
-	  ++jt;
+	  value.push_back(*it);
 	}
+      
       nrow = rhs.nrow;
     }
   return(*this);

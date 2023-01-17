@@ -129,8 +129,9 @@ namespace bigintegerR
     //std::cout << "import value" << std::endl;
     bigvec v = bigintegerR::create_vector(param);
 
-    if (TYPEOF(dimAttr) == INTSXP)
+    if (TYPEOF(dimAttr) == INTSXP){
 	v.nrow = INTEGER(dimAttr)[0];
+    }
     else {
 	// catch to get std matrix dimensions value
 	dimAttr = Rf_getAttrib(param, Rf_mkString("dim"));
