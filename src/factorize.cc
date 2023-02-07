@@ -24,6 +24,7 @@ this program.  If not, see http://www.gnu.org/licenses/.  */
 
 #include "Rgmp.h"
 #include "factorize.h"
+#include <stdexcept>
 
 static unsigned char primes_diff[] = {
 #define P(a,b,c) a,
@@ -180,8 +181,8 @@ mp_prime_p (mpz_t n)
 	}
     }
 
-
-  error( "Lucas prime test failure.  This should not happen\n");
+  factors.clear();
+  throw std::invalid_argument( "Lucas prime test failure.  This should not happen\n");
  ret1:
   if (flag_prove_primality)  
     factors.resize(0);

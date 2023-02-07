@@ -2,7 +2,7 @@
  *  \brief Description of class biginteger
  *
  *  \date Created: 2004
- *  \date Last modified: Time-stamp: <2023-01-16 19:17:13 (antoine)>
+ *  \date Last modified: Time-stamp: <2023-01-28 15:50:33 (antoine)>
  *
  *  \author Immanuel Scholz
  *
@@ -57,11 +57,6 @@ struct mpz_t_sentry {
  * This does not mean, the internal state is not constructed, but
  * the value explicit is "not available".
  */
-
-
-
-
-
 class biginteger
 {
  private:
@@ -274,6 +269,8 @@ class biginteger
    */
   biginteger & operator= (const biginteger& rhs);
 
+
+  static int getCount();
 };
 
 
@@ -307,6 +304,11 @@ biginteger operator% (const biginteger& rhs, const biginteger& lhs);
  *   mpz value
  */
 int as_raw(char* raw,mpz_t value,bool na);
+
+
+
+  
+
 
 
 

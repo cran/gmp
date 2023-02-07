@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2005
- *  \date Last modified: Time-stamp: <2023-01-16 19:09:32 (antoine)>
+ *  \date Last modified: Time-stamp: <2023-02-03 08:59:56 (antoine)>
  *
  *
  *  \note Licence: GPL (>= 2)
@@ -19,6 +19,12 @@
 #include "bigmod.h"
 #include "templateMatrix.h"
 
+enum TYPE_MODULUS{
+		  NO_MODULUS,
+		  MODULUS_GLOBAL,
+		  MODULUS_BY_CELL
+};
+
 /** \brief class bigvec
  *
  * It a class composed of 2 vectors, (value & modulus) that
@@ -26,15 +32,14 @@
  * parameter (for matrix support)
  */
 class bigvec : public math::Matrix<bigmod> {
- public:
-  /** \brief value */
-  std::vector<biginteger> value;
-  /** \brief modulus */
-  std::vector<biginteger> modulus;
   
+protected:
   /** array with all bigmod, that are references to values in vector. */
-  std::vector<bigmod *> valuesMod;
+  std::vector<bigmod > values;
+  TYPE_MODULUS type;
+  std::shared_ptr<biginteger> modulus;
   
+public:
   /** \brief optional parameter used with matrix -- set to -1 for non-matrix */
   int nrow ;
 
@@ -89,6 +94,10 @@ class bigvec : public math::Matrix<bigmod> {
    */
   void push_back(int value_p);
 
+  inline void erase(unsigned int index){
+    values.erase(values.begin() + index);
+  }
+
   /**
    * Insert Big Integer value
    */
@@ -128,8 +137,35 @@ class bigvec : public math::Matrix<bigmod> {
    */
   void print();
 
+  inline unsigned int getModulusSize(){
+    if(type == NO_MODULUS) return 0;
+    if(type == MODULUS_GLOBAL) return 1;
+    return size();
+  }
 
+  void setGlobalModulus(std::shared_ptr<biginteger> & modulus);
 
+  inline std::shared_ptr<biginteger> & getGlobalModulus(){
+    return modulus;
+  }
+  
+  const  TYPE_MODULUS getType() const {
+    return type;
+  }
+
+  inline void setType(TYPE_MODULUS val){
+    type = val;
+    if(val == MODULUS_GLOBAL && size() > 0){
+      modulus = (*this)[0].getModulusPtr();
+    }
+  }
+
+  inline void reserve(unsigned int size){
+    values.reserve(size);
+  }
+  /** return a global modulus if possible, null if not */
+  static std::shared_ptr<biginteger> getGlobalModulus(bigvec & first,  bigvec & second);
+  
  private:
   void checkValuesMod() ;
   void clearValuesMod() ;

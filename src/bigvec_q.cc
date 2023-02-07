@@ -11,12 +11,12 @@ bigvec_q::bigvec_q(const bigvec_q & rhs):
 
 
 bigvec_q::bigvec_q(const bigvec & rhs):
-  value(rhs.value.size()),
+  value(rhs.size()),
   nrow(rhs.nrow)
 {
   for(unsigned int i=0; i< rhs.size(); ++i)
     {
-      value[i].setValue(rhs.value[i]);
+      value[i].setValue(rhs[i].getValue());
     }
 }
 

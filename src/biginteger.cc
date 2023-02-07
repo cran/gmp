@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 27/10/04
- *  \date Last modified: Time-stamp: <2023-01-16 18:48:41 (antoine)>
+ *  \date Last modified: Time-stamp: <2023-01-28 15:51:50 (antoine)>
  *
  *  \author Immanuel Scholz
  *
@@ -17,10 +17,13 @@
 #include "biginteger.h"
 
 using std::string;
+static int count=0;
+static int countALL=0;
 
 biginteger::biginteger() 
   : na(true) {
-
+  count++;
+  countALL++;
   mpz_init(value);}
 
 
@@ -29,6 +32,8 @@ biginteger::biginteger()
  * Construct a biginteger from a int value.
  */
 biginteger::biginteger(const int value_) : na(false) {
+  count++;
+  countALL++;
   if(value_ ==  NA_INTEGER)
     {mpz_init(value); na = true  ;}
   else
@@ -38,6 +43,8 @@ biginteger::biginteger(const int value_) : na(false) {
  * Construct a biginteger from a long value.
  */
 biginteger::biginteger(const long int value_) : na(false) {
+  count++;
+  countALL++;
   if(value_ ==  NA_INTEGER)
     {mpz_init(value); na = true  ;}
   else
@@ -47,6 +54,8 @@ biginteger::biginteger(const long int value_) : na(false) {
  * Construct a biginteger from a unsigned long value.
  */
 biginteger:: biginteger(const unsigned long int value_) : na(false) {
+  count++;
+  countALL++;
   if(value_ == (unsigned long int) NA_INTEGER)
     {mpz_init(value); na = true  ;}
   else
@@ -56,6 +65,8 @@ biginteger:: biginteger(const unsigned long int value_) : na(false) {
  * Construct a biginteger from a double value.
  */
 biginteger::biginteger(const double value_) : na(false) {
+  count++;
+  countALL++;
   if( R_FINITE(value_) )
     mpz_init_set_d(value, value_);
   else
@@ -67,6 +78,8 @@ biginteger::biginteger(const double value_) : na(false) {
  */
 biginteger::biginteger(const std::string& value_) : na(false)
 {
+  count++;
+  countALL++;
   /* mpz_init.. return -1 when error, 0: ok */
   if(mpz_init_set_str(value, value_.c_str(), 0))
     {
@@ -82,6 +95,8 @@ biginteger::biginteger(const std::string& value_) : na(false)
  */
 biginteger::biginteger(const biginteger& rhs) : na(rhs.na)
 {
+  count++;
+  countALL++;
   mpz_init_set(value, rhs.getValueTemp());
 }
 
@@ -89,10 +104,21 @@ biginteger::biginteger(const biginteger& rhs) : na(rhs.na)
   /**
    * Free the owned mpz_t structs
    */
-biginteger::~biginteger() {mpz_clear(value);}
+biginteger::~biginteger() {
+  count--;
+  //    printf("nb : %d %d \n",count,countALL);
+  mpz_clear(value);
+}
+
+
+int biginteger::getCount(){
+  return count;
+}
 
 biginteger::biginteger(const char* raw)
 {
+  count++;
+  countALL++;
   mpz_init(value);
   na = true;
   const int* r = (int*)(raw);
@@ -117,6 +143,8 @@ biginteger::biginteger(const char* raw)
 biginteger::biginteger(const mpz_t value_)
     : na(false)
 {
+  count++;
+  countALL++;
   mpz_init_set(value, value_);
 }
 

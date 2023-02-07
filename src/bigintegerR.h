@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2006
- *  \date Last modified: Time-stamp: <2023-01-16 19:11:24 (antoine)>
+ *  \date Last modified: Time-stamp: <2023-01-24 15:52:06 (antoine)>
  *
  *
  *  \note Licence: GPL (>= 2)
@@ -18,7 +18,7 @@
 #ifndef T_BIGMOD_BINARY_OPERATION
 #define T_BIGMOD_BINARY_OPERATION 1
 /// A pointer to a binary operator for bigintegers
-typedef DefaultBigMod (*biginteger_binary_fn)(const bigmod&, const bigmod&);
+typedef bigmod (*biginteger_binary_fn)(const bigmod&, const bigmod&);
 #endif
 
 #ifndef T_BIGMOD_BINARY_OPERATION_LOGICAL
@@ -26,6 +26,7 @@ typedef DefaultBigMod (*biginteger_binary_fn)(const bigmod&, const bigmod&);
 typedef bool (*biginteger_logical_binary_fn)(const biginteger&, const biginteger&);
 #endif
 
+typedef const biginteger & (*bigmod_accessor_fn)(const bigmod&);
 
 struct lockSexp {
   lockSexp(const SEXP & value) {
@@ -61,13 +62,14 @@ namespace bigintegerR{
   /**
    * \brief export vector of biginteger to R value
    */
-  SEXP create_SEXP(const std::vector<biginteger>& v);
+  SEXP create_SEXP(const bigvec& v,bigmod_accessor_fn fct, unsigned int size);
 
   /**
    * \brief export bigvec to R value
    */
   SEXP create_SEXP(const bigvec & v);
 
+  SEXP biginteger_binary_operation(const bigvec & a,const bigvec & b, biginteger_binary_fn f);
   SEXP biginteger_binary_operation(const SEXP & a,const SEXP & b, biginteger_binary_fn f);
 
   SEXP biginteger_logical_binary_operation(const SEXP & a,const SEXP & b, biginteger_logical_binary_fn f);

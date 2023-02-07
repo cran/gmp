@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 25/05/06
- *  \date Last modified: Time-stamp: <2006-05-25 23:05:20 antoine>
+ *  \date Last modified: Time-stamp: <2023-01-28 15:47:35 (antoine)>
  *
  *  \author A. Lucas
  *
@@ -16,27 +16,33 @@
 
 #include "bigrationalR.h"
 #include "bigintegerR.h"
+using namespace std;
 
 // inverse a rational matrix
 SEXP inverse_q(SEXP A)
 {
+ try{
+    bigvec_q a = bigrationalR::create_bignum(A);
 
-  bigvec_q a = bigrationalR::create_bignum(A);
-
-  return(solve_gmp_R::inverse_q(a));
+    return(solve_gmp_R::inverse_q(a));
+  } catch(std::invalid_argument & e){
+    error(e.what());
+  }
 }
 
 SEXP solve_gmp_R::inverse_q(bigvec_q a)
 {
-  if(a.nrow * a.nrow != (int) a.size())
-    error(_("Argument 1 must be a square matrix"));
+  if(a.nrow * a.nrow != (int) a.size()){
+    a.clear();
+    throw invalid_argument(_("Argument 1 must be a square matrix"));
+  }
   bigvec_q b (a.size());
   b.nrow = a.nrow;
 
   // initialize b to identity
   for(int i=0; i<b.nrow ; ++i)
     for(int j=0; j<b.nrow ; ++j)
-	b.value[i+j*b.nrow].setValue((i == j) ? 1 : 0);
+      b[i+j*b.nrow].setValue((i == j) ? 1 : 0);
 
   solve_gmp_R::solve(a,b);
 
@@ -46,94 +52,114 @@ SEXP solve_gmp_R::inverse_q(bigvec_q a)
 
 SEXP inverse_z (SEXP A)
 {
-  bigvec a = bigintegerR::create_bignum(A);
-  if(a.modulus.size() == 1 &&  !a.modulus[0].isNA()) {
-    bigvec b (a.size() );
-    b.nrow = a.nrow;
-    if(a.nrow * a.nrow != (int) a.size())
-      error(_("Argument 1 must be a square matrix"));
+ try{
+    bigvec a = bigintegerR::create_bignum(A);
 
-    b.modulus.push_back(a.modulus[0]);
-    // initialize b to identity
-    for(int i=0; i<b.nrow ; ++i)
-      for(int j=0; j<b.nrow ; ++j)
-	b.value[i+j*b.nrow].setValue((i == j) ? 1 : 0);
+    if(a.nrow * a.nrow != (int) a.size()){
+      throw invalid_argument(_("Argument 1 must be a square matrix"));
+    }
 
-    solve_gmp_R::solve(a,b);
+    if(a.getType() == TYPE_MODULUS::MODULUS_GLOBAL) {
+      bigvec b (a.size() );
+      b.nrow = a.nrow;
+  
+      // initialize b to identity
+      for(int i=0; i<b.nrow ; ++i)
+	for(int j=0; j<b.nrow ; ++j)
+	  b[i+j*b.nrow].setValue((i == j) ? 1 : 0);
 
-    return(bigintegerR::create_SEXP(b));
-  }
-  else {
-    bigvec_q aq (a);
-    return(solve_gmp_R::inverse_q(aq));
+      b.setGlobalModulus(a.getGlobalModulus());
+      solve_gmp_R::solve(a,b);
+
+      return(bigintegerR::create_SEXP(b));
+    }
+    else {
+      bigvec_q aq (a);
+      return(solve_gmp_R::inverse_q(aq));
+    }
+  } catch(std::invalid_argument & e){
+    error(e.what());
   }
 }
 
 // solve AX=B
 SEXP solve_z(SEXP A,SEXP B)
 {
-  bool common_modulus=true;
-  bigvec a = bigintegerR::create_bignum(A);
-  bigvec b = bigintegerR::create_bignum(B);
-  if(a.modulus.size() == 1 )
-    if(!a.modulus[0].isNA())
-      {
-	if(b.modulus.size()>1)
-	  common_modulus = false; // -> solve with rational
-	if(b.modulus.size() == 1)
+  try
+    {
+      bigvec a = bigintegerR::create_bignum(A);
+      bigvec b = bigintegerR::create_bignum(B);
+
+      // case: b a vector
+      if(b.nrow<1)
+	b.nrow = b.size();
+  
+      if(a.nrow * a.nrow != (int) a.size()){
+	throw invalid_argument(_("Argument 1 must be a square matrix"));
+      }
+	
+      if(a.nrow != b.nrow){
+	throw invalid_argument(_("Dimensions do not match"));
+      }
+  
+      if(a.getType() == TYPE_MODULUS::MODULUS_GLOBAL && b.getType() != TYPE_MODULUS::MODULUS_BY_CELL ) {
+
+	if(b.getType() == TYPE_MODULUS::NO_MODULUS){
+	  b.setGlobalModulus(a.getGlobalModulus());
+	}
+    
+	if(*a.getGlobalModulus() == *b.getGlobalModulus())
 	  {
-	    if(b.modulus[0] == a.modulus[0])
-	      common_modulus = false; // -> solve with rational
-	  }
-	else
-	  b.modulus.push_back(a.modulus[0]);
-	// solve in Z/nZ
-	if(common_modulus)
-	  {
-	    // case: b a vector
-	    if(b.nrow<1)
-	      b.nrow = b.size();
-
-	    if(a.nrow * a.nrow != (int) a.size())
-	      error(_("Argument 1 must be a square matrix"));
-
-	    if(a.nrow != b.nrow)
-	      error(_("Dimensions do not match"));
-
+	    // solve in Z/nZ
+	
+	
 	    solve_gmp_R::solve(a,b);
-
+	
 	    return(bigintegerR::create_SEXP(b));
+	
 	  }
       }
-
-  bigvec_q aq (a);
-  bigvec_q bq (b);
-  return(solve_gmp_R::solve_q(aq,bq));
+      // Solve as rational numbers.
+      bigvec_q aq (a);
+      bigvec_q bq (b);
+      return(solve_gmp_R::solve_q(aq,bq));
+    } catch(std::invalid_argument & e){
+    error(e.what());
+  }
 }
 
 
 // solve AX=B
 SEXP solve_q(SEXP A,SEXP B)
 {
-  bigvec_q a = bigrationalR::create_bignum(A);
-  bigvec_q b = bigrationalR::create_bignum(B);
+ try{
+    bigvec_q a = bigrationalR::create_bignum(A);
+    bigvec_q b = bigrationalR::create_bignum(B);
 
-  return(solve_gmp_R::solve_q(a,b));
+    return(solve_gmp_R::solve_q(a,b));
+  } catch(std::invalid_argument & e){
+    error(e.what());
+  }
 }
 
 // solve AX = B
 SEXP solve_gmp_R::solve_q(bigvec_q a, bigvec_q b)
 {
-  if(a.nrow * a.nrow != (int) a.size())
-    error(_("Argument 1 must be a square matrix"));
-
+  if(a.nrow * a.nrow != (int) a.size()){
+    a.clear();
+    b.clear();
+    throw invalid_argument(_("Argument 1 must be a square matrix"));
+  }
   // case: b a vector
   if(b.nrow<0)
     b.nrow = b.size();
 
-  if(a.nrow != b.nrow)
-    error(_("Dimensions do not match"));
-
+  if(a.nrow != b.nrow){
+    a.clear();
+    b.clear();
+    throw invalid_argument(_("Dimensions do not match"));
+  }
+  
   solve_gmp_R::solve(a,b);
 
   return(bigrationalR::create_SEXP(b));

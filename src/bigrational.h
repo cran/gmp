@@ -2,7 +2,7 @@
  *  \brief Description of class bigrational
  *
  *  \date Created: 22/05/06
- *  \date Last modified: Time-stamp: <2009-10-27 17:28:06 antoine>
+ *  \date Last modified: Time-stamp: <2023-01-24 18:42:58 (antoine)>
  *
  *  \author Antoine Lucas (adapted from biginteger class made by
  *                         Immanuel Scholz)
@@ -45,9 +45,7 @@ class bigrational
   /**
    * Construct a "NA" bigrational.
    */
-  bigrational() :
-    value(),
-    na(true) {mpq_init(value);}
+  bigrational();
 
   /**
    * Construct a bigrational from a raw expression.
@@ -61,94 +59,47 @@ class bigrational
    * parameter's mpz_t if you allocated them by yourself -
    * biginteger will copy the value.
    */
-  bigrational(const mpq_t& value_) :
-    value(),
-    na(false)
-    {
-      mpq_init(value);
-      mpq_set(value, value_);
-    }
-
+  bigrational(const mpq_t& value_);
+  
   /**
    * \brief create a rational from an [big] integer
    */
-  bigrational(const mpz_t& value_) :
-    value(),
-    na(false)
-    {
-      mpq_init(value);
-      mpq_set_z(value, value_);
-    }
+  bigrational(const mpz_t& value_);
 
   /**
    * Construct a bigrational from a long value.
    */
-  bigrational(int value_) :
-    value(),
-    na(false) {
-    mpq_init(value);
-    if(value_ ==  NA_INTEGER)
-      na = true  ;
-    else
-      mpq_set_si(value, value_,1);
-  }
+  bigrational(int value_);
 
   /**
    * Construct a bigrational from a long value.
    */
-  bigrational(int num_, int den_) :
-    value(),
-    na(false) {
-    mpq_init(value);
-    if((num_ ==  NA_INTEGER) || (den_ == NA_INTEGER) )
-      na = true  ;
-    else
-      mpq_set_si(value, num_,den_);}
+  bigrational(int num_, int den_);
 
   /**
    * Construct a bigrational from a double value.
    */
-  bigrational(double value_) :
-    value(),
-    na(false)
-    {
-      mpq_init(value);
-      if(R_FINITE( value_ ) )
-	mpq_set_d(value, value_);
-      else // FIXME: consider  "1/0" and "(-1)/0" for  +- Inf
-	na = true  ;
-    }
+  bigrational(double value_);
 
   /**
    * Construct a bigrational from a string value. it can be "4343" or "2322/4343"
    */
-  bigrational(const std::string& value_) :
-    value(),
-    na(false)
-    {
-      mpq_init(value);
-      /* mpz_init.. return -1 when error, 0: ok */
-      if(mpq_set_str(value, value_.c_str(), 0))
-	na=true;
-      /*	if(mpz_init_set_str(value, value_.c_str(), 0) == -1)
-		Rf_error("Not a valid number");    */
-    }
+  bigrational(const std::string& value_);
 
   /**
    *  Copy constructor (mpz_t aren't standard-copyable)
    */
-  bigrational(const bigrational & rhs) :
-    value(),
-    na(rhs.na)
-    {
-      mpq_init(value);
-      mpq_set(value, rhs.value);
-    }
+  bigrational(const biginteger & rhs) ;
+
+  /**
+   *  Copy constructor (mpz_t aren't standard-copyable)
+   */
+  bigrational(const bigrational & rhs);
 
   /**
    * Free the owned mpz_t structs
    */
-  virtual ~bigrational() {mpq_clear(value);}
+  virtual ~bigrational();
 
   /** \brief overload affectation operator
    *

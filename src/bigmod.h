@@ -2,7 +2,7 @@
  *  \brief Description of class bigmod
  *
  *  \date Created: 22/05/06
- *  \date Last modified: Time-stamp: <2019-03-10 10:30:30 (antoine)>
+ *  \date Last modified: Time-stamp: <2023-01-24 19:36:06 (antoine)>
  *
  *  \author Immanuel Scholz
  *
@@ -13,6 +13,7 @@
 #ifndef BIGMOD_HEADER_
 #define BIGMOD_HEADER_ 1
 
+#include <memory>
 #include "biginteger.h"
 
 typedef void (*gmp_binary)(mpz_t, const mpz_t, const mpz_t);
@@ -36,32 +37,25 @@ extern "C" {
  */
 class bigmod {
  private:
-  /** optional source */
-  biginteger * value_ptr;
-  biginteger * modulus_ptr;
- 
- protected:
-  /** \brief  Value of our bigmod -- only references*/
-  biginteger & value;
+  /** \brief  Value of our bigmod */
+  std::shared_ptr<biginteger> value;
   /** \brief  modulus of our bigmod representation: value %% modulus */
-  biginteger & modulus;
+  std::shared_ptr<biginteger> modulus;
  
  public:
 
-  /** keep both references value / modulus
+  /** keep both pointers value / modulus
    */
-  bigmod(biginteger& value_,
-	 biginteger& modulus_)  :
-    value_ptr(NULL),
-    modulus_ptr(NULL),
-    value(value_),modulus(modulus_) {};
+  bigmod(biginteger * value_,
+	 biginteger * modulus_)  :
+    value(value_),
+    modulus(modulus_) {};
 
  /** keep references value / modulus is new object.
    */
- bigmod(biginteger& value_)  :
-   value_ptr(NULL),
-   modulus_ptr(new biginteger()),
-   value(value_),modulus(*modulus_ptr) {};
+ bigmod(biginteger* value_)  :
+   value(value_),
+   modulus(std::make_shared<biginteger>()) {};
 
 
   /**
@@ -69,33 +63,48 @@ class bigmod {
    */
  bigmod(const biginteger& value_,
 	 const biginteger& modulus_)  :
-   value_ptr(new biginteger(value_)),
-   modulus_ptr(new biginteger(modulus_)),
-   value(*value_ptr),modulus(*modulus_ptr) {};
+   value(std::make_shared<biginteger>(value_)),
+   modulus(std::make_shared<biginteger>(modulus_)) {};
+
 
  bigmod(const biginteger& value_)  :
-   value_ptr(new biginteger(value_)),
-   modulus_ptr(new biginteger()),
-   value(*value_ptr),modulus(*modulus_ptr) {};
+   value(std::make_shared<biginteger>(value_)),
+   modulus(std::make_shared<biginteger>()) {};
 
 
  bigmod()  :
-   value_ptr(new biginteger()),
-   modulus_ptr(new biginteger()),
-   value(*value_ptr),modulus(*modulus_ptr) {};
+   value(std::make_shared<biginteger>()),
+   modulus(std::make_shared<biginteger>()) {};
 
+ bigmod(std::shared_ptr<biginteger> value_, std::shared_ptr<biginteger> modulus_ )  :
+    value(),
+    modulus()
+  {
+    value = value_;
+    modulus = modulus_;
+  };
+ 
+  bigmod(std::shared_ptr<biginteger> value_ )  :
+    value(),
+    modulus(std::make_shared<biginteger>())
+  {
+    value = value_;
+  };
+ 
  
   /** \brief copy operator  */
-  bigmod(const bigmod & rhs) : 
-    value_ptr(new biginteger(rhs.getValue())),
-    modulus_ptr(new biginteger(rhs.getModulus())),
-   value(*value_ptr),modulus(*modulus_ptr) {
+   bigmod(const bigmod & rhs) : 
+    value(),
+    modulus()
+  {
+    value = rhs.value;
+    modulus = rhs.modulus;
   };
+ 
 
 
   virtual ~bigmod(){
-    if(value_ptr != NULL) delete value_ptr;
-    if(modulus_ptr != NULL) delete modulus_ptr;
+  
   };
 
   /**
@@ -116,86 +125,83 @@ class bigmod {
   bigmod  inv () const;
 
  
-  biginteger & getValue() {
-    return value;
+  inline biginteger & getValue() {
+    return *value;
+  }
+  
+  inline mpz_t & getMpValue()
+  {
+    return value->getValue();
+  }
+  
+  inline const mpz_t& getValueTemp() const
+  {
+    return value->getValueTemp();
   }
 
   biginteger & getModulus() {
+    return *modulus;
+  }
+
+
+  inline bool isNA(){
+    return value->isNA();
+  }
+  
+  std::shared_ptr<biginteger> & getValuePtr()  {
+    return value;
+  }
+  
+  const std::shared_ptr<biginteger> & getModulusPtr() const {
     return modulus;
   }
 
+  inline void setValue(const std::shared_ptr<biginteger>  & v){
+    value = v;
+  }
+  
+  inline void setValue(const bigmod  & v){
+    value = std::make_shared<biginteger>(v.getValue());
+    modulus = std::make_shared<biginteger>(v.getModulus());
+  }
+
+  inline void setValue( bigmod  & v){
+    value = v.getValuePtr();
+    modulus = v.getModulusPtr();
+  }
+
+  inline void setValue(const mpz_t  & v){
+    value->setValue(v);
+  }
+
+  inline void setValue(int v){
+    value->setValue(v);
+  }
+
+  inline void setValue(double v){
+    value->setValue(v);
+  }
+
+  inline void setValue(){
+    value->setValue();
+    modulus->setValue();
+  }
+
+  inline void setModulus(const std::shared_ptr<biginteger> & v){
+    modulus = v;
+  }
+  
   const biginteger & getValue() const{
-    return value;
+    return *value;
   }
 
   const biginteger & getModulus() const {
-    return modulus;
+    return *modulus;
   }
 
 };
 
 
-class DefaultBigMod : public bigmod {
- private:
-  /** \brief  Value of our bigmod */
-  biginteger valueLocal;
-  /** \brief  modulus of our bigmod representation: value %% modulus */
-  biginteger modulusLocal;
- 
- public:
-/** \brief creator
-   */
-  DefaultBigMod(const biginteger& value_ = biginteger(),
-	 const biginteger& modulus_ = biginteger()) :
-  bigmod(valueLocal,modulusLocal),
-    valueLocal(value_),modulusLocal(modulus_) {
-    value = valueLocal;
-    modulus = modulusLocal;
-}
-
-  /** \brief copy operator  */
- DefaultBigMod(const bigmod & rhs) :
-    bigmod(valueLocal,modulusLocal),
-     valueLocal(rhs.getValue()),modulusLocal(rhs.getModulus()) {
-    value = valueLocal;
-    modulus = modulusLocal;
-}
-
- /** \brief copy operator  */
- DefaultBigMod(const DefaultBigMod & rhs) :
-    bigmod(valueLocal,modulusLocal),
-     valueLocal(rhs.getValue()),modulusLocal(rhs.getModulus()) {
-    value = valueLocal;
-    modulus = modulusLocal;
-}
-  ~DefaultBigMod(){};
- 
-  
-
-};
-
-
-/**
- * a bigmod that has only integer.
- */
-class BigModInt : public bigmod {
- private:
-   /** \brief  modulus of our bigmod representation */
-  biginteger modulusLocal;
- 
- public:
-/** \brief creator
-   */
-  BigModInt(biginteger& value_) :
-  bigmod(value_,modulusLocal),
-    modulusLocal() {
-    modulus = modulusLocal;
-}
-
-  ~BigModInt(){};
- 
- 
-};
 
 
 
@@ -217,33 +223,33 @@ bool operator== (const bigmod& rhs, const bigmod& lhs);
  * a modulus set. If none modulus for either bigmod is set, the result will not
  * have a modulus as well.
  */
-DefaultBigMod operator+(const bigmod& rhs, const bigmod& lhs);
+bigmod operator+(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief Subtract two bigmods.
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-DefaultBigMod operator-(const bigmod& rhs, const bigmod& lhs);
+bigmod operator-(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief Multiply two bigmods.
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-DefaultBigMod operator*(const bigmod& rhs, const bigmod& lhs);
+bigmod operator*(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief Divide two bigmods   a / b  :=  a * b^(-1)
  */
-DefaultBigMod div_via_inv(const bigmod& a, const bigmod& b);
+bigmod div_via_inv(const bigmod& a, const bigmod& b);
 
 /**
  * \brief Divide two bigmods.
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-DefaultBigMod operator/(const bigmod& rhs, const bigmod& lhs);
+bigmod operator/(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief Calculate the modulus (remainder) of two bigmods.
@@ -253,7 +259,7 @@ DefaultBigMod operator/(const bigmod& rhs, const bigmod& lhs);
  * was before, except if rhs and lhs has both no modulus set,
  * in which case the resulting modulus will be unset too.
  */
-DefaultBigMod operator%(const bigmod& rhs, const bigmod& lhs);
+bigmod operator%(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief Return the power of "exp" to the base of "base" (return = base^exp).
@@ -265,14 +271,14 @@ DefaultBigMod operator%(const bigmod& rhs, const bigmod& lhs);
  *
  * For other modulus description, see operator+(bigmod, bigmod)
  */
-DefaultBigMod pow(const bigmod& base, const bigmod& exp);
+bigmod pow(const bigmod& base, const bigmod& exp);
 
 /**
  * \brief Return the modulo inverse to x mod m. (return = x^-1 % m)
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-DefaultBigMod inv(const bigmod& x, const bigmod& m);
+bigmod inv(const bigmod& x, const bigmod& m);
 
 /**
  * \brief Return a bigmod with value (x % m) and the intern modulus set to m.
@@ -280,7 +286,7 @@ DefaultBigMod inv(const bigmod& x, const bigmod& m);
  *
  * Do not confuse this with operator%(bigmod, bigmod).
  */
-DefaultBigMod set_modulus(const bigmod& x, const bigmod& m);
+bigmod set_modulus(const bigmod& x, const bigmod& m);
 
 
 biginteger get_modulus(const bigmod& b1, const bigmod& b2);
@@ -289,20 +295,20 @@ biginteger get_modulus(const bigmod& b1, const bigmod& b2);
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-DefaultBigMod gcd(const bigmod& rhs, const bigmod& lhs);
+bigmod gcd(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief  Return the least common multiply of both parameter.
  *
  * For modulus description, see operator+(bigmod, bigmod)
  */
-DefaultBigMod lcm(const bigmod& rhs, const bigmod& lhs);
+bigmod lcm(const bigmod& rhs, const bigmod& lhs);
 
 /**
  * \brief function used to make any binary operation between
  * two bigmod that return a bigmod (addition substraction... )
  */
-DefaultBigMod create_bigmod(const bigmod& lhs, const bigmod& rhs, gmp_binary f,
+bigmod create_bigmod(const bigmod& lhs, const bigmod& rhs, gmp_binary f,
 		     bool zeroRhsAllowed = true) ;
 
 #endif

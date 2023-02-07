@@ -21,6 +21,7 @@
 
 #include <R.h>
 #include <Rinternals.h>
+#include <stdexcept>
 
 #include "bigvec_q.h"
 
@@ -58,9 +59,12 @@ namespace solve_gmp_R
       // A [ i ,j] = A[ i + j * A.nrow]
       for(unsigned int k = 0 ; k < A.nRows(); ++k)
 	{
-	  if(A.get(k, k).sgn() == 0 )
-	    Rf_error("System is singular");
-
+	  if(A.get(k, k).sgn() == 0 ){
+	    A.clear();
+	    B.clear();
+	    throw std::invalid_argument("System is singular");
+	  }
+	  
 	  // l_k <- (1/akk) l_k
 	  T tmpValeur =A.get(k , k).inv() ;
 	  A.mulLine(k,tmpValeur);

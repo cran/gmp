@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2005
- *  \date Last modified: Time-stamp: <2022-12-09 15:08:46 (antoine)>
+ *  \date Last modified: Time-stamp: <2023-01-24 16:31:53 (antoine)>
  *
  *
  *  \note Licence: GPL (>= 2)
@@ -185,6 +185,7 @@ namespace bigrationalR{
   SEXP create_SEXP(const math::Matrix<bigrational> & v);
 
   SEXP bigrational_binary_operation        (SEXP a, SEXP b, bigrational_binary_fn f);
+  SEXP bigrational_binary_operation        (const bigvec_q & a,const  bigvec_q & b, bigrational_binary_fn f);
   SEXP bigrational_bigz_binary_operation   (SEXP a, SEXP b, bigrational_bigz_binary_fn f);
   SEXP bigrational_logical_binary_operation(SEXP a, SEXP b, bigrational_logical_binary_fn f);
 

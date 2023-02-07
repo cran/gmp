@@ -1,24 +1,34 @@
 #include "extract_matrix.h"
 
 #include "bigrationalR.h"
+#include <stdexcept>
+using namespace std;
 
 // for something like x = A[indi, indj], but also simply  A[ind]
 SEXP matrix_get_at_q(SEXP A,SEXP INDI, SEXP INDJ)
 {
-  bigvec_q mat = bigrationalR::create_bignum(A);
-
-  return(bigrationalR::create_SEXP(extract_gmp_R::get_at( mat,INDI,INDJ)));
+  try{
+    bigvec_q mat = bigrationalR::create_bignum(A);
+    
+    return(bigrationalR::create_SEXP(extract_gmp_R::get_at( mat,INDI,INDJ)));
+  }
+  catch(std::invalid_argument & e){
+    error(e.what());
+  }
 }
 
 // for something like x = A[indi, indj], but also simply  A[ind]
 SEXP matrix_get_at_z(SEXP A,SEXP INDI, SEXP INDJ)
 {
-  bigvec mat = bigintegerR::create_bignum(A);
-  bigvec mat2 = extract_gmp_R::get_at( mat,INDI,INDJ);
-
+ //  printf("ici\n");
+  try
+    {
+      bigvec mat = bigintegerR::create_bignum(A);
+      bigvec mat2 = extract_gmp_R::get_at( mat,INDI,INDJ);
+  /*
   // now modulus !
   // cell based modulus
-  if(mat.modulus.size() == mat.value.size())
+  if(mat.getType() == TYPE_MODULUS:: MODULUS_BY_CELL)
     {
       for(unsigned int i = 0; i< mat.size(); ++i)
 	mat.value[i] = mat.modulus[i];
@@ -49,9 +59,12 @@ SEXP matrix_get_at_z(SEXP A,SEXP INDI, SEXP INDJ)
     {
       mat2.modulus.resize(1);
       mat2.modulus[0] = mat.modulus[0];
+      }*/
+      return(bigintegerR::create_SEXP(mat2) );
     }
-
-  return(bigintegerR::create_SEXP(mat2) );
+  catch(std::invalid_argument & e){
+    error(e.what());
+  }
 }
 
 
@@ -59,22 +72,38 @@ SEXP matrix_get_at_z(SEXP A,SEXP INDI, SEXP INDJ)
 // for something like A[indi, indj] <- val
 SEXP matrix_set_at_z(SEXP A, SEXP VAL, SEXP INDI, SEXP INDJ)
 {
-  bigvec mat = bigintegerR::create_bignum(A);
-  bigvec val = bigintegerR::create_bignum(VAL);
-  extract_gmp_R::set_at( mat,val,INDI,INDJ);
-  return(bigintegerR::create_SEXP(mat));
+  try{
+    bigvec mat = bigintegerR::create_bignum(A);
+    bigvec val = bigintegerR::create_bignum(VAL);
+    
+    extract_gmp_R::set_at( mat,val,INDI,INDJ);
+
+    return(bigintegerR::create_SEXP(mat));
+  }
+  catch(std::invalid_argument & e){
+    error(e.what());
+  }
+
+
 
 }
 
 // for something like A[indi, indj] <- val
 SEXP matrix_set_at_q(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
 {
-  bigvec_q mat = bigrationalR::create_bignum(A);
-  bigvec_q val = bigrationalR::create_bignum(VAL);
+  try{
+    bigvec_q mat = bigrationalR::create_bignum(A);
+    bigvec_q val = bigrationalR::create_bignum(VAL);
+    
+    
+    extract_gmp_R::set_at( mat,val,INDI,INDJ);
+    return(bigrationalR::create_SEXP(mat));
+  }
+  catch(std::invalid_argument & e){
+    error(e.what());
+  }
 
-  extract_gmp_R::set_at( mat,val,INDI,INDJ);
 
-  return(bigrationalR::create_SEXP(mat));
 
 }
 
@@ -116,7 +145,8 @@ std::vector<int> extract_gmp_R::indice_get_at (unsigned int n , SEXP & IND)
 	  for (std::vector<int>::const_iterator jt = vidx.begin(); jt != vidx.end(); ++jt)
 	    {
 	      if(*jt > 0)
-		error(_("only 0's may mix with negative subscripts"));
+		throw invalid_argument("only 0's may mix with negative subscripts");
+		  //error(_("only 0's may mix with negative subscripts"));
 	      if( (*jt != 0) && (*jt >= - static_cast<int>(n)))
 		tempo[-(*jt)-1] = false;
 	    }
@@ -130,7 +160,8 @@ std::vector<int> extract_gmp_R::indice_get_at (unsigned int n , SEXP & IND)
 	  for (std::vector<int>::const_iterator jt = vidx.begin(); jt != vidx.end(); ++jt) {
 	    int i = *jt;
 	    if(i < 0)
-	      error(_("only 0's may mix with negative subscripts"));
+	      throw invalid_argument("only 0's may mix with negative subscripts");
+	    //error(_("only 0's may mix with negative subscripts"));
 	    result.push_back(i-1);
 	  }
 

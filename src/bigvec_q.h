@@ -4,7 +4,7 @@
  *  \version 1
  *
  *  \date Created: 2005
- *  \date Last modified: Time-stamp: <2006-06-16 20:19:01 antoine>
+ *  \date Last modified: Time-stamp: <2023-01-20 19:13:13 (antoine)>
  *
  *
  *  \note Licence: GPL (>= 2)
@@ -90,6 +90,9 @@ class bigvec_q  : public math::Matrix<bigrational> {
    */
   void set(unsigned int i,const mpq_t & val);
 
+  inline void erase(unsigned int index){
+    value.erase(value.begin() + index);
+  }
 
   /**
    * \brief add a value

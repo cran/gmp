@@ -12,21 +12,22 @@
 // for GetOption etc:
 #include <R.h>
 #include <Rinternals.h>
-
+using namespace std;
+#include <stdexcept>
 
 // string representation of (.) wrt base 'b' :
 std::string bigmod::str(int b) const
 {
-  if (value.isNA())
+  if (value->isNA())
     return "NA";
 
   std::string s; // sstream seems to collide with libgmp :-(
-  if (!modulus.isNA())
+  if (!modulus->isNA())
     s = "(";
-  s += value.str(b);
-  if (!modulus.isNA()) {
+  s += value->str(b);
+  if (!modulus->isNA()) {
     s += " %% ";
-    s += modulus.str(b);
+    s += modulus->str(b);
     s += ")";
   }
   return s;
@@ -36,15 +37,15 @@ bigmod & bigmod::operator= (const bigmod& rhs)
 {
   if(this != &rhs)
     {
-      modulus.setValue( rhs.getModulus() );
-      value.setValue(rhs.value );
+      modulus = make_shared<biginteger>(rhs.getModulus());
+      value = make_shared<biginteger>(rhs.getValue() );
     }
   return(*this);
 }
 
 bigmod bigmod::inv () const
 {
-  if(value.isNA() || modulus.isNA()) {
+  if(value->isNA() || modulus->isNA()) {
     return bigmod();
   }
     
@@ -59,7 +60,7 @@ bigmod bigmod::inv () const
     return bigmod(); // return NA; was
   }
 
-  return bigmod(val, modulus);
+  return bigmod(std::make_shared<biginteger>(val), std::make_shared<biginteger>(modulus->getValueTemp()));
 }
 
 
@@ -72,23 +73,25 @@ bool operator!=(const bigmod& rhs, const bigmod& lhs)
 
 bool operator==(const bigmod& rhs, const bigmod& lhs)
 {
+  
   if(rhs.getValue() != lhs.getValue())
     return(false);
+  // if(rhs.getModulusPtr().get() == lhs.getModulusPtr().get()) return true; // same pointer
   return(!(rhs.getModulus() != lhs.getModulus()));
 }
 
 
-DefaultBigMod operator+(const bigmod& lhs, const bigmod& rhs)
+bigmod operator+(const bigmod& lhs, const bigmod& rhs)
 {
   return create_bigmod(lhs, rhs, mpz_add);
 }
 
-DefaultBigMod operator-(const bigmod& lhs, const bigmod& rhs)
+bigmod operator-(const bigmod& lhs, const bigmod& rhs)
 {
   return create_bigmod(lhs, rhs, mpz_sub);
 }
 
-DefaultBigMod operator*(const bigmod& lhs, const bigmod& rhs)
+bigmod operator*(const bigmod& lhs, const bigmod& rhs)
 {
   return create_bigmod(lhs, rhs, mpz_mul);
 }
@@ -98,9 +101,9 @@ DefaultBigMod operator*(const bigmod& lhs, const bigmod& rhs)
  *   ~~~~~~~~~~~~~~
  * itself called from  "/.bigz" = div.bigz()
  */
-DefaultBigMod div_via_inv(const bigmod& a, const bigmod& b) {
+bigmod div_via_inv(const bigmod& a, const bigmod& b) {
     // compute  a/b  as  a * b^(-1)
-    return operator*(a, pow(b, DefaultBigMod(-1)));
+    return operator*(a, pow(b, bigmod(-1)));
 }
 
 
@@ -125,17 +128,17 @@ void integer_div(mpz_t result,const mpz_t a, const mpz_t b) {
 /* called via biginteger_binary_operation(.) from R's
  * .Call(biginteger_divq, a, b) , itself called from '%/%.bigz' = divq.bigz()
  */
-DefaultBigMod operator/(const bigmod& lhs, const bigmod& rhs) {
+bigmod operator/(const bigmod& lhs, const bigmod& rhs) {
   return create_bigmod(lhs, rhs, integer_div, false);
 }
 
-DefaultBigMod operator%(const bigmod& lhs, const bigmod& rhs)
+bigmod operator%(const bigmod& lhs, const bigmod& rhs)
 {
   if (lhs.getValue().isNA() || rhs.getValue().isNA())
-    return DefaultBigMod();
+    return bigmod();
   if (mpz_sgn(rhs.getValue().getValueTemp()) == 0) {
     warning(_("biginteger division by zero: returning NA"));
-    return DefaultBigMod();
+    return bigmod();
   }
   biginteger mod;
   if (!lhs.getModulus().isNA() || !rhs.getModulus().isNA())
@@ -145,13 +148,13 @@ DefaultBigMod operator%(const bigmod& lhs, const bigmod& rhs)
   mpz_init(val);
   mpz_t_sentry val_s(val);
   mpz_mod(val, lhs.getValue().getValueTemp(), rhs.getValue().getValueTemp());
-  return DefaultBigMod(val, mod);
+  return bigmod(val, mod);
 }
 
 
 // Either 'base' has a modulus, or it has not *and* exp >= 0 :
 
-DefaultBigMod pow(const bigmod& base, const bigmod& exp)
+bigmod pow(const bigmod& base, const bigmod& exp)
 {
   biginteger mod = get_modulus(base, exp);
 #ifdef DEBUG_bigmod
@@ -165,9 +168,9 @@ DefaultBigMod pow(const bigmod& base, const bigmod& exp)
   if(mod.isNA() &&
      ((!base.getValue().isNA() && !mpz_cmp_si(base.getValue().getValueTemp(), 1)) ||
       (! exp.getValue().isNA() && !mpz_cmp_si( exp.getValue().getValueTemp(), 0))))
-    return DefaultBigMod(biginteger(1));
+    return bigmod(biginteger(1));
   if (base.getValue().isNA() || exp.getValue().isNA())
-    return DefaultBigMod();
+    return bigmod();
   int sgn_exp = mpz_sgn(exp.getValue().getValueTemp());
   bool neg_exp = (sgn_exp < 0); // b ^ -|e| =  1 / b^|e|
   mpz_t val; mpz_init(val); mpz_t_sentry val_s(val);
@@ -177,9 +180,11 @@ DefaultBigMod pow(const bigmod& base, const bigmod& exp)
 	  mod.str(10).c_str());
 #endif
   if (mod.isNA()) { // <==> (both have no mod || both have mod. but differing)
-    if(neg_exp) error(_("** internal error (negative powers for Z/nZ), please report!"));
+    if(neg_exp){
+      throw invalid_argument(_("** internal error (negative powers for Z/nZ), please report!"));
+    }
     if (!mpz_fits_ulong_p(exp.getValue().getValueTemp()))
-      error(_("exponent e too large for pow(z,e) = z^e"));// FIXME? return( "Inf" )
+      throw invalid_argument(_("exponent e too large for pow(z,e) = z^e"));// FIXME? return( "Inf" )
     // else :
     mpz_pow_ui(val, base.getValue().getValueTemp(),
  	       mpz_get_ui(exp.getValue().getValueTemp()));
@@ -190,27 +195,30 @@ DefaultBigMod pow(const bigmod& base, const bigmod& exp)
 	SEXP wOpt = Rf_GetOption1(Rf_install("gmp:warnNoInv"));
 	if(wOpt != R_NilValue && Rf_asInteger(wOpt))
 	  warning(_("pow(x, -|n|) returning NA as x has no inverse wrt modulus"));
-	return(DefaultBigMod()); // return NA; was
+	return(bigmod()); // return NA; was
       } // else: val = x^(-1) already: ==> result =  val ^ |exp| =  val ^ (-exp) :
       // nExp := - exp
-      mpz_t nExp; mpz_init(nExp); mpz_neg(nExp, exp.getValue().getValueTemp());
+      mpz_t nExp;
+      mpz_init(nExp);
+      mpz_t_sentry val_ex(nExp);
+      mpz_neg(nExp, exp.getValue().getValueTemp());
       mpz_powm(val, val, nExp, mod.getValueTemp());
     } else { // non-negative exponent
       mpz_powm(val, base.getValue().getValueTemp(), exp.getValue().getValueTemp(), mod.getValueTemp());
     }
   }
-  return DefaultBigMod(val, mod);
+  return bigmod(val, mod);
 }
 
-DefaultBigMod inv(const bigmod& x, const bigmod& m)
+bigmod inv(const bigmod& x, const bigmod& m)
 {
   if (x.getValue().isNA() || m.getValue().isNA())
-    return DefaultBigMod();
+    return bigmod();
   SEXP wOpt = Rf_GetOption1(Rf_install("gmp:warnNoInv"));
   bool warnI = (wOpt != R_NilValue && Rf_asInteger(wOpt));
   if (mpz_sgn(m.getValue().getValueTemp()) == 0) {
     if(warnI) warning(_("inv(0) returning NA"));
-    return DefaultBigMod();
+    return bigmod();
   }
   biginteger mod = get_modulus(x, m);
   mpz_t val;
@@ -218,30 +226,31 @@ DefaultBigMod inv(const bigmod& x, const bigmod& m)
   mpz_t_sentry val_s(val);
   if (mpz_invert(val, x.getValue().getValueTemp(), m.getValue().getValueTemp()) == 0) {
     if(warnI) warning(_("inv(x,m) returning NA as x has no inverse modulo m"));
-    return(DefaultBigMod()); // return NA; was
+    return(bigmod()); // return NA; was
   }
-  return DefaultBigMod(val, mod);
+  return bigmod(val, mod);
 }
 
 // R  as.bigz() :
-DefaultBigMod set_modulus(const bigmod& x, const bigmod& m)
+bigmod set_modulus(const bigmod& x, const bigmod& m)
 {
-  if (!m.getValue().isNA() && mpz_sgn(m.getValue().getValueTemp()) == 0)
-    error(_("modulus 0 is invalid"));
+  if (!m.getValue().isNA() && mpz_sgn(m.getValue().getValueTemp()) == 0){
+    throw invalid_argument("modulus 0 is invalid");
+  }
   //    if (!m.getValue().isNA() && mpz_cmp(x.getValue().getValueTemp(),m.getValue().getValueTemp())>=0) {
   if (!m.getValue().isNA() ) {
-    DefaultBigMod t(x%m);
-    return DefaultBigMod(t.getValue(), m.getValue());
+    bigmod t(x%m);
+    return bigmod(t.getValue(), m.getValue());
   } else
-    return DefaultBigMod(x.getValue(), m.getValue());
+    return bigmod(x.getValue(), m.getValue());
 }
 
-DefaultBigMod gcd(const bigmod& lhs, const bigmod& rhs)
+bigmod gcd(const bigmod& lhs, const bigmod& rhs)
 {
   return create_bigmod(lhs, rhs, mpz_gcd);
 }
 
-DefaultBigMod lcm(const bigmod& lhs, const bigmod& rhs)
+bigmod lcm(const bigmod& lhs, const bigmod& rhs)
 {
   return create_bigmod(lhs, rhs, mpz_lcm);
 }
@@ -271,13 +280,13 @@ biginteger get_modulus(const bigmod& b1, const bigmod& b2)
 
 
 // Create a bigmod from a binary combination of two other bigmods
-DefaultBigMod create_bigmod(const bigmod& lhs, const bigmod& rhs, gmp_binary f,
+bigmod create_bigmod(const bigmod& lhs, const bigmod& rhs, gmp_binary f,
 		     bool zeroRhsAllowed) {
   if (lhs.getValue().isNA() || rhs.getValue().isNA())
-    return DefaultBigMod();
+    return bigmod();
   if (!zeroRhsAllowed && mpz_sgn(rhs.getValue().getValueTemp()) == 0) {
     warning(_("returning NA  for (modulus) 0 in RHS"));
-    return DefaultBigMod();
+    return bigmod();
   }
   biginteger mod = get_modulus(lhs, rhs);
   mpz_t val;
@@ -313,5 +322,5 @@ DefaultBigMod create_bigmod(const bigmod& lhs, const bigmod& rhs, gmp_binary f,
     }
 #endif
   }
-  return DefaultBigMod(val, mod);
+  return bigmod(val, mod);
 }

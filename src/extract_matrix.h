@@ -24,6 +24,7 @@
 
 #include "bigvec_q.h"
 #include "bigintegerR.h"
+#include <stdexcept>
 
 #include <stdio.h>
 
@@ -75,19 +76,23 @@ namespace extract_gmp_R
     if(A.nrow < 0)
       A.nrow = A.size();
     else // check that size is a multiple of row
-	if((A.size() / A.nrow) != static_cast<float>(A.size()) / static_cast<float>(A.nrow))
-	    Rf_error("malformed matrix");
-
+      {
+	if((A.size() / A.nrow) != static_cast<float>(A.size()) / static_cast<float>(A.nrow)){
+	  A.clear();
+	  Rf_error("malformed matrix");
+	}
+      }
+    
     retour.resize(A.size() / A.nrow);
     for(i = 0; i < retour.size();  ++i)
       {
 	retour[i] = new T();
-	retour[i]->value.resize(A.nrow);
+	retour[i]->resize(A.nrow);
       }
     // go !
-    for(i= 0 ; i < A.value.size(); ++i)
+    for(i= 0 ; i < A.size(); ++i)
       // retour[col       ]  [row        ]
-      (retour[i / A.nrow ])->value[ i % A.nrow].setValue(A.value[i]);
+      (*retour[i / A.nrow ])[ i % A.nrow].setValue(A[i]);
 
     //return(retour);
 
@@ -116,14 +121,15 @@ namespace extract_gmp_R
    */
   template <class T> T get_at (T & A, SEXP& INDI, SEXP& INDJ)
   {
-
+    //DEBUG
+    //return A;
     // result = A[indi,indj]
     int oldnrow = A.nrow;
     std::vector<int> indJ;
 
     typename std::vector<T*> matricetmp ;
     typename std::vector<T*> matricetmp2;
-
+    
     toVecVec(A,matricetmp);
     typename std::vector<T*> copyAdress(matricetmp);
 
@@ -187,11 +193,13 @@ namespace extract_gmp_R
 
 	      // remove consecutive  duplicates
 	      it = std::unique(indJ.begin(),indJ.end());
-	      //indJ.erase(it,indJ.end());
+	      indJ.erase(it,indJ.end());
 
-	      if ( indJ.back() > 0)
+	      if ( indJ.back() > 0){
+		clearVec<T>(copyAdress);
+		A.clear();
 		Rf_error("only 0's may mix with negative subscripts");
-
+	      }
 
 
 	      it=indJ.begin();
@@ -225,13 +233,18 @@ namespace extract_gmp_R
 	      // for all [new] rows
 	      for( it=indJ.begin(); it != indJ.end(); it++)
 		{
-		  if (*it < 0)
+		  if (*it < 0){
+		    clearVec<T>(copyAdress);
+		    A.clear();		    
 		    Rf_error("only 0's may mix with negative subscripts");
+		  }
 		  if( static_cast<unsigned int>(*it-1) < matrice->size() ) {
 		      //printf("on sort %s",(*matrice)[(*it)-1][0].str(10).c_str());
 		      matricework->push_back( (*matrice)[*it-1] );
 		  } else {
-		      Rf_error("column subscript out of bounds");
+		    clearVec<T>(copyAdress);
+		    A.clear();
+		    Rf_error("column subscript out of bounds");
 		  }
 		}
 
@@ -253,7 +266,7 @@ namespace extract_gmp_R
     // --------------------------
     // PART 2:  ROWS
     // --------------------------
-    indJ.empty();
+
     std::vector<int> indI = bigintegerR::create_int(INDI);
     if(TYPEOF(INDI) != NILSXP) {
 	if (TYPEOF(INDI) == LGLSXP) { // LOGICAL
@@ -265,7 +278,7 @@ namespace extract_gmp_R
 		{
 		  // for all columns j delete row i
 		  for (j = 0; j < matrice->size(); ++j)
-		    (*matrice)[j]->value.erase(i+(*matrice)[j]->value.begin());
+		    (*matrice)[j]->erase(i);
 
 		  //++newnrow;
 		  --i; // i: new indice in modified matrix
@@ -292,12 +305,14 @@ namespace extract_gmp_R
 	      // we should have indI like -1 -3 -7 -7 -12 ...
 
 	      // remove duplicates
-	      std::unique(indI.begin(),indI.end());
-	      //indI.erase(it,indI.end());
+	      it= std::unique(indI.begin(),indI.end());
+	      indI.erase(it,indI.end());
 
-	      if ( indI.back() > 0)
+	      if ( indI.back() > 0){
+		clearVec<T>(copyAdress);
+		A.clear();	
 		Rf_error("only 0's may mix with negative subscripts");
-
+	      }
 
 
 	      //newnrow = A.nrow;
@@ -313,7 +328,7 @@ namespace extract_gmp_R
 			// for all columns j remove row i
 			for (j = 0; j < matrice->size(); ++j)
 			  {
-			    (*matrice)[j]->value.erase(i+(*matrice)[j]->value.begin());
+			    (*matrice)[j]->erase(i);
 			  }
 			//--newnrow;
 			--i; // i: new indice in modified matrix
@@ -337,6 +352,8 @@ namespace extract_gmp_R
 			/* it = indI.erase(it); */
 			/* --it; */
 		      } else { // matrix case:
+			clearVec<T>(copyAdress);
+			A.clear();
 			Rf_error("subscript out of bounds");
 		      }
 		    }
@@ -365,18 +382,21 @@ namespace extract_gmp_R
 	      // for all [new] rows
 	      for( i=0; i < indI.size(); ++i)
 		{
-		  if (indI[i] < 0)
+		  if (indI[i] < 0){
+		    clearVec<T>(copyAdress);
+		    A.clear();
 		    Rf_error("only 0's may mix with negative subscripts");
+		  }
 		  if( static_cast<unsigned int>(indI[i]-1) < (*matrice)[0]->size() )
 		    {
 		      // for all columns
 		      for (j = 0; j < matricework->size(); ++j)
 			//newmat[i,j] = oldmat[ind[i],j]
-			( (*matricework)[j])->value[i] = ((*matrice)[j])->value[indI[i]-1];
+			( *(*matricework)[j])[i] = (*(*matrice)[j])[indI[i]-1];
 		    }
 		  else
 		    for (j = 0; j < matricework->size(); ++j)
-		      ( (*matricework)[j])->value[i].setValue();
+		      ( *(*matricework)[j])[i].setValue();
 		}
 
 	      matrice = matricework; // change addresses
@@ -393,7 +413,7 @@ namespace extract_gmp_R
     retour.resize(matrice->size() * newnrow);
     for(i=0; i< newnrow ; ++i)
       for(j=0; j <  matrice->size() ; ++j)
-	retour.value[i + j* newnrow ]  =  ((*matrice)[j])->value[i] ;
+	retour[i + j* newnrow ]  =  (*(*matrice)[j])[i] ;
 
     retour.nrow = (oldnrow < 0) ? -1 : newnrow;
 
@@ -413,9 +433,13 @@ namespace extract_gmp_R
       src.nrow = src.size();
 
     // check that size is a multiple of row
-    if((src.size() / src.nrow) != static_cast<float>(src.size()) / static_cast<float>(src.nrow))
-      Rf_error("malformed matrix");
-
+    if((src.size() / src.nrow) != static_cast<float>(src.size()) / static_cast<float>(src.nrow)){
+      src.clear();
+      T & vval = const_cast<T&>(value);
+      vval.clear();
+      throw std::invalid_argument("malformed matrix");
+      //Rf_error("malformed matrix");
+    }
     unsigned int ncol = src.size() / src.nrow; // number of col
     std::vector<int> vidx =  indice_get_at ( src.nrow, IDX);
     std::vector<int> vjdx =  indice_get_at ( ncol, JDX);
@@ -428,7 +452,14 @@ namespace extract_gmp_R
 	for(unsigned int i = 0 ; i < vidx.size(); ++i)
 	  {
 	    unsigned int index = vidx[i] + vjdx[j] * src.nrow;
-	    if(index >= src.size()) Rf_error("indice out of bounds");
+	    if(index >= src.size()) {
+	      src.clear();
+	      T & vval = const_cast<T&>(value);
+	      vval.clear();
+	      throw std::invalid_argument("indice out of bounds");
+
+	      //	      Rf_error("indice out of bounds");
+	    }
 
 	    src.set(index, value[k % value.size()] );
 	    ++k;

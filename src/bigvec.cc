@@ -1,69 +1,57 @@
 
 #include "bigvec.h"
 
+static int count = 0;
+static int countAll = 0;
+
 
 /** \brief constructor
  *
  */
 bigvec::bigvec(unsigned int size) :
   math::Matrix<bigmod>(),
-  value(),
+  values(),
+  type(NO_MODULUS),
   modulus(),
-  valuesMod(),
   nrow(-1)
 {
-
-  for (int i=0 ; i < size; i++){
-    value.push_back(biginteger());
+  count++;
+  countAll++;
+ 
+  for (unsigned int i=0 ; i < size; i++){
+    values.push_back(bigmod());
   }
 }
 
 
 bigvec::bigvec(const bigvec & vecteur) :
   math::Matrix<bigmod>(),
-  value(),
-  modulus(),
-  valuesMod(),
+  values(),
+  type(vecteur.type),
+  modulus(vecteur.modulus),
   nrow(vecteur.nrow)
 {
-  //  *this = vecteur;
-  std::vector<biginteger>::const_iterator it;
-
-  for(it = vecteur.modulus.begin();it !=  vecteur.modulus.end(); ++it)
+  count++;
+  countAll++;
+   //  *this = vecteur;
+  values.reserve(vecteur.size());
+  for(std::vector<bigmod>::const_iterator it= vecteur.values.begin(); it !=  vecteur.values.end(); ++it)
     {
-      modulus.push_back(*it);
-    }
-
-  for(it= vecteur.value.begin(); it !=  vecteur.value.end(); ++it)
-    {
-      value.push_back(*it);
+      values.push_back(*it);
     }
 }
 
 bigvec::~bigvec(){
-  clearValuesMod();
+  count--;
+  //  printf("bv %d %d \n",count, countAll);
+  clear();
+    
 }
 
 //
 std::string bigvec::str(int i,int b) const
 {
-    if (value[i].isNA())
-      return ("NA");
-
-    std::string s; // sstream seems to collide with libgmp :-(
-    bool onemodulus = modulus.size()>0;
-    if(onemodulus)
-      onemodulus = !modulus[i%modulus.size()].isNA() ;
-    if (onemodulus)
-	s = "(";
-    s += value[i].str(b);
-    if (onemodulus) {
-	s += " %% ";
-	s += modulus[i%modulus.size()].str(b);
-	s += ")";
-    }
-
-    return s;
+   return values[i].str(b);
 }
 
 bigmod & bigvec::get(unsigned int row, unsigned int col) {
@@ -73,116 +61,47 @@ bigmod & bigvec::get(unsigned int row, unsigned int col) {
 
  bigmod & bigvec::operator[] (unsigned int i)
 {
-  checkValuesMod();
-  return *valuesMod[i];
+  return values[i];
 }
 
 
 const bigmod & bigvec::operator[] (unsigned int i) const
 {
-  bigvec * nonConst = const_cast<bigvec*>(this);
-  nonConst->checkValuesMod();
-  return *valuesMod[i];
+  return values[i];
 }
 
 void bigvec::set(unsigned int row, unsigned int col, const  bigmod & val) {
   set( row + col*nRows(),val);
 }
 
-void bigvec::checkValuesMod() {
-  if (valuesMod.size() != value.size()){
-    // reconstruct bigmod that are references to values and modulus:
-    clearValuesMod();
-    if(modulus.size()>0) {
-      for (unsigned int i = 0 ; i < value.size(); i++)
-	valuesMod.push_back(new bigmod(value[i], modulus[i%modulus.size()]));
-    } else {
-      for (unsigned int i= 0 ; i < value.size(); i++)
-	valuesMod.push_back(new BigModInt(value[i]));
-    }
-
-  }
-}
-
-void bigvec::clearValuesMod(){
-  for (unsigned int i = 0 ; i < valuesMod.size(); i++){
-    delete valuesMod[i];
-  }
-  valuesMod.clear();
-}
 
 void bigvec::set(unsigned int i,const bigmod & val)
 {
-  value[i] = val.getValue();
+  values[i] = val;
 
-  if(!val.getModulus().isNA())
-    {
-      if(modulus.size()> i)
-	{
-	  modulus[i] = val.getModulus() ;
-	  return;
-	}
 
-      unsigned int nrow_mod = nrow;
-      if(nrow<1)
-	nrow_mod = 1;
-      if( (modulus.size() ==  (unsigned int)nrow_mod ) || (modulus.size() == 1) )
-	{
-	  // check "row-mod" or "global" modulus
-	  if(!(val.getModulus() != modulus[i % modulus.size()])) {
-	    return;
-	  }
-	}
-
-      // we add "previous"
-      nrow_mod = modulus.size();
-      for(unsigned int j = nrow_mod; j< i;++j)
-	modulus.push_back(modulus[j % nrow_mod]);
-      modulus.push_back(val.getModulus());
-      clearValuesMod();
+  if(type == NO_MODULUS){
+    if(val.getModulus().isNA()) return;
+    if(i == 0 && values.size() == 1) {
+      type = MODULUS_GLOBAL;
+      modulus = val.getModulusPtr();
+    } else {
+      type = MODULUS_BY_CELL;
     }
+  }
+  if(type == MODULUS_GLOBAL){
+    if(values.size() == 1){
+      modulus = val.getModulusPtr();
+    } else 	if(val.getModulus() != *modulus ){
+      type = MODULUS_BY_CELL;
+    }
+  }
 }
 
 void bigvec::push_back(const bigmod & number)
 {
-  unsigned int nrow_mod = (nrow < 0) ? 1 : nrow;
-  clearValuesMod();
-
-  value.push_back(number.getValue());
-
-  if((!number.getModulus().isNA()) || (modulus.size()>0) )
-    {
-      // pathologic case: value.size >0 ; modulus.size =0
-      // we assume previous mod where NA
-      if((modulus.size() ==0) && (value.size()>0))
-	{
-	  modulus.resize(value.size()-1);
-	  modulus.push_back( number.getModulus());
-	  return;
-	}
-
-      // standard cas
-      if((modulus.size() != 1 ) && (modulus.size() != nrow_mod))
-	{
-	  modulus.push_back(number.getModulus());
-	  return;
-	}
-
-      // pathologic case:
-      //  value modulus [nrow=4]
-      //  2     2  push_back: ok
-      //  2     2  push_back: nothing
-      //  2     1  push_back: shoud add previous modulus then 1
-      // note nrow_mod is either 1 ither nrow (when nrow >1)
-      nrow_mod = modulus.size();
-      if(modulus[(value.size() -1)% nrow_mod ] != number.getModulus())
-	{
-	  // we add "previous"
-	  for(unsigned int i = nrow_mod; i< value.size()-1;i++)
-	    modulus.push_back(modulus[i % nrow_mod]);
-	  modulus.push_back(number.getModulus());
-	  }
-    }
+  values.push_back(bigmod());
+  set(values.size()-1, number);
 }
 
 /**
@@ -190,8 +109,7 @@ void bigvec::push_back(const bigmod & number)
  */
 void bigvec::push_back(int value_p)
 {
-  clearValuesMod();
-  value.push_back(biginteger(value_p));
+  push_back(biginteger(value_p));
 }
 
 /**
@@ -199,8 +117,7 @@ void bigvec::push_back(int value_p)
  */
 void bigvec::push_back(biginteger & value_p)
 {
-  clearValuesMod();
-  value.push_back(value_p);
+  push_back(bigmod(value_p));
 }
 
 /**
@@ -208,15 +125,14 @@ void bigvec::push_back(biginteger & value_p)
  */
 void bigvec::push_back(const __mpz_struct * value_p)
 {
-  clearValuesMod();
-  value.push_back(biginteger(value_p));
+  push_back(biginteger(value_p));
 }
 
 
 // return size of value
 unsigned int bigvec::size() const
 {
-  return(value.size());
+  return(values.size());
 }
 
 
@@ -228,20 +144,16 @@ unsigned int  bigvec::nRows() const {
 // hummm. to avoid !
 void bigvec::resize(unsigned int i)
 {
-  clearValuesMod();
 
-
-  value.resize(i);
-  if(i < modulus.size())
-      modulus.resize(i);
+  values.resize(i);
 }
 
 // clear all
 void bigvec::clear()
 {
-  clearValuesMod();
-  value.clear();
-  modulus.clear();
+  values.clear();
+  type=NO_MODULUS;
+  modulus=nullptr;
   nrow = -1;
 }
 
@@ -251,22 +163,16 @@ bigvec & bigvec::operator= (const bigvec & rhs)
 {
   if(this != &rhs)
     {
-      clearValuesMod();
-      value.resize(0);
-      modulus.resize(0);
-      std::vector<biginteger>::const_iterator it;
+      values.resize(0);
+      modulus = rhs.modulus;
+      type=rhs.type;
       
-      for(it = rhs.modulus.begin();it !=  rhs.modulus.end(); ++it)
-	{
-	  modulus.push_back(*it);
-	}
-      
-      for(it= rhs.value.begin(); it !=  rhs.value.end(); ++it)
-	{
-	  value.push_back(*it);
-	}
+      for (unsigned int i = 0 ;  i < rhs.size(); i++){
+	values.push_back(rhs[i]);
+      }
       
       nrow = rhs.nrow;
+      
     }
   return(*this);
 }
@@ -276,24 +182,21 @@ bigvec & bigvec::operator= (const bigvec & rhs)
 // Comparison operator
 bool operator!=(const bigvec & rhs, const bigvec& lhs)
 {
-  std::vector<biginteger>::const_iterator it = rhs.value.begin();
-  std::vector<biginteger>::const_iterator jt = lhs.value.begin();
 
-  if( (rhs.value.size() != lhs.value.size()) || \
+
+  if( (rhs.size() != lhs.size()) || \
       (rhs.nrow != lhs.nrow )  )
     return(false);
 
+
+  
   // check value
-  while(it != rhs.value.end())
+  for (unsigned int i = 0 ; i < rhs.size(); i++)
     {
-      if(*it != *jt)
+      if(rhs[i] != lhs[i])
 	return(false);
-      it++; jt++;
     }
-  for(unsigned int i=0; i < std::max( rhs.modulus.size() ,lhs.modulus.size() ); ++i)
-    if(rhs.modulus[i % rhs.modulus.size()] != \
-       lhs.modulus[i % lhs.modulus.size()] )
-      return(false);
+
   return(true);
 }
 
@@ -305,14 +208,34 @@ void bigvec::print()
   if(nrow > 0) {
     for(int i=0; i < nrow; ++i)
       {
-	for(unsigned int j=0; j < (value.size() / nrow); ++j)
-	  Rprintf("%s\t", value[i+j* nrow].str(10).c_str() );
+	for(unsigned int j=0; j < (values.size() / nrow); ++j)
+	  Rprintf("%s\t", values[i+j* nrow].str(10).c_str() );
 	Rprintf("\n");
       }
   }
   else {
-    for(unsigned int i=0; i < value.size(); ++i)
-      Rprintf("%s\t", value[i].str(10).c_str() );
+    for(unsigned int i=0; i < values.size(); ++i)
+      Rprintf("%s\t", values[i].str(10).c_str() );
     Rprintf("\n");
   }
+}
+
+
+void bigvec::setGlobalModulus(std::shared_ptr<biginteger> & val){
+  modulus = val;
+  type = MODULUS_GLOBAL;
+  for (unsigned int i = 0 ; i < values.size(); i++){
+    values[i].setModulus(val);
+  }
+}
+
+
+std::shared_ptr<biginteger> bigvec::getGlobalModulus(bigvec & first,  bigvec & second){
+  std::shared_ptr<biginteger> empty(nullptr);
+  if(first.getType() == MODULUS_GLOBAL && second.getType() ==  NO_MODULUS) return first.getGlobalModulus();
+  if(first.getType() == NO_MODULUS && second.getType() ==  MODULUS_GLOBAL) return second.getGlobalModulus();
+  if(first.getType() == MODULUS_GLOBAL && second.getType() ==  MODULUS_GLOBAL) {
+    return (*first.getGlobalModulus()) == (*second.getGlobalModulus()) ? first.getGlobalModulus() : empty;
+  }
+  return empty;
 }

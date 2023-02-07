@@ -16,6 +16,8 @@ namespace math{
 
     virtual const T & operator[](unsigned int i) const=0;
     virtual  T & operator[](unsigned int i) =0;
+
+    virtual ~Vector(){};
   };
 
   template< class T>
@@ -44,6 +46,7 @@ namespace math{
     /** return true if matrix is supposed to be a vector and not a matrix n x 1 */
     virtual bool isVector() const = 0;
 
+    virtual void clear() = 0;
     /**
      * \brief assign a value at indice i
      */
