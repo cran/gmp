@@ -426,8 +426,8 @@ prod.bigq <- function(..., na.rm = FALSE)
   a1 & b1
 }
 
-"xor.bigq" <- function(a,b) {
-  a1 = a != 0
-  b1 = b != 0
-  xor(a1, b1)
+"xor.bigq" <- function(x,y) {
+  a = x != 0
+  b = y != 0
+  xor(a, b)
 }

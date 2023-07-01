@@ -1,11 +1,12 @@
 // This ensures registration -- see also useDynLib(...) in  ../NAMESPACE
 
+#include "bigintegerR.h"
 #include <R.h>
 #include <Rinternals.h>
 
 // include those that have an  extern "C" { .... } :
 #include "apply.h"
-#include "bigintegerR.h"
+
 #include "bigrationalR.h"
 //
 #include "extract_matrix.h"

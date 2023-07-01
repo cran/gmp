@@ -12,20 +12,23 @@
  *
  *  \note Licence: GPL (>= 2)
  */
-
+#include <vector>
+#include <algorithm>
+#include <stdexcept>
+#include "bigintegerR.h"
 #include "Rgmp.h"
 
 #include "bigvec_q.h"
 
-#include <vector>
-#include <algorithm>
+
+
 using namespace std;
-#include "bigintegerR.h"
+
 #include "bigrationalR.h"
 
 #include "matrix.h"
 #include "extract_matrix.h"
-#include <stdexcept>
+
 
 namespace bigrationalR
 {

@@ -1,13 +1,14 @@
-
+#include <stdexcept>
+#include "bigintegerR.h"
 #include <R.h>
 #include <Rinternals.h>
 // and one thing from Rdefines.h :
 #define NEW_LIST(n) allocVector(VECSXP,n)
 
 #include "apply.h"
-#include "bigintegerR.h"
+
 #include "bigrationalR.h"
-#include <stdexcept>
+
 
 // X a matrix, or a bigz integer
 // line: true = we return a list of all lines

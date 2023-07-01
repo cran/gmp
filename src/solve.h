@@ -18,10 +18,10 @@
 
 #ifndef SOLVE_HEADER_GMP_R_
 #define SOLVE_HEADER_GMP_R_ 1
-
+#include <stdexcept>
 #include <R.h>
 #include <Rinternals.h>
-#include <stdexcept>
+
 
 #include "bigvec_q.h"
 

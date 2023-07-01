@@ -21,10 +21,10 @@ this program.  If not, see http://www.gnu.org/licenses/.  */
 #include <cstring>
 // This is needed as cinttypes is C++11
 #include <inttypes.h>
-
-#include "Rgmp.h"
-#include "factorize.h"
 #include <stdexcept>
+
+#include "factorize.h"
+
 
 static unsigned char primes_diff[] = {
 #define P(a,b,c) a,

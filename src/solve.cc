@@ -11,11 +11,11 @@
  *  \note Licence: GPL (>= 2)
  */
 
-
+#include "bigintegerR.h"
 #include "solve.h"
 
 #include "bigrationalR.h"
-#include "bigintegerR.h"
+
 using namespace std;
 
 // inverse a rational matrix

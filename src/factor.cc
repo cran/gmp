@@ -14,9 +14,9 @@
 
 
 #include <stdexcept>
-
-#include "Rgmp.h"
 #include "factorize.h"
+#include "Rgmp.h"
+
 using namespace std;
 
 

@@ -12,17 +12,21 @@
  *  \note Licence: GPL (>= 2)
  */
 
+#include <stdexcept>
+#include <vector>
+#include <algorithm>
+#include "bigintegerR.h"
 #include "Rgmp.h"
 
-#include "bigintegerR.h"
+
 // only for  <bigz> ^ -|n| :
 #include "bigrationalR.h"
-#include <stdexcept>
+
 
 #include "matrix.h"
 
-#include <vector>
-#include <algorithm>
+
+
 
 using namespace std;
 

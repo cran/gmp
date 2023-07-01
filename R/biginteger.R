@@ -95,9 +95,9 @@ inv.bigz <- function(a,b,...) .Call(biginteger_inv,a,b)
 	 a1 & b1
 }
 
-"xor.bigz" <- function(a,b) {
-	 a1 = a != 0
-	 b1 = b != 0
+"xor.bigz" <- function(x,y) {
+	 a1 = x != 0
+	 b1 = y != 0
 	 xor(a1 , b1)
 }
 
