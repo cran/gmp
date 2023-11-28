@@ -33,7 +33,7 @@ Eulerian.all (n)
   ascents (or exactly \eqn{k} descents).
 
   Stirling numbers of the first kind:\cr
-  s(n,k) = (-1)^{n-k} times
+  \eqn{s(n,k) = (-1)^{n-k}} times
   the number of permutations of 1,2,\dots,n with exactly k cycles.
 
   Stirling numbers of the second kind:\cr

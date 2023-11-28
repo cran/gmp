@@ -242,7 +242,7 @@ namespace bigrationalR
 
 	return bigrational_binary_operation(va,vb,f);
       } catch(std::invalid_argument & e){
-      error(e.what());
+      error("%s",e.what());
     }
   }
 
@@ -265,7 +265,7 @@ namespace bigrationalR
 
 	return bigrationalR::create_SEXP(result);
       } catch(std::invalid_argument & e){
-      error(e.what());
+      error("%s",e.what());
     }
   }
 
@@ -311,7 +311,7 @@ namespace bigrationalR
 	UNPROTECT(1);
 	return ans;
       } catch(std::invalid_argument & e){
-      error(e.what());
+      error("%s",e.what());
     }
   }
 
@@ -461,7 +461,7 @@ SEXP bigrational_as_character(SEXP a, SEXP b)
       UNPROTECT(1);
       return ans;
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -477,7 +477,7 @@ SEXP bigrational_as_numeric(SEXP a)
       UNPROTECT(1);
       return ans;
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -493,7 +493,7 @@ SEXP bigrational_get_at(SEXP a, SEXP b)
     catch(std::invalid_argument & e){
       va.clear();
       v_ind.clear();
-      error(e.what());
+      error("%s",e.what());
     }
  
     bigvec_q result;
@@ -509,7 +509,7 @@ SEXP bigrational_get_at(SEXP a, SEXP b)
 
     return bigrationalR::create_SEXP(result);
   } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -540,7 +540,7 @@ SEXP bigrational_set_at(SEXP src, SEXP idx, SEXP value)
   
       return bigrationalR::create_SEXP(result);
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -550,7 +550,7 @@ SEXP bigrational_length(SEXP a)
     {
       return Rf_ScalarInteger(bigrationalR::create_bignum(a).size());
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
   
 }
@@ -572,7 +572,7 @@ SEXP bigrational_den(SEXP a)
       mpz_clear(z_tmp);
       return bigintegerR::create_SEXP(result);
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }
@@ -596,7 +596,7 @@ SEXP bigrational_num(SEXP a)
       mpz_clear(z_tmp);
       return bigintegerR::create_SEXP(result);
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }
@@ -610,34 +610,34 @@ SEXP bigrational_setlength(SEXP vec, SEXP value)
       case INTSXP:
       case LGLSXP:
 	if (LENGTH(value) != 1)
-	  error(_("invalid second argument"));
+	  error("%s",_("invalid second argument"));
 	len = *INTEGER(value);
 	if (len < 0)
-	  error(_("vector size cannot be negative"));
+	  error("%s",_("vector size cannot be negative"));
 	else if (len == NA_INTEGER)
-	  error(_("vector size cannot be NA"));
+	  error("%s",_("vector size cannot be NA"));
 	break;
       case REALSXP:
 	if (LENGTH(value) != 1)
-	  error(_("invalid second argument"));
+	  error("%s",_("invalid second argument"));
 	len = (int)*REAL(value);
 	if (len < 0)
-	  error(_("vector size cannot be negative"));
+	  error("%s",_("vector size cannot be negative"));
 	else if (! (R_FINITE (len ) ) )
-	  error(_("vector size cannot be NA, NaN, or Inf"));
+	  error("%s",_("vector size cannot be NA, NaN, or Inf"));
 	break;
       case STRSXP:
 	// dunno why R spits out this strange error on "Length(foo) <- -1"
 	// but I always follow the holy standard ;-)
-	error(_("negative length vectors are not allowed"));
+	error("%s",_("negative length vectors are not allowed"));
       default:
-	error(_("invalid second argument"));
+	error("%s",_("invalid second argument"));
       }
       bigvec_q v =bigrationalR::create_bignum(vec);
       v.resize(len);
       return bigrationalR::create_SEXP(v);
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }
@@ -672,7 +672,7 @@ SEXP bigrational_is_int(SEXP a)
       UNPROTECT(1);
       return ans;
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }
@@ -682,7 +682,7 @@ SEXP bigrational_c(SEXP args)
   try
     {
       //  if(TYPEOF( args ) != LISTSXP)
-      //  error(_("should be a list"));
+      //  error("%s",_("should be a list"));
       bigvec_q result;
       for(int i = 0; i < Rf_length(args); i++) {
 	bigvec_q v = bigrationalR::create_bignum(VECTOR_ELT(args,i));
@@ -693,7 +693,7 @@ SEXP bigrational_c(SEXP args)
 
       return bigrationalR::create_SEXP(result);
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }
@@ -713,7 +713,7 @@ SEXP bigrational_rep(SEXP x, SEXP times)
 
       return bigrationalR::create_SEXP(result);
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }
@@ -745,7 +745,7 @@ SEXP bigrational_max(SEXP a, SEXP narm)
 
       return bigrationalR::create_SEXP(result);
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }
@@ -777,7 +777,7 @@ SEXP bigrational_min(SEXP a, SEXP narm)
 
       return bigrationalR::create_SEXP(result);
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }
@@ -804,7 +804,7 @@ SEXP bigrational_cumsum(SEXP a)
       }
       return(bigrationalR::create_SEXP(result));
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }
@@ -831,7 +831,7 @@ SEXP bigrational_sum(SEXP a)
       result[0].setValue(val);
       return(bigrationalR::create_SEXP(result));
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }
@@ -860,7 +860,7 @@ SEXP bigrational_prod(SEXP a)
       result[0].setValue(val);
       return(bigrationalR::create_SEXP(result));
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }
@@ -920,7 +920,7 @@ SEXP bigrational_R_pow(SEXP x, SEXP y)
 
       return bigrationalR::create_SEXP(result);
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 } // ..._pow()

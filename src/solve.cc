@@ -26,7 +26,7 @@ SEXP inverse_q(SEXP A)
 
     return(solve_gmp_R::inverse_q(a));
   } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -78,7 +78,7 @@ SEXP inverse_z (SEXP A)
       return(solve_gmp_R::inverse_q(aq));
     }
   } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -124,7 +124,7 @@ SEXP solve_z(SEXP A,SEXP B)
       bigvec_q bq (b);
       return(solve_gmp_R::solve_q(aq,bq));
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -138,7 +138,7 @@ SEXP solve_q(SEXP A,SEXP B)
 
     return(solve_gmp_R::solve_q(a,b));
   } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 

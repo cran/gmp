@@ -127,7 +127,7 @@ SEXP as_matrixz (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP mod)
     return( bigintegerR::create_SEXP (mat));
   }
   catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -160,7 +160,7 @@ SEXP bigint_transposeR(SEXP x)
     return( bigintegerR::create_SEXP(matrixz::bigint_transpose(mat)));
   }
   catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -264,7 +264,7 @@ SEXP matrix_crossp_z (SEXP a, SEXP trans)
     return( bigintegerR::create_SEXP (res));
   }
   catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
   
 } // matrix_crossp_z()
@@ -469,7 +469,7 @@ SEXP matrix_mul_z (SEXP a, SEXP b, SEXP op)
     return( bigintegerR::create_SEXP (res));
   }
   catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 } // matrix_mul_z()
 #undef R_IJ
@@ -521,7 +521,7 @@ SEXP biginteger_rbind(SEXP args)
     return bigintegerR::create_SEXP(result);
   }
   catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -566,7 +566,7 @@ SEXP biginteger_cbind(SEXP args)
   
     return bigintegerR::create_SEXP(result);
   } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 

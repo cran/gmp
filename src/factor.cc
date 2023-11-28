@@ -53,6 +53,6 @@ SEXP factorR (SEXP n)
   }
   return bigintegerR::create_SEXP(result);
   }    catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }

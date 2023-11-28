@@ -100,7 +100,7 @@ SEXP as_matrixq (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP den)
 
       return( bigrationalR::create_SEXP (mat));
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -132,7 +132,7 @@ SEXP bigq_transposeR(SEXP x)
     UNPROTECT(2);
     return( bigrationalR::create_SEXP( mat_transp));
   } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -223,7 +223,7 @@ SEXP matrix_crossp_q (SEXP a, SEXP trans)
 #undef K_LOOP
       return( bigrationalR::create_SEXP (res));
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 } // matrix_crossp_q()
 
@@ -407,7 +407,7 @@ SEXP matrix_mul_q (SEXP a, SEXP b, SEXP op)
 
       return( bigrationalR::create_SEXP (res));
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 } // matrix_mul_q()
 #undef K_LOOP
@@ -446,7 +446,7 @@ SEXP bigrational_rbind(SEXP args)
 
       return bigrationalR::create_SEXP(result);
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 }
 
@@ -483,7 +483,7 @@ SEXP bigrational_cbind(SEXP args){
   
       return bigrationalR::create_SEXP(result);
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
 
 }

@@ -67,7 +67,7 @@ SEXP gmpMatToListZ(SEXP X, SEXP line)
 
       return(ans);
     } catch(std::invalid_argument & e){
-    error(e.what());
+   error("%s",e.what());
   }
   
 }
@@ -127,7 +127,7 @@ SEXP gmpMatToListQ(SEXP X, SEXP line)
       return(ans);
 
     } catch(std::invalid_argument & e){
-    error(e.what());
+    error("%s",e.what());
   }
   
 }
