@@ -55,7 +55,7 @@ bigmod bigmod::inv () const
   if (mpz_invert(val, getValue().getValueTemp(), getModulus().getValueTemp()) == 0) {
     SEXP wOpt = Rf_GetOption1(Rf_install("gmp:warnNoInv"));
     if(wOpt != R_NilValue && Rf_asInteger(wOpt))
-      warning(_("inv(x) returning NA as x has no inverse"));
+      warning("inv(x) returning NA as x has no inverse");
     
     return bigmod(); // return NA; was
   }
@@ -137,7 +137,7 @@ bigmod operator%(const bigmod& lhs, const bigmod& rhs)
   if (lhs.getValue().isNA() || rhs.getValue().isNA())
     return bigmod();
   if (mpz_sgn(rhs.getValue().getValueTemp()) == 0) {
-    warning(_("biginteger division by zero: returning NA"));
+    warning("biginteger division by zero: returning NA");
     return bigmod();
   }
   biginteger mod;
@@ -194,7 +194,7 @@ bigmod pow(const bigmod& base, const bigmod& exp)
       if (mpz_invert(val, base.getValue().getValueTemp(), mod.getValueTemp()) == 0) {
 	SEXP wOpt = Rf_GetOption1(Rf_install("gmp:warnNoInv"));
 	if(wOpt != R_NilValue && Rf_asInteger(wOpt))
-	  warning(_("pow(x, -|n|) returning NA as x has no inverse wrt modulus"));
+	  warning("pow(x, -|n|) returning NA as x has no inverse wrt modulus");
 	return(bigmod()); // return NA; was
       } // else: val = x^(-1) already: ==> result =  val ^ |exp| =  val ^ (-exp) :
       // nExp := - exp
@@ -217,7 +217,7 @@ bigmod inv(const bigmod& x, const bigmod& m)
   SEXP wOpt = Rf_GetOption1(Rf_install("gmp:warnNoInv"));
   bool warnI = (wOpt != R_NilValue && Rf_asInteger(wOpt));
   if (mpz_sgn(m.getValue().getValueTemp()) == 0) {
-    if(warnI) warning(_("inv(0) returning NA"));
+    if(warnI) warning("inv(0) returning NA");
     return bigmod();
   }
   biginteger mod = get_modulus(x, m);
@@ -225,7 +225,7 @@ bigmod inv(const bigmod& x, const bigmod& m)
   mpz_init(val);
   mpz_t_sentry val_s(val);
   if (mpz_invert(val, x.getValue().getValueTemp(), m.getValue().getValueTemp()) == 0) {
-    if(warnI) warning(_("inv(x,m) returning NA as x has no inverse modulo m"));
+    if(warnI) warning("inv(x,m) returning NA as x has no inverse modulo m");
     return(bigmod()); // return NA; was
   }
   return bigmod(val, mod);
@@ -267,7 +267,7 @@ biginteger get_modulus(const bigmod& b1, const bigmod& b2)
   else if (mpz_cmp(b1.getModulus().getValueTemp(), b2.getModulus().getValueTemp())) {
     SEXP wOpt = Rf_GetOption1(Rf_install("gmp:warnModMismatch"));
     if(wOpt != R_NilValue && Rf_asInteger(wOpt))
-      warning(_("modulus mismatch in bigz.* arithmetic"));
+      warning("modulus mismatch in bigz.* arithmetic");
     return biginteger(); // i.e. NA
   } else // equal
     return b1.getModulus();
@@ -285,7 +285,7 @@ bigmod create_bigmod(const bigmod& lhs, const bigmod& rhs, gmp_binary f,
   if (lhs.getValue().isNA() || rhs.getValue().isNA())
     return bigmod();
   if (!zeroRhsAllowed && mpz_sgn(rhs.getValue().getValueTemp()) == 0) {
-    warning(_("returning NA  for (modulus) 0 in RHS"));
+    warning("returning NA  for (modulus) 0 in RHS");
     return bigmod();
   }
   biginteger mod = get_modulus(lhs, rhs);

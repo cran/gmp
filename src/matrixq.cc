@@ -67,13 +67,13 @@ SEXP as_matrixq (SEXP x, SEXP nrR, SEXP ncR, SEXP byrowR, SEXP den)
 	if (lendat > 1 && (nr * nc) % lendat != 0) {
 	  if (((lendat > nr) && (lendat / nr) * nr != lendat) ||
 	      ((lendat < nr) && (nr / lendat) * lendat != nr))
-	    warning(_("data length [%d] is not a sub-multiple or multiple of the number of rows [%d] in matrix"), lendat, nr);
+	    warning("data length [%d] is not a sub-multiple or multiple of the number of rows [%d] in matrix", lendat, nr);
 	  else if (((lendat > nc) && (lendat / nc) * nc != lendat) ||
 		   ((lendat < nc) && (nc / lendat) * lendat != nc))
-	    warning(_("data length [%d] is not a sub-multiple or multiple of the number of columns [%d] in matrix"), lendat, nc);
+	    warning("data length [%d] is not a sub-multiple or multiple of the number of columns [%d] in matrix", lendat, nc);
 	}
 	else if ((lendat > 1) && (nr * nc == 0)){
-	  warning(_("data length exceeds size of matrix"));
+	  warning("data length exceeds size of matrix");
 	}
       }
 

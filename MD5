@@ -1,6 +1,6 @@
 cb49c8696441532f10718914aa6f9c47 *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-6514d8bfcf033c76b45940179bc4eaa7 *DESCRIPTION
+192aca40305345c2b934746c1a3c4c38 *DESCRIPTION
 c0c893f9d5ca79bcf51bec6f6ed1a22d *NAMESPACE
 031eddddcfbf9c2a9bc74c83342699e5 *R/AllClasses-etc.R
 65ac0056c1b5e56444132b029badd500 *R/Stirling-n-etc.R
@@ -60,7 +60,7 @@ cca3fe0ad8e8e547c04660f30c6610b5 *src/Rgmp.h
 1a49e287fb30d67c40c1d3027ba7fd34 *src/biginteger.h
 1daded1f7f448d70f35a06c9e09363fa *src/bigintegerR.cc
 260726a3a45e8a50eebe59db1d37efed *src/bigintegerR.h
-e2f9c09dcca4113fda2e083f516ae509 *src/bigmod.cc
+6567b88f4244b748649650ca8a943de1 *src/bigmod.cc
 f2d008af0cee40156041b5b553b0a9d9 *src/bigmod.h
 a5a9d32e6b952c98f94fae50e07ccfdc *src/bigrational.cc
 8782f3ecebbd0a5f0ddfd09d6e561081 *src/bigrational.h
@@ -77,9 +77,9 @@ c2c8803dbb6bb4aa409704e91b4ce6b5 *src/factor.h
 8dacd53e9a8c5be245b8c74b2bd2efd3 *src/factorize.cc
 fa4b1298454f3eab5efccd4dc82d2c78 *src/factorize.h
 8f93458848582beaa61cb672ada2892a *src/init.cc
-b6f64afea1788acabe91f15412956c7b *src/matrix.cc
+70a7a2b6ef9e38fb2e9892aafc7deda7 *src/matrix.cc
 476f0db7a86aeba7d5cc05cda88345c1 *src/matrix.h
-4432d79c9972dfdcbccb0d433f1d45d0 *src/matrixq.cc
+773ae70bca57f92782f7928b61e73519 *src/matrixq.cc
 e4455d2faa62646eb8bdbb6ee92ee23c *src/matrixq.h
 7ddf216fc7d6c1796f6eac06289eb8de *src/primes.h
 c592feb03957cfc5ab2d481d892a3fea *src/solve.cc
