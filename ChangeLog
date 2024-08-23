@@ -1,7 +1,11 @@
-2022-02-23 Antoine Lucas
+2024-08-24 Antoine Lucas
 
-	rework on operator[]. Fix bugs.
-	
+	Fix issue "compliation with R_NO_REMAP flag" i.e. use of Rf_error and Rf_warning instead of error / warning.
+
+2024-01-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/biginteger.R (all.equal.bigz): fixed, notably for 'NA'.
+
 2022-02-23 Antoine Lucas
 
 	rework on operator[]. Fix bugs.

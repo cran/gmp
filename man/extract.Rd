@@ -1,7 +1,7 @@
 \name{extract}
-\title{Extract or Replace Parts of an Object}
-
+\title{Extract or Replace Parts of a 'bigz' or 'bigq' Object}
 \alias{[.bigz}
+%F\alias{[<-}% otherwise warning " Objects in \usage w/o \alias : '[<-' "
 \alias{[<-.bigz}
 \alias{[[.bigz}
 \alias{[[<-.bigz}
@@ -13,23 +13,20 @@
 \alias{[<-.bigq}
 \alias{[[.bigq}
 \alias{[[<-.bigq}
-
+%-
 \alias{c.bigq}
 \alias{rep.bigq}
 \alias{length.bigq}
 \alias{length<-.bigq}
-
 \description{
   Operators acting on vectors, arrays and lists to extract or replace subsets.
 }
 \usage{
 \method{[}{bigz}(x, i=NULL, j=NULL, drop = TRUE)
 \method{[}{bigq}(x, i=NULL, j=NULL, drop = TRUE)
-
-##_______ In the following, only the bigq method is mentioned: ______
-%%FIXME: R-Rd bug in "rendering" this  ( '[' is ok )
-%%FIXME \method{[<-}{bigq}(x, i=NULL, j=NULL, value)    ==> "the same", manually :
-%% x[i, j] <- value   | But this gives  ... WARNING .. Objects in \usage w/o \alias
+%F \method{[<-}{bigq}(x, i=NULL, j=NULL, value) %    ==> "the same", manually -- R check-bug:
+%F x[i=NULL, j=NULL] <- value % still WARNING .. usage in doc.. .. but not in code: `[<-`
+##___ In the following, only the bigq method is mentioned (but 'bigz' is "the same"): ___
 \method{c}{bigq}(\dots, recursive = FALSE)
 \method{rep}{bigq}(x, times=1, length.out=NA, each=1, \dots)
 }
@@ -37,18 +34,13 @@
   \item{x}{\R object of class \code{"bigz"} or \code{"bigq"}, respectively.}
   \item{\dots}{further arguments, notably for \code{c()}.}
   \item{i,j}{indices, see standard \R subsetting and subassignment.}
-  \item{drop}{logical, unused here.}
-%%FIXME \item{value}{\R object, typically of same \code{\link{class}} as
-%%FIXME   \code{x}, or also \code{\link{numeric}}.}
+  \item{drop}{logical, unused here, i.e., matrix subsetting \bold{always} returns a matrix, here!}
+%F \item{value}{\R object, typically of same \code{\link{class}} as
+%F   \code{x}, or also \code{\link{numeric}}.}
   \item{times, length.out, each}{integer; typically only \emph{one} is
     specified; for more see \code{\link{rep}} (standard \R, package \pkg{base}).
   }
-  \item{recursive}{unused here}
-}
-
-\note{
-  Unlike standard matrices, \code{x[i]} and \code{x[i,]} do the same.
-  %% MM: hmm, just because of lazyness ??
+  \item{recursive}{from \code{c()}'s default method; disregarded here}
 }
 
 \examples{
@@ -63,11 +55,11 @@
   ## repeate a 5 times
   rep(a,5)
 
-  ## with matrix
+  ## with matrix: 3 x 2
   m <- matrix.bigz(1:6,3)
 
-  ## these do the same:
-  m[1,]
+  m[1,] # the first row
+  m[1,, drop=TRUE] # the same: drop does *not* drop
   m[1]
   m[-c(2,3),]
   m[-c(2,3)]
@@ -83,4 +75,3 @@
   m[2,-1] <- 11
 }
 \keyword{arith}
-

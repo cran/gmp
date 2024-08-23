@@ -73,6 +73,9 @@ is.matrixZQ(x)
 \S3method{\%*\%}{bigq}(x, y)
 \S3method{crossprod}{bigq}(x, y=NULL,...)
 \S3method{tcrossprod}{bigz}(x, y=NULL,...)
+
+\S3method{cbind}{bigz}(..., deparse.level=1)
+\S3method{rbind}{bigq}(..., deparse.level=1)
 ## ..... etc
 }
 \arguments{
@@ -83,9 +86,11 @@ is.matrixZQ(x)
     columns, otherwise the matrix is filled by rows.}
   \item{dimnames}{not implemented for \code{"bigz"} or \code{"bigq"} matrices.}
   \item{mod}{optional modulus (when \code{data} is \code{"bigz"}).}
-  \item{...}{Not used}
 
   \item{x,y}{numeric, \code{bigz}, or \code{bigq} matrices or vectors.}
+
+  \item{..., deparse.level}{arguments from the generic; \emph{not} made use
+  of, i.e., disregarded here.}
 }
 \details{
   The extract function (\code{"["}) is the same use for vector or
@@ -120,8 +125,14 @@ is.matrixZQ(x)
 
   \code{dim()}, \code{ncol()}, etc: integer or \code{NULL}, as for
   simple matrices.
+
+  \code{cbind(x,y,...)} and \code{rbind(x,y,...)} now (2024-01, since
+  \pkg{gmp} version 0.9-5), do drop \code{deparse.level=.} instead of
+  wrongly creating an extra column or row \emph{and} the \code{"bigz"}
+  method takes all arguments into account and calls the \code{"bigq"}
+  method in case of arguments inheriting from \code{"\link{bigq}"}.
 }
-\author{Antoine Lucas}
+\author{Antoine Lucas and Martin Maechler}
 
 \seealso{Solving a linear system: \code{\link{solve.bigz}}.
   \code{\link[base]{matrix}}

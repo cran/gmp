@@ -34,10 +34,10 @@ as.vector.bigq <- function(x, mode="any") {
 
 t.bigq <- function(x) .Call(bigq_transposeR, x)
 
-cbind.bigq <- function(..., recursive = FALSE)
+cbind.bigq <- function(..., deparse.level = 1)
     .Call(bigrational_cbind, list(...))
 
-rbind.bigq <- function(..., recursive = FALSE)
+rbind.bigq <- function(..., deparse.level = 1)
     .Call(bigrational_rbind, list(...))
 
 apply.bigq <- function(X, MARGIN, FUN, ...)

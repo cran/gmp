@@ -13,7 +13,8 @@ SEXP matrix_get_at_q(SEXP A,SEXP INDI, SEXP INDJ)
     return(bigrationalR::create_SEXP(extract_gmp_R::get_at( mat,INDI,INDJ)));
   }
   catch(std::invalid_argument & e){
-    error("%s",e.what());
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
   }
 }
 
@@ -63,8 +64,9 @@ SEXP matrix_get_at_z(SEXP A,SEXP INDI, SEXP INDJ)
       return(bigintegerR::create_SEXP(mat2) );
     }
   catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 
@@ -81,8 +83,9 @@ SEXP matrix_set_at_z(SEXP A, SEXP VAL, SEXP INDI, SEXP INDJ)
     return(bigintegerR::create_SEXP(mat));
   }
   catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 
 
 
@@ -100,8 +103,9 @@ SEXP matrix_set_at_q(SEXP A,SEXP VAL ,SEXP INDI, SEXP INDJ)
     return(bigrationalR::create_SEXP(mat));
   }
   catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 
 
 

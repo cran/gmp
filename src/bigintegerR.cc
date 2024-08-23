@@ -274,7 +274,8 @@ namespace bigintegerR
 	bigvec vb = bigintegerR::create_bignum(b);
 	return biginteger_binary_operation(va, vb, f);
       } catch(std::invalid_argument & e){
-      error("%s",e.what());
+      Rf_error("%s",e.what());
+      return Rf_mkString(0);
     }
   }
 
@@ -320,7 +321,8 @@ namespace bigintegerR
       UNPROTECT(1);
       return ans;
     }catch(std::invalid_argument & e){
-      error("%s",e.what());
+      Rf_error("%s",e.what());
+      return Rf_mkString(0);
     }
     
   }
@@ -337,7 +339,7 @@ namespace bigintegerR
   {return mpz_cmp(lhs.getValueTemp(), rhs.getValueTemp()) == 0;}
   bool neq(const biginteger& lhs, const biginteger& rhs)
   {return mpz_cmp(lhs.getValueTemp(), rhs.getValueTemp()) != 0;}
-
+  
 }
 
 /* End of namespace bigintegerR*/
@@ -346,6 +348,9 @@ namespace bigintegerR
 SEXP R_gmp_get_version() {
   return Rf_mkString(gmp_version);
 }
+
+
+
 
 SEXP biginteger_add (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator+);}
 SEXP biginteger_sub (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,operator-);}
@@ -407,7 +412,8 @@ SEXP biginteger_div (SEXP a, SEXP b) { // called from  "/.bigz" == div.bigz
 
     return bigintegerR::biginteger_binary_operation(A,B, div_via_inv);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
   }
 }
 
@@ -439,8 +445,9 @@ SEXP biginteger_pow (SEXP a, SEXP b) {
     // else, either, a has a modulus, or (no modulus *and*  exp >= 0) :
     return bigintegerR::biginteger_binary_operation(a,b, pow); // -> pow() in ./bigmod.cc
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 SEXP biginteger_inv (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,inv);}
 SEXP biginteger_gcd (SEXP a, SEXP b) {return bigintegerR::biginteger_binary_operation(a,b,gcd);}
@@ -484,8 +491,9 @@ SEXP biginteger_as_character(SEXP a, SEXP b)
     UNPROTECT(1);
     return ans;
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 SEXP biginteger_as_numeric(SEXP a)
@@ -499,8 +507,9 @@ SEXP biginteger_as_numeric(SEXP a)
     UNPROTECT(1);
     return ans;
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 SEXP biginteger_as_integer(SEXP a)
@@ -523,7 +532,8 @@ SEXP biginteger_as_integer(SEXP a)
     UNPROTECT(1);
     return ans;
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
   }
 }
 
@@ -534,8 +544,9 @@ SEXP biginteger_get_at(SEXP a, SEXP i)
     bigvec va = bigintegerR::create_bignum(a);
     return(bigintegerR::create_SEXP(bigintegerR::biginteger_get_at_C(va,i)));
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 
 }
 
@@ -588,8 +599,9 @@ SEXP biginteger_set_at(SEXP src, SEXP idx, SEXP value)
   
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 
 }
 
@@ -598,8 +610,9 @@ SEXP biginteger_length(SEXP a)
   try{
     return Rf_ScalarInteger(bigintegerR::create_bignum(a).size());
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 SEXP biginteger_setlength(SEXP vec, SEXP value)
@@ -610,34 +623,35 @@ SEXP biginteger_setlength(SEXP vec, SEXP value)
     case INTSXP:
     case LGLSXP:
       if (LENGTH(value) != 1)
-	error("%s",_("invalid second argument"));
+	Rf_error("%s",_("invalid second argument"));
       len =  Rf_asInteger(value);
       if (len < 0)
-	error("%s",_("vector size cannot be negative"));
+	Rf_error("%s",_("vector size cannot be negative"));
       else if (len == NA_INTEGER)
-	error("%s",_("vector size cannot be NA"));
+	Rf_error("%s",_("vector size cannot be NA"));
       break;
     case REALSXP:
       if (LENGTH(value) != 1)
-	error("%s",_("invalid second argument"));
+	Rf_error("%s",_("invalid second argument"));
       len = (int)*REAL(value);
       if (len < 0)
-	error("%s",_("vector size cannot be negative"));
+	Rf_error("%s",_("vector size cannot be negative"));
       else if (! (R_FINITE (len ) ))
-	error("%s",_("vector size cannot be NA, NaN of Inf"));
+	Rf_error("%s",_("vector size cannot be NA, NaN of Inf"));
       break;
     case STRSXP:
       // dunno why R spits out this strange error on "length(foo) <- -1"
       // but I always follow the holy standard ;-)
-      error("%s",_("negative length vectors are not allowed"));
+      Rf_error("%s",_("negative length vectors are not allowed"));
     default:
-      error("%s",_("invalid second argument"));
+      Rf_error("%s",_("invalid second argument"));
     }
     bigvec v =bigintegerR::create_bignum(vec);
     v.resize(len);
     return bigintegerR::create_SEXP(v);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
   }
 }
 
@@ -651,8 +665,9 @@ SEXP biginteger_is_na(SEXP a)
     UNPROTECT(1);
     return ans;
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 
@@ -667,14 +682,15 @@ SEXP biginteger_sgn(SEXP a)
     UNPROTECT(1);
     return ans;
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
   }
 }
 
 SEXP biginteger_c(SEXP args)
 {
   try{
-    // if(TYPEOF(args) != VECSXP) error("%s",_("should be a list"));
+    // if(TYPEOF(args) != VECSXP) Rf_error("%s","%s",_("should be a list"));
     bigvec result;
     for(int i=0; i < LENGTH(args); i++) {
       bigvec v = bigintegerR::create_bignum(VECTOR_ELT(args,i));
@@ -685,7 +701,8 @@ SEXP biginteger_c(SEXP args)
     }
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
   }
 }
 
@@ -704,8 +721,9 @@ SEXP biginteger_rep(SEXP x, SEXP times)
 
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 
@@ -726,7 +744,8 @@ SEXP biginteger_is_prime(SEXP a, SEXP reps)
     UNPROTECT(1);
     return ans;
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
   }
 }
 
@@ -748,8 +767,9 @@ SEXP biginteger_nextprime(SEXP a)
       }
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 SEXP biginteger_abs(SEXP a)
@@ -771,8 +791,9 @@ SEXP biginteger_abs(SEXP a)
 
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 
@@ -813,8 +834,9 @@ SEXP biginteger_gcdex(SEXP a, SEXP b)
       }
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 /** @brief Random number generation
@@ -872,8 +894,9 @@ SEXP biginteger_rand_u (SEXP nb, SEXP length, SEXP newseed, SEXP ok)
       }
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 
@@ -893,8 +916,9 @@ SEXP biginteger_sizeinbase(SEXP x, SEXP base)
     UNPROTECT(1);
     return ans;
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 
@@ -915,8 +939,9 @@ SEXP bigI_factorial(SEXP n)
     }
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+}
 } // bigI_factorial
 
 /** @brief bigI_choose(n, k) returns binomial coefficient (n \choose k)
@@ -949,8 +974,9 @@ SEXP bigI_choose(SEXP n, SEXP k)
     }
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 /** @brief fibnum return nth Fibonacci number
@@ -975,12 +1001,13 @@ SEXP bigI_fibnum(SEXP n)
 	//      result[0].value.setValue(val);
       }
     // else
-    //   error("%s",_("argument must not be an empty list"));
+    //   Rf_error("%s","%s",_("argument must not be an empty list"));
 
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
+    Rf_error("%s",e.what());
   }
+  return Rf_mkString(0);
 
 }
 
@@ -1014,7 +1041,9 @@ SEXP bigI_fibnum2(SEXP n)
 
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+
   }
 }
 
@@ -1040,12 +1069,13 @@ SEXP bigI_lucnum(SEXP n)
 	result.push_back(bigmod(val));
       }
     // else
-    //   error("%s",_("argument must not be an empty list"));
+    //   Rf_error("%s","%s",_("argument must not be an empty list"));
 
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 /** @brief lucnum2 return nth and n-1th lucas number
@@ -1077,8 +1107,9 @@ SEXP bigI_lucnum2(SEXP n)
 
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 
@@ -1112,8 +1143,9 @@ SEXP biginteger_max(SEXP a, SEXP narm)
 
     return(bigintegerR::create_SEXP(result));
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 
@@ -1146,8 +1178,9 @@ SEXP biginteger_min(SEXP a, SEXP narm)
 
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 
@@ -1186,8 +1219,9 @@ SEXP biginteger_cumsum(SEXP a)
 
     return(bigintegerR::create_SEXP(result));
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 
@@ -1227,8 +1261,9 @@ SEXP biginteger_sum(SEXP a)
 
     return(bigintegerR::create_SEXP(result));
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 }
 
 
@@ -1266,7 +1301,8 @@ SEXP biginteger_prod(SEXP a)
 
     return(bigintegerR::create_SEXP(result));
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
   }
 }
 
@@ -1299,8 +1335,9 @@ SEXP biginteger_powm(SEXP x, SEXP y, SEXP n)
 
     return bigintegerR::create_SEXP(result);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+    return Rf_mkString(0);
+ }
 } // ..._powm()
 
 
@@ -1318,18 +1355,24 @@ SEXP bigI_frexp(SEXP x)
   // The return value is in the range 0.5 ≤ |d| < 1 and the exponent is stored to *exp . d ∗ 2exp is
   // the (truncated) op value. If op is zero, the return is 0.0 and 0 is stored to *exp .
   // This is similar to the standard C frexp function.
-
+  
+  bigvec vx;
   try{
-    const char *nms[] = {"d", "exp", ""};
-    SEXP ans, d_R, exp_R;
-    bigvec vx = bigintegerR::create_bignum(x);
-    int n = vx.size();
+    vx = bigintegerR::create_bignum(x);
+  }catch(std::invalid_argument & e){
+    Rf_error("%s",e.what());
+  }
+  
+  const char *nms[] = {"d", "exp", ""};
+  SEXP ans, d_R, exp_R;
+  int n = vx.size();
 
-    PROTECT(ans = Rf_mkNamed(VECSXP, nms)); // =~= R  list(d = . , exp= .)
-    d_R   = Rf_allocVector(REALSXP, n); SET_VECTOR_ELT(ans, 0, d_R);
-    exp_R = Rf_allocVector(INTSXP,  n); SET_VECTOR_ELT(ans, 1, exp_R);
-    double *d_ = REAL(d_R);
-    int  *exp_ = INTEGER(exp_R);
+  PROTECT(ans = Rf_mkNamed(VECSXP, nms)); // =~= R  list(d = . , exp= .)
+  d_R   = Rf_allocVector(REALSXP, n); SET_VECTOR_ELT(ans, 0, d_R);
+  exp_R = Rf_allocVector(INTSXP,  n); SET_VECTOR_ELT(ans, 1, exp_R);
+  double *d_ = REAL(d_R);
+  int  *exp_ = INTEGER(exp_R);
+  try{
     for (int i = 0 ; i < n; i++) {
       signed long int ex;
       d_[i] = mpz_get_d_2exp(&ex, vx[i].getValueTemp());
@@ -1341,50 +1384,56 @@ SEXP bigI_frexp(SEXP x)
 	throw invalid_argument(_("exponent too large to fit into an integer"));
       }
     }
-    UNPROTECT(1);
-    return ans;
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
-  }
+    Rf_error("%s",e.what());
+ }
+  UNPROTECT(1);
+  return ans;
+  
 } // bigI_frexp()
 
 
 SEXP biginteger_log2(SEXP x)
 {
+  bigvec v;
   try{
-    bigvec v = bigintegerR::create_bignum(x);
-    SEXP ans = PROTECT(Rf_allocVector(REALSXP,v.size()));
-    double *r = REAL(ans);
-
-    for (unsigned int i = 0; i < v.size(); ++i) {
-      signed long int ex;
-      double di = mpz_get_d_2exp(&ex, v[i].getValueTemp());
-      // xi = di * 2 ^ ex  ==> log2(xi) = log2(di) + ex :
-      r[i] = log(di) / M_LN2 + (double)ex;
-    }
-    UNPROTECT(1);
-    return ans;
-  }catch(std::invalid_argument & e){
-    error("%s",e.what());
+    v = bigintegerR::create_bignum(x);
   }
+  catch(std::invalid_argument & e){
+    Rf_error("%s",e.what());
+  }
+  SEXP ans = PROTECT(Rf_allocVector(REALSXP,v.size()));
+  double *r = REAL(ans);
+  
+  for (unsigned int i = 0; i < v.size(); ++i) {
+    signed long int ex;
+    double di = mpz_get_d_2exp(&ex, v[i].getValueTemp());
+    // xi = di * 2 ^ ex  ==> log2(xi) = log2(di) + ex :
+    r[i] = log(di) / M_LN2 + (double)ex;
+  }
+  UNPROTECT(1);
+  return ans;
+  
 }
 
 SEXP biginteger_log(SEXP x)
 {
+  bigvec v ;
   try{
-    bigvec v = bigintegerR::create_bignum(x);
-    SEXP ans = PROTECT(Rf_allocVector(REALSXP,v.size()));
-    double *r = REAL(ans);
-
-    for (unsigned int i = 0; i < v.size(); ++i) {
-      signed long int ex;
-      double di = mpz_get_d_2exp(&ex, v[i].getValueTemp());
-      // xi = di * 2 ^ ex  ==> log(xi) = log(di) + ex*log(2) :
-      r[i] = log(di) + M_LN2*(double)ex;
-    }
-    UNPROTECT(1);
-    return ans;
+    v = bigintegerR::create_bignum(x);
   }catch(std::invalid_argument & e){
-    error("%s",e.what());
+    Rf_error("%s",e.what());
   }
+  SEXP ans = PROTECT(Rf_allocVector(REALSXP,v.size()));
+  double *r = REAL(ans);
+  
+  for (unsigned int i = 0; i < v.size(); ++i) {
+    signed long int ex;
+    double di = mpz_get_d_2exp(&ex, v[i].getValueTemp());
+    // xi = di * 2 ^ ex  ==> log(xi) = log(di) + ex*log(2) :
+    r[i] = log(di) + M_LN2*(double)ex;
+  }
+  UNPROTECT(1);
+  return ans;
+ 
 }

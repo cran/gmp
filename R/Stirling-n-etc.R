@@ -240,7 +240,7 @@ B1 <- function(n) { # stopifnot( length(n) == 1 )
             ## recurse:
             if(lB+1L < n2)
                 for(k in (lB+1L):(n2-1L)) B[k] <- B1(2*k)
-            k0 <- seq(length=n2-1L) # (1, 2, .., n2-1)
+            k0 <- seq_len(n2-1L) # (1, 2, .., n2-1)
             B. <- half - (1 + sum( chooseZ(n+1L, k0+k0) * B[k0])) / (n+1L)
             B[n2] <- B.
             .Bernl..env$B <- B

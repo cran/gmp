@@ -1,18 +1,6 @@
 library(gmp)
 
-## From ~/R/Pkgs/Matrix/inst/test-tools-1.R -- only for R <= 3.0.1 --
-##' @title Ensure evaluating 'expr' signals an error
-##' @param expr
-##' @return the caught error, invisibly
-##' @author Martin Maechler
-assertError <- function(expr, verbose=getOption("verbose")) {
-    d.expr <- deparse(substitute(expr))
-    t.res <- tryCatch(expr, error = function(e) e)
-    if(!inherits(t.res, "error"))
-	stop(d.expr, "\n\t did not give an error", call. = FALSE)
-    if(verbose) cat("Asserted Error:", conditionMessage(t.res),"\n")
-    invisible(t.res)
-}
+assertError <- tools::assertError
 
 Z1 <- as.bigz(1) ; Z1[FALSE]
 Q1 <- as.bigq(1) ; Q1[FALSE]
@@ -226,3 +214,26 @@ rev(B) # is sorted
 is.unsorted(rev(B))# TRUE but should be FALSE
 if(FALSE) ## not yet
     identical(sort(B), rev(B))
+
+## all.equal()
+stopifnot(exprs = {
+    is.character(all.equal(as.bigz(7), rep(7, 3)))
+})
+
+##------------------ cbind(), rbind() -------------------------------
+
+a <- as.bigz(123); a[2] <- a[1] ; a[4] <- -4
+stopifnot(all.equal(a, c(123, 123, NA, -4))) # bigz <--> numeric
+
+(caa <- cbind(a,a)) # ok
+stopifnot(exprs = {
+    identical(caa,    cbind(a,a, deparse.level=1)) # did prepend a column of 1
+    identical(t(caa), rbind(a,a, deparse.level=0)) # did prepend a  row   of 0
+    identical(ca2 <- cbind(a/2, a, deparse.level=0),
+              cbind(a, a/2)[, 2:1]) # wrongly remained bigz, just using numerator...
+    identical(ra2 <- rbind(a/2, a, deparse.level=0),
+              rbind(a, a/2)[2:1, ]) # wrongly remained bigz ...
+    identical(dim(ca2), c(4L, 2L))
+    identical(dim(ra2), c(2L, 4L))
+})
+

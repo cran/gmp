@@ -103,11 +103,24 @@ ncol.bigz <- .ncolZQ
 ncol.bigq <- .ncolZQ
 
 
-cbind.bigz <- function(..., recursive = FALSE)
-    .Call(biginteger_cbind, list(...))
+cbind.bigz <- function(..., deparse.level = 1)
+{
+    argL <- list(...)
+    if(any(vapply(argL, inherits, NA, what="bigq")))
+        .Call(bigrational_cbind, argL)
+    else
+        .Call(biginteger_cbind, argL)
+}
 
-rbind.bigz <- function(..., recursive = FALSE)
-    .Call(biginteger_rbind, list(...))
+rbind.bigz <- function(..., deparse.level = 1)
+{
+    argL <- list(...)
+    if(any(vapply(argL, inherits, NA, what="bigq")))
+        .Call(bigrational_rbind, argL)
+    else
+        .Call(biginteger_rbind, argL)
+}
+
 
 apply <- function(X, MARGIN, FUN, ...)
     UseMethod("apply")

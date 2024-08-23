@@ -419,8 +419,27 @@ duplicated.bigz <- function(x, incomparables = FALSE, ...) {
 unique.bigz <- function(x, incomparables = FALSE, ...)
     x[!duplicated(x, incomparables, ...)]
 
-all.equal.bigz <- function(target, current, ...)
-    if(all(target == current)) TRUE else "'target'(bigz) and 'current' differ"
+
+all.equal.bigz <- function(target, current, ...) {
+    if(is.bigq(target))
+        return(all.equal.bigq(target, current, ...))
+    ## Using  tolerance = 0  --- implicitly below
+    if(length(target) != length(current))
+        return("lengths differ")
+    if(!identical(dim(target), dim(current)))
+        return("dimensions differ")
+    target <- as.vector(target)
+    current <- as.vector(current)
+    ina <- is.na(target)
+    if(any(ina != is.na(current)))
+	paste("'is.NA' value mismatch:", sum(is.na(current)),
+                     "in current", sum(ina), "in target")
+    else if(all(ina | target == current)) # equal NAs _or_ numbers
+        TRUE
+    else
+        "'target'(bigz) and 'current' differ"
+}
+
 
 # Isprime, return:
 #   0 if not prime
@@ -490,7 +509,7 @@ solve.bigz <- function(a, b,...)
     .Call(matrix_get_at_z, x, i,j)
   } else { ## non-matrix
     if(has.j) stop("invalid vector subsetting")
-  
+
     r <- .Call(biginteger_get_at, x, i)
     attr(r,"nrow") <- NULL
     r
