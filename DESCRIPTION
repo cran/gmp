@@ -1,5 +1,5 @@
 Package: gmp
-Version: 0.7-5
+Version: 0.7-5.1
 Date: 2024-08-23
 Title: Multiple Precision Arithmetic
 Authors@R: c(person("Antoine","Lucas",role = c("aut","cre"),
@@ -21,11 +21,12 @@ BuildResaveData: no
 LazyDataNote: not available, as we use data/*.R *and* our classes
 NeedsCompilation: yes
 URL: https://forgemia.inra.fr/sylvain.jasson/gmp
-Packaged: 2024-08-23 17:22:31 UTC; antoine
-Author: Antoine Lucas [aut, cre] (<https://orcid.org/0000-0002-8059-9767>),
+Packaged: 2026-02-09 09:14:53 UTC; ripley
+Author: Antoine Lucas [aut, cre] (ORCID:
+    <https://orcid.org/0000-0002-8059-9767>),
   Immanuel Scholz [aut],
   Rainer Boehme [ctb],
   Sylvain Jasson [ctb],
   Martin Maechler [ctb]
 Repository: CRAN
-Date/Publication: 2024-08-23 18:40:02 UTC
+Date/Publication: 2026-02-09 09:19:08 UTC

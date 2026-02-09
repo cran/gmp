@@ -17,6 +17,9 @@
 #define AS_INTEGER(x) Rf_coerceVector(x,INTSXP)
 #endif
 
+// avoid conflicts in bigrational.cc
+#undef length
+
 #define class_P(_x_) CHAR(Rf_asChar(Rf_getAttrib(_x_, R_ClassSymbol)))
 
 #ifdef ENABLE_NLS

@@ -1,6 +1,6 @@
 39fd9c0876fc9bc122c97bb8cfc9210c *ChangeLog
 ebb3e86d6b9fae7939450340f88b351e *Changes
-1497247236d5e385b87a972051a6b791 *DESCRIPTION
+84b50ccab8bdd6014e9c175c55ab3426 *DESCRIPTION
 c0c893f9d5ca79bcf51bec6f6ed1a22d *NAMESPACE
 031eddddcfbf9c2a9bc74c83342699e5 *R/AllClasses-etc.R
 9aa71dab886de7604ee1c33ce14ec35b *R/Stirling-n-etc.R
@@ -53,7 +53,7 @@ bf889df64a7c88dace8e491e9eb67d35 *man/sizeinbase.Rd
 d8cb9c64227e9cabd609dd235eb3dd86 *man/utils.Rd
 6efbea6ed0404655104f141b49a9e6ab *src/Makevars.in
 055d49e4a190e10444c376787b2b54ca *src/Makevars.win
-cca3fe0ad8e8e547c04660f30c6610b5 *src/Rgmp.h
+ffecf178a218ffc25f9f056cf605d286 *src/Rgmp.h
 7254469978a02a5777868d5ec9d115d2 *src/apply.cc
 2f25f95aedc17f66633efad43411089a *src/apply.h
 27807d8c7d4d8fd10e3ed2503369c18f *src/biginteger.cc
